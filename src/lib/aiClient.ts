@@ -25,9 +25,9 @@ export interface AIMessage {
 
 const DEFAULT_CFG: AIModelConfig = {
   default_model: 'doubao',
-  doubao_api_key: '',
+  doubao_api_key: 'ark-d751d0e3-08af-4d58-80b9-1e51b6830dd7-0fd5d',
   doubao_endpoint: 'https://ark.cn-beijing.volces.com/api/v3/chat/completions',
-  doubao_model: '',
+  doubao_model: 'ep-20250529145638-8v7r6',
   claude_api_key: '',
   claude_model: 'claude-3-5-sonnet-20241022',
   claude_endpoint: 'https://api.anthropic.com/v1/messages',
@@ -36,7 +36,7 @@ const DEFAULT_CFG: AIModelConfig = {
   openai_endpoint: 'https://api.openai.com/v1/chat/completions',
   max_tokens: 800,
   temperature: 0.8,
-  system_prompt_prefix: '',
+  system_prompt_prefix: '你是一个专业的语言学习助手，请用简洁清晰的方式回答用户的问题。',
 };
 
 let configCache: AIModelConfig | null = null;

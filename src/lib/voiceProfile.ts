@@ -46,13 +46,35 @@ export function saveVoicePreset(id: number): void {
   localStorage.setItem(STORAGE_KEY, String(id));
 }
 
+let voicesLoaded = false;
+let voicesLoadCallback: (() => void) | null = null;
+
+window.speechSynthesis?.addEventListener('voiceschanged', () => {
+  voicesLoaded = true;
+  if (voicesLoadCallback) {
+    voicesLoadCallback();
+    voicesLoadCallback = null;
+  }
+});
+
+function ensureVoicesLoaded(): Promise<void> {
+  if (voicesLoaded) return Promise.resolve();
+  return new Promise((resolve) => {
+    voicesLoadCallback = resolve;
+    window.speechSynthesis?.getVoices();
+    setTimeout(resolve, 500);
+  });
+}
+
 /** Speak text using the user's active voice preset and the target language. */
-export function speakWithPreset(
+export async function speakWithPreset(
   text: string,
   langCode: string,
   preset?: VoicePreset,
-): void {
+): Promise<void> {
   if (!window.speechSynthesis) return;
+  
+  await ensureVoicesLoaded();
   window.speechSynthesis.cancel();
 
   const p = preset ?? loadVoicePreset();
@@ -65,6 +87,7 @@ export function speakWithPreset(
   utt.lang = LANG_SR[langCode] ?? 'zh-CN';
   utt.pitch = p.pitch;
   utt.rate = p.rate;
+  utt.volume = 1.0;
 
   const voices = window.speechSynthesis.getVoices();
   const langPrefix = (LANG_SR[langCode] ?? 'zh').split('-')[0];
@@ -74,5 +97,9 @@ export function speakWithPreset(
     voices.find((v) => v.lang.startsWith(langPrefix));
   if (match) utt.voice = match;
 
-  window.speechSynthesis.speak(utt);
+  try {
+    window.speechSynthesis.speak(utt);
+  } catch (err) {
+    console.warn('Speech synthesis error:', err);
+  }
 }
