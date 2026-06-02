@@ -1,0 +1,67 @@
+<view class="container">
+  <view class="header">
+    <view class="back-btn" bindtap="goBack">
+      <text class="back-icon">←</text>
+    </view>
+    <text class="title">用户服务协议</text>
+    <view class="placeholder"></view>
+  </view>
+
+  <scroll-view scroll-y class="content">
+    <view class="section">
+      <text class="section-title">一、协议概述</text>
+      <text class="section-content">
+        欢迎使用「言道」服务！本协议是您与「言道」之间的服务协议，您使用本服务即表示同意遵守本协议。
+      </text>
+    </view>
+
+    <view class="section">
+      <text class="section-title">二、用户权利与义务</text>
+      <text class="section-content">
+        2.1 您有权使用本服务提供的学习功能，包括但不限于游戏学习、AI陪练、语伴匹配等。
+      </text>
+      <text class="section-content">
+        2.2 您应妥善保管账号信息，不得转借、出租或出售账号。
+      </text>
+      <text class="section-content">
+        2.3 您应遵守法律法规和社区公约，不得发布违法违规内容。
+      </text>
+    </view>
+
+    <view class="section">
+      <text class="section-title">三、AI内容生成与责任条款</text>
+      <text class="section-content">
+        3.1 本服务提供的AI生成内容仅供学习参考，不构成专业建议。
+      </text>
+      <text class="section-content">
+        3.2 AI生成内容可能存在错误，您应自行判断其准确性。
+      </text>
+      <text class="section-content">
+        3.3 对于因使用AI生成内容导致的任何损失，我们不承担责任。
+      </text>
+    </view>
+
+    <view class="section">
+      <text class="section-title">四、创作者与UGC内容条款</text>
+      <text class="section-content">
+        4.1 创作者应保证其发布的内容原创、合法，不得侵犯他人知识产权。
+      </text>
+      <text class="section-content">
+        4.2 创作者授权我们在本服务范围内使用其内容。
+      </text>
+      <text class="section-content">
+        4.3 我们有权对UGC内容进行审核和管理，违规内容将被删除。
+      </text>
+    </view>
+
+    <view class="section">
+      <text class="section-title">五、服务变更与终止</text>
+      <text class="section-content">
+        5.1 我们有权根据业务调整变更或终止服务。
+      </text>
+      <text class="section-content">
+        5.2 用户违反协议时，我们有权暂停或终止其账号。
+      </text>
+    </view>
+  </scroll-view>
+</view>

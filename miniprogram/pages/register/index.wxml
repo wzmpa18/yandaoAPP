@@ -1,0 +1,96 @@
+<view class="container">
+  <view class="header">
+    <view class="back-btn" bindtap="goBack">
+      <text class="back-icon">←</text>
+    </view>
+    <text class="title">用户注册</text>
+    <view class="placeholder"></view>
+  </view>
+
+  <view class="form-container">
+    <view class="form-item">
+      <text class="form-label">手机号</text>
+      <input 
+        class="form-input" 
+        placeholder="请输入手机号" 
+        value="{{phone}}"
+        bindinput="onPhoneInput"
+        type="number"
+      />
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">密码</text>
+      <input 
+        class="form-input" 
+        placeholder="请输入密码" 
+        value="{{password}}"
+        bindinput="onPasswordInput"
+        type="password"
+      />
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">确认密码</text>
+      <input 
+        class="form-input" 
+        placeholder="请再次输入密码" 
+        value="{{confirmPassword}}"
+        bindinput="onConfirmPasswordInput"
+        type="password"
+      />
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">邀请码（选填）</text>
+      <input 
+        class="form-input" 
+        placeholder="输入邀请码可获得奖励" 
+        value="{{inviteCode}}"
+        bindinput="onInviteCodeInput"
+      />
+    </view>
+
+    <view class="agreement-section">
+      <view class="agree-item" bindtap="toggleAgreeAll">
+        <view class="checkbox {{agreeAll ? 'checked' : ''}}">
+          <text>{{agreeAll ? '✓' : ''}}</text>
+        </view>
+        <text class="agree-text">我已阅读并同意</text>
+      </view>
+
+      <view class="agree-item" bindtap="toggleAgreePrivacy">
+        <view class="checkbox {{agreePrivacy ? 'checked' : ''}}">
+          <text>{{agreePrivacy ? '✓' : ''}}</text>
+        </view>
+        <text class="agree-text">
+          《<text class="link" bindtap="navigateToAgreement" data-type="privacy">隐私政策</text>》
+          <text class="grey">（含儿童隐私保护条款）</text>
+        </text>
+      </view>
+
+      <view class="agree-item" bindtap="toggleAgreeService">
+        <view class="checkbox {{agreeService ? 'checked' : ''}}">
+          <text>{{agreeService ? '✓' : ''}}</text>
+        </view>
+        <text class="agree-text">
+          《<text class="link" bindtap="navigateToAgreement" data-type="service">用户服务协议</text>》
+          <text class="grey">、</text>
+          《<text class="link" bindtap="navigateToAgreement" data-type="disclaimer">免责声明</text>》
+          <text class="grey">、</text>
+          《<text class="link" bindtap="navigateToAgreement" data-type="complaint">侵权投诉指引</text>》
+          <text class="grey">、</text>
+          《<text class="link" bindtap="navigateToAgreement" data-type="community">社区公约</text>》
+        </text>
+      </view>
+    </view>
+
+    <button 
+      class="submit-btn {{(agreePrivacy && agreeService && phone && password && confirmPassword) ? 'active' : ''}}" 
+      bindtap="submitRegister"
+      disabled="{{!(agreePrivacy && agreeService && phone && password && confirmPassword)}}"
+    >
+      <text>立即注册</text>
+    </button>
+  </view>
+</view>

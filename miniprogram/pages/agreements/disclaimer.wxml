@@ -1,0 +1,42 @@
+<view class="container">
+  <view class="header">
+    <view class="back-btn" bindtap="goBack">
+      <text class="back-icon">←</text>
+    </view>
+    <text class="title">免责声明</text>
+    <view class="placeholder"></view>
+  </view>
+
+  <scroll-view scroll-y class="content">
+    <view class="section">
+      <text class="section-title">一、服务内容</text>
+      <text class="section-content">
+        「言道」提供的学习内容仅供参考，不构成专业教育建议。
+      </text>
+    </view>
+
+    <view class="section">
+      <text class="section-title">二、责任限制</text>
+      <text class="section-content">
+        2.1 我们不对服务的可用性、准确性或完整性做出保证。
+      </text>
+      <text class="section-content">
+        2.2 对于因使用本服务导致的任何直接或间接损失，我们不承担责任。
+      </text>
+    </view>
+
+    <view class="section">
+      <text class="section-title">三、第三方内容</text>
+      <text class="section-content">
+        3.1 本服务可能包含第三方链接或内容，我们不对其负责。
+      </text>
+    </view>
+
+    <view class="section">
+      <text class="section-title">四、用户行为</text>
+      <text class="section-content">
+        4.1 用户应对其使用本服务的行为负责。
+      </text>
+    </view>
+  </scroll-view>
+</view>

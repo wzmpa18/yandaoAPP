@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="bodyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4ade80"/>
+      <stop offset="50%" stop-color="#22c55e"/>
+      <stop offset="100%" stop-color="#16a34a"/>
+    </linearGradient>
+    <linearGradient id="chestGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fde047"/>
+      <stop offset="100%" stop-color="#facc15"/>
+    </linearGradient>
+    <linearGradient id="beakGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fb923c"/>
+      <stop offset="100%" stop-color="#f97316"/>
+    </linearGradient>
+    <radialGradient id="eyeShine" cx="30%" cy="30%" r="50%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#ffffff00"/>
+    </radialGradient>
+  </defs>
+  
+  <!-- Body -->
+  <ellipse cx="50" cy="65" rx="35" ry="30" fill="url(#bodyGradient)" stroke="#1f2937" stroke-width="2"/>
+  
+  <!-- Chest -->
+  <ellipse cx="50" cy="72" rx="22" ry="18" fill="url(#chestGradient)" stroke="#1f2937" stroke-width="1.5"/>
+  
+  <!-- Head -->
+  <ellipse cx="50" cy="35" rx="32" ry="28" fill="url(#bodyGradient)" stroke="#1f2937" stroke-width="2"/>
+  
+  <!-- Head Feathers -->
+  <path d="M35 15 Q30 5 38 12" fill="#4ade80" stroke="#1f2937" stroke-width="1.5"/>
+  <path d="M45 10 Q42 0 50 8" fill="#4ade80" stroke="#1f2937" stroke-width="1.5"/>
+  <path d="M55 10 Q58 0 62 8" fill="#4ade80" stroke="#1f2937" stroke-width="1.5"/>
+  <path d="M65 15 Q70 5 62 12" fill="#4ade80" stroke="#1f2937" stroke-width="1.5"/>
+  
+  <!-- Left Eye -->
+  <circle cx="35" cy="32" r="10" fill="white" stroke="#1f2937" stroke-width="2"/>
+  <circle cx="35" cy="32" r="6" fill="#1f2937"/>
+  <circle cx="33" cy="30" r="2" fill="white"/>
+  
+  <!-- Right Eye -->
+  <circle cx="65" cy="32" r="10" fill="white" stroke="#1f2937" stroke-width="2"/>
+  <circle cx="65" cy="32" r="6" fill="#1f2937"/>
+  <circle cx="63" cy="30" r="2" fill="white"/>
+  
+  <!-- Cheek Blush -->
+  <ellipse cx="28" cy="40" rx="5" ry="4" fill="#fb923c" opacity="0.6"/>
+  <ellipse cx="72" cy="40" rx="5" ry="4" fill="#fb923c" opacity="0.6"/>
+  
+  <!-- Beak -->
+  <polygon points="50,38 42,50 50,45 58,50" fill="url(#beakGradient)" stroke="#1f2937" stroke-width="1.5"/>
+  <circle cx="47" cy="43" r="1.5" fill="#1f2937"/>
+  <circle cx="53" cy="43" r="1.5" fill="#1f2937"/>
+  
+  <!-- Wing -->
+  <path d="M75 55 Q95 50 90 70 Q85 85 70 75" fill="#14b8a6" stroke="#1f2937" stroke-width="1.5"/>
+  
+  <!-- Tail -->
+  <path d="M65 92 Q80 100 75 88 Q70 95 65 92" fill="#06b6d4" stroke="#1f2937" stroke-width="1.5"/>
+</svg>

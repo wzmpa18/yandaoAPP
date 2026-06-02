@@ -1,0 +1,64 @@
+<view class="container">
+  <view class="header">
+    <view class="back-btn" bindtap="goBack">
+      <text class="back-icon">←</text>
+    </view>
+    <text class="title">✍️ AI作文教练</text>
+    <view class="placeholder"></view>
+  </view>
+
+  <view class="main-content">
+    <view class="input-section">
+      <text class="section-label">输入文本</text>
+      <textarea 
+        class="input-textarea"
+        placeholder="请输入需要批改的英文文本..."
+        value="{{input}}"
+        bindinput="onInput"
+        auto-height
+        maxlength="2000"
+      />
+      <button 
+        class="analyze-btn {{loading ? 'loading' : ''}}" 
+        bindtap="analyzeText"
+        disabled="{{loading}}"
+      >
+        <text>{{loading ? '分析中...' : '📝 开始分析'}}</text>
+      </button>
+    </view>
+
+    <view wx:if="{{errors.length > 0}}" class="result-section">
+      <text class="section-title">🚨 语法问题</text>
+      <view wx:for="{{errors}}" wx:key="index" class="error-item">
+        <view class="error-highlight">
+          <text class="error-text">{{analyzedText.slice(item.start, item.end)}}</text>
+        </view>
+        <text class="error-message">{{item.message}}</text>
+        <text class="error-suggestion">💡 {{item.suggestion}}</text>
+      </view>
+    </view>
+
+    <view wx:if="{{improvements.length > 0}}" class="result-section">
+      <text class="section-title">✨ 优化建议</text>
+      <view wx:for="{{improvements}}" wx:key="index" class="improvement-item">
+        <view class="improvement-row">
+          <view class="improvement-original">
+            <text class="label">原句：</text>
+            <text class="text">{{item.original}}</text>
+          </view>
+          <view class="improvement-arrow">→</view>
+          <view class="improvement-improved">
+            <text class="label">优化：</text>
+            <text class="text">{{item.improved}}</text>
+          </view>
+        </view>
+        <text class="improvement-reason">💬 {{item.reason}}</text>
+      </view>
+    </view>
+
+    <view wx:if="{{!loading && analyzedText && errors.length === 0 && improvements.length === 0}}" class="success-section">
+      <text class="success-icon">🎉</text>
+      <text class="success-text">太棒了！您的文本没有发现语法问题</text>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,239 @@
+.referral-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+}
+
+.referral-header {
+  text-align: center;
+  color: white;
+  margin-bottom: 30px;
+}
+
+.referral-header h1 {
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+.referral-header .subtitle {
+  font-size: 16px;
+  opacity: 0.9;
+}
+
+.referral-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  margin-bottom: 20px;
+}
+
+.card-header h2 {
+  font-size: 18px;
+  color: #333;
+  margin: 0;
+}
+
+.referral-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.referral-code {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.referral-code .label {
+  font-size: 14px;
+  color: #666;
+}
+
+.referral-code .code {
+  font-size: 24px;
+  font-weight: bold;
+  color: #667eea;
+  letter-spacing: 2px;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.referral-link {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.referral-link .label {
+  font-size: 14px;
+  color: #666;
+}
+
+.referral-link input {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #333;
+  background: #f8f9fa;
+}
+
+.copy-btn {
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.copy-btn:hover {
+  transform: translateY(-2px);
+}
+
+.stats {
+  display: flex;
+  gap: 10px;
+}
+
+.stat-item {
+  flex: 1;
+  text-align: center;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+.stat-value {
+  display: block;
+  font-size: 24px;
+  font-weight: bold;
+  color: #667eea;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #666;
+}
+
+.generate-btn {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.generate-btn:hover {
+  transform: translateY(-2px);
+}
+
+.records-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.record-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 10px;
+}
+
+.record-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.record-date {
+  font-size: 14px;
+  color: #333;
+}
+
+.record-status {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.record-status.pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.record-status.confirmed {
+  background: #d4edda;
+  color: #155724;
+}
+
+.record-status.paid {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.record-amount {
+  font-size: 18px;
+  font-weight: bold;
+  color: #28a745;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 30px;
+}
+
+.empty-state p {
+  margin: 0;
+  color: #666;
+}
+
+.empty-state .hint {
+  font-size: 14px;
+  margin-top: 8px;
+  opacity: 0.8;
+}
+
+.rules ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.rules li {
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+  color: #333;
+}
+
+.rules li:last-child {
+  border-bottom: none;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: white;
+  font-size: 18px;
+}

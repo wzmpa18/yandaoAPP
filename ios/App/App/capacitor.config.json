@@ -1,0 +1,40 @@
+{
+	"appId": "com.yandao.language",
+	"appName": "言道学外语",
+	"webDir": "dist",
+	"server": {
+		"androidScheme": "https"
+	},
+	"android": {
+		"allowMixedContent": false,
+		"captureInput": true,
+		"webContentsDebuggingEnabled": false
+	},
+	"ios": {
+		"bundleId": "com.yandao.language",
+		"displayName": "言道学外语",
+		"teamId": "WM586465ZD",
+		"entitlements": {
+			"aps-environment": "production"
+		},
+		"scheme": "yandao",
+		"infoPlist": {
+			"NSCameraUsageDescription": "用于拍照识别和语音练习",
+			"NSMicrophoneUsageDescription": "用于语音练习和录音",
+			"NSLocationWhenInUseUsageDescription": "用于提供本地化学习内容",
+			"NSAppTransportSecurity": {
+				"NSAllowsArbitraryLoads": true
+			}
+		}
+	},
+	"plugins": {
+		"SplashScreen": {
+			"launchShowDuration": 1500,
+			"backgroundColor": "#0D1117",
+			"androidSplashResourceName": "splash",
+			"iosSplashResourceName": "splash",
+			"showSpinner": false
+		}
+	},
+	"packageClassList": []
+}

@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>言道学外语 - APP下载</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #6366f1;
+            --secondary-color: #8b5cf6;
+            --success-color: #10b981;
+            --accent-color: #f59e0b;
+            --bg-gradient-start: #667eea;
+            --bg-gradient-end: #764ba2;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --bg-light: #f9fafb;
+            --bg-white: #ffffff;
+            --border-color: #e5e7eb;
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .logo {
+            width: 120px;
+            height: 120px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        h1 {
+            color: white;
+            font-size: 36px;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .subtitle {
+            color: rgba(255,255,255,0.9);
+            font-size: 18px;
+            margin-bottom: 40px;
+        }
+
+        .download-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .download-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            padding: 20px 40px;
+            border-radius: 15px;
+            font-size: 20px;
+            font-weight: bold;
+            text-decoration: none;
+            margin-bottom: 20px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 5px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        .download-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(76, 175, 80, 0.6);
+        }
+
+        .download-btn.ios {
+            background: linear-gradient(135deg, #007AFF 0%, #0056b3 100%);
+            box-shadow: 0 5px 20px rgba(0, 122, 255, 0.4);
+        }
+
+        .download-btn.ios:hover {
+            box-shadow: 0 8px 30px rgba(0, 122, 255, 0.6);
+        }
+
+        .download-btn.web {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            box-shadow: 0 5px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .download-btn.web:hover {
+            box-shadow: 0 8px 30px rgba(99, 102, 241, 0.6);
+        }
+
+        .download-btn.disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            box-shadow: none;
+            opacity: 0.7;
+        }
+
+        .download-btn.disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-icon {
+            font-size: 32px;
+        }
+
+        .btn-text {
+            text-align: left;
+        }
+
+        .btn-text small {
+            display: block;
+            font-size: 12px;
+            font-weight: normal;
+            opacity: 0.9;
+        }
+
+        .feature-list {
+            text-align: left;
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+        }
+
+        .feature-list h3 {
+            color: var(--text-primary);
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .feature-list ul {
+            list-style: none;
+        }
+
+        .feature-list li {
+            padding: 10px 0;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feature-list li::before {
+            content: '✓';
+            color: var(--success-color);
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .version-info {
+            margin-top: 30px;
+            padding: 20px;
+            background: #e3f2fd;
+            border-radius: 15px;
+            color: #1976D2;
+        }
+
+        .version-info h4 {
+            margin-bottom: 10px;
+        }
+
+        .qr-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 15px;
+        }
+
+        .qr-container {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 15px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .qr-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .qr-placeholder {
+            width: 150px;
+            height: 150px;
+            background: #ddd;
+            border-radius: 10px;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 12px;
+        }
+
+        .footer {
+            margin-top: 40px;
+            color: rgba(255,255,255,0.8);
+            font-size: 14px;
+        }
+
+        .footer a {
+            color: white;
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255,255,255,0.9);
+            text-decoration: none;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+            .download-btn {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .btn-text {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/index.html" class="back-link">
+            ← 返回首页
+        </a>
+
+        <div class="logo">
+            <img src="/parrot.jpg" alt="鹦鹉图标" />
+        </div>
+        <h1>言道学外语</h1>
+        <p class="subtitle">AI驱动的智能语言学习平台</p>
+
+        <div class="download-card">
+            <a href="/app-release.apk" class="download-btn" id="androidBtn">
+                <span class="btn-icon">🤖</span>
+                <span class="btn-text">
+                    下载 Android APP
+                    <small>版本 1.0.0 · 支持 Android 8.0+</small>
+                </span>
+            </a>
+
+            <a href="#" class="download-btn ios disabled" id="iosBtn">
+                <span class="btn-icon">🍎</span>
+                <span class="btn-text">
+                    iOS APP (即将上线)
+                    <small>TestFlight 内测中</small>
+                </span>
+            </a>
+
+            <a href="/index.html" class="download-btn web">
+                <span class="btn-icon">🌐</span>
+                <span class="btn-text">
+                    直接使用 Web 版
+                    <small>无需下载，立即体验</small>
+                </span>
+            </a>
+
+            <div class="feature-list">
+                <h3>✨ APP 特色功能</h3>
+                <ul>
+                    <li>AI智能对话陪练，4种角色随时练</li>
+                    <li>10种语言：日、英、韩、法、西、德、意、葡、阿、中</li>
+                    <li>游戏化闯关学习，单词猎人、语法星球</li>
+                    <li>语音识别，实时练习发音</li>
+                    <li>边学边赚，学习金兑换VIP会员</li>
+                    <li>百位大咖达人分享学习秘方</li>
+                    <li>每日任务，养成学习习惯</li>
+                    <li>好友比拼，一起进步</li>
+                </ul>
+            </div>
+
+            <div class="version-info">
+                <h4>📱 当前版本信息</h4>
+                <p><strong>版本：</strong>1.0.0</p>
+                <p><strong>更新时间：</strong>2026年6月1日</p>
+                <p><strong>大小：</strong>约 25 MB</p>
+                <p style="font-size: 12px; margin-top: 10px; color: #666;">
+                    * 提示：Android 8.0及以上系统可能需要开启"未知来源"安装权限
+                </p>
+            </div>
+        </div>
+
+        <div class="download-card qr-section">
+            <h3>📱 扫码下载</h3>
+            <div class="qr-container">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://yandao.vip/app-release.apk" 
+                     alt="下载APP二维码" 
+                     class="qr-image"
+                     onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=qr-placeholder>加载中...</div>';" />
+            </div>
+            <p style="color: #666; font-size: 14px;">使用手机扫描二维码下载APP</p>
+            <p style="color: #999; font-size: 12px; margin-top: 10px;">支持 Android 8.0+</p>
+        </div>
+
+        <div class="footer">
+            <p>© 2026 言道学外语 · <a href="/index.html">返回首页</a></p>
+            <p style="margin-top: 10px; font-size: 12px;">
+                如有问题请联系：support@yandao.vip
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // 检查APK文件是否存在
+        fetch('/app-release.apk', { method: 'HEAD' })
+            .then(response => {
+                if (!response.ok) {
+                    const btn = document.getElementById('androidBtn');
+                    btn.classList.add('disabled');
+                    btn.innerHTML = `
+                        <span class="btn-icon">🤖</span>
+                        <span class="btn-text">
+                            Android APP (打包中)
+                            <small>稍后再来下载</small>
+                        </span>
+                    `;
+                    btn.href = '#';
+                }
+            })
+            .catch(() => {
+                const btn = document.getElementById('androidBtn');
+                btn.classList.add('disabled');
+            });
+    </script>
+</body>
+</html>

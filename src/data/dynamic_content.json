@@ -1,0 +1,92 @@
+{
+  "_comment": "言道 · Gendou 动态内容数据库 — 将此文件替换或扩充即可批量导入题目、词汇和文案，无需修改任何代码。",
+
+  "vocab_pairs": [
+    {
+      "id": "ja_001",
+      "lang": "ja",
+      "zh": "你好",
+      "target": "こんにちは",
+      "morphology": {
+        "base": "こんにちは",
+        "steps": [
+          { "form": "こんにちは", "label": "日常招呼语", "note": "全天候通用打招呼，见人就用！" }
+        ]
+      },
+      "vibe_pure_correct": { "emoji": "🐱", "title": "针不戳！", "body": "你知道こんにちは，智商在线！" },
+      "vibe_flirt_correct": { "emoji": "😏", "title": "哎哟不错哦～", "body": "连こんにちは都知道，果然不一般嘛❤️" },
+      "vibe_pure_wrong": { "emoji": "🐕", "title": "大意了没有闪！", "body": "打招呼都能错？快跟本喵读：こんにちは！" },
+      "vibe_flirt_wrong": { "emoji": "😤", "title": "笨蛋！", "body": "这都选错？罚你对着镜子说三遍 こんにちは！💢" }
+    },
+    {
+      "id": "ja_002",
+      "lang": "ja",
+      "zh": "谢谢",
+      "target": "ありがとう",
+      "morphology": {
+        "base": "ありがとう",
+        "steps": [
+          { "form": "ありがとう", "label": "普通感谢", "note": "朋友之间用，随意亲切。" },
+          { "form": "ありがとうございます", "label": "礼貌感谢", "note": "加 ございます 变礼貌体，对长辈或客户必用！" }
+        ]
+      },
+      "vibe_pure_correct": { "emoji": "🎉", "title": "满分！", "body": "ありがとう记住了，感谢全世界不成问题！" },
+      "vibe_flirt_correct": { "emoji": "🥰", "title": "太聪明了！", "body": "ありがとう都知道，让人怎么不喜欢呢～" },
+      "vibe_pure_wrong": { "emoji": "😹", "title": "哎呀！", "body": "感谢都不会？快对本喵说：ありがとう！" },
+      "vibe_flirt_wrong": { "emoji": "🙄", "title": "无语子…", "body": "连谢谢都错？罚你多说三遍 ありがとう，快！💢" }
+    },
+    {
+      "id": "en_001",
+      "lang": "en",
+      "zh": "你好",
+      "target": "Hello",
+      "morphology": {
+        "base": "Hello",
+        "steps": [
+          { "form": "Hello", "label": "正式打招呼", "note": "全场合通用，安全无害。" },
+          { "form": "Hi", "label": "非正式", "note": "朋友间更常用，更随意。" },
+          { "form": "Hey", "label": "超非正式", "body": "只用于非常熟悉的人，正式场合慎用！" }
+        ]
+      },
+      "vibe_pure_correct": { "emoji": "🏆", "title": "太强了！", "body": "Hello 都知道，英语入门第一步完成！" },
+      "vibe_flirt_correct": { "emoji": "😉", "title": "早就猜到你会！", "body": "Hello 嘛，你这么聪明当然会～继续！" },
+      "vibe_pure_wrong": { "emoji": "🙈", "title": "啊这…", "body": "Hello 都错了，从头开始！快跟本喵念：Hello！" },
+      "vibe_flirt_wrong": { "emoji": "😒", "title": "你这人啊～", "body": "Hello 都选错让我很失望哦，快说三遍：Hello Hello Hello！💢" }
+    }
+  ],
+
+  "sentence_puzzles": [
+    {
+      "id": "ja_puzzle_001",
+      "lang": "ja",
+      "zh": "我是学生。",
+      "words": ["私", "は", "学生", "です", "。"],
+      "answer": ["私", "は", "学生", "です", "。"],
+      "tip": "日语语序：主语（私は）+ 名词（学生）+ です，です是礼貌句尾！"
+    },
+    {
+      "id": "en_puzzle_001",
+      "lang": "en",
+      "zh": "这个多少钱？",
+      "words": ["much", "How", "this", "is", "?"],
+      "answer": ["How", "much", "is", "this", "?"],
+      "tip": "英语特殊疑问句：疑问词（How much）+ 助动词（is）+ 主语（this）"
+    },
+    {
+      "id": "ko_puzzle_001",
+      "lang": "ko",
+      "zh": "厕所在哪里？",
+      "words": ["어디에", "화장실이", "있어요", "?"],
+      "answer": ["화장실이", "어디에", "있어요", "?"],
+      "tip": "韩语语序：主语+主格助词（화장실이）+ 疑问词（어디에）+ 动词（있어요），动词永远在最后！"
+    }
+  ],
+
+  "_audio_guide": {
+    "success_dir": "/public/audio/success/",
+    "failure_dir": "/public/audio/failure/",
+    "naming": "将搞怪配音文件命名为 1.mp3、2.mp3… 放入对应文件夹，系统自动随机调用",
+    "success_files": ["1.mp3", "2.mp3", "3.mp3"],
+    "failure_files": ["1.mp3", "2.mp3", "3.mp3"]
+  }
+}

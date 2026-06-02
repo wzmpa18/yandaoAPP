@@ -1,0 +1,69 @@
+<view class="container">
+  <view class="page-header">
+    <text class="page-title">📜 隐私政策</text>
+  </view>
+
+  <view class="content-card">
+    <view class="section">
+      <text class="section-title">一、信息收集</text>
+      <text class="section-content">
+        我们重视您的隐私。本应用仅收集必要的个人信息以提供更好的服务，包括但不限于：
+      </text>
+      <view class="bullet-list">
+        <text class="bullet">• 用户注册信息（昵称、头像）</text>
+        <text class="bullet">• 学习数据（学习时长、完成进度）</text>
+        <text class="bullet">• 位置信息（用于同城语伴功能，需用户授权）</text>
+        <text class="bullet">• 设备信息（用于适配不同设备）</text>
+      </view>
+    </view>
+
+    <view class="section">
+      <text class="section-title">二、信息使用</text>
+      <text class="section-content">
+        收集的信息将用于：
+      </text>
+      <view class="bullet-list">
+        <text class="bullet">• 提供个性化学习推荐</text>
+        <text class="bullet">• 匹配同城学习伙伴</text>
+        <text class="bullet">• 统计学习数据和成就</text>
+        <text class="bullet">• 优化应用性能和用户体验</text>
+      </view>
+    </view>
+
+    <view class="section">
+      <text class="section-title">三、信息保护</text>
+      <text class="section-content">
+        我们采用业界领先的安全技术保护您的信息：
+      </text>
+      <view class="bullet-list">
+        <text class="bullet">• 数据加密存储和传输</text>
+        <text class="bullet">• 严格的访问控制</text>
+        <text class="bullet">• 定期安全审计</text>
+      </view>
+    </view>
+
+    <view class="section">
+      <text class="section-title">四、未成年人保护</text>
+      <text class="section-content">
+        我们特别关注未成年人的隐私保护：
+      </text>
+      <view class="bullet-list">
+        <text class="bullet">• 14岁以下用户自动关闭交友功能</text>
+        <text class="bullet">• 不收集未成年人的敏感信息</text>
+        <text class="bullet">• 内容过滤确保适宜未成年人</text>
+      </view>
+    </view>
+
+    <view class="section">
+      <text class="section-title">五、用户权利</text>
+      <text class="section-content">
+        您有权：
+      </text>
+      <view class="bullet-list">
+        <text class="bullet">• 查看和修改个人信息</text>
+        <text class="bullet">• 导出学习数据</text>
+        <text class="bullet">• 申请账号注销</text>
+      </view>
+    </view>
+  </view>
+</view>

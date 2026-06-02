@@ -1,0 +1,239 @@
+.container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  padding: 20rpx;
+  box-sizing: border-box;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 0;
+}
+
+.header-left {
+  width: 80rpx;
+}
+
+.back-icon {
+  font-size: 48rpx;
+  color: #fff;
+}
+
+.header-center .title {
+  font-size: 40rpx;
+  font-weight: bold;
+  color: #fff;
+}
+
+.header-right .stars {
+  font-size: 36rpx;
+  color: #fbbf24;
+}
+
+.game-info {
+  margin: 20rpx 0;
+}
+
+.progress-bar {
+  height: 20rpx;
+  background: rgba(255,255,255,0.3);
+  border-radius: 10rpx;
+  overflow: hidden;
+  margin-bottom: 20rpx;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #4ade80;
+  transition: width 0.3s;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-around;
+}
+
+.info-item {
+  text-align: center;
+}
+
+.info-label {
+  display: block;
+  font-size: 24rpx;
+  color: rgba(255,255,255,0.8);
+}
+
+.info-value {
+  display: block;
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #fff;
+}
+
+.info-value.lives {
+  font-size: 36rpx;
+}
+
+.question-card {
+  background: rgba(255,255,255,0.95);
+  border-radius: 30rpx;
+  padding: 40rpx;
+  margin-bottom: 30rpx;
+}
+
+.question-text {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 40rpx;
+  line-height: 1.6;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.option-item {
+  display: flex;
+  align-items: center;
+  padding: 25rpx 30rpx;
+  background: #f8fafc;
+  border: 3rpx solid #e2e8f0;
+  border-radius: 20rpx;
+  transition: all 0.2s;
+}
+
+.option-item.selected {
+  border-color: #6366f1;
+  background: #eef2ff;
+}
+
+.option-item.correct {
+  border-color: #22c55e;
+  background: #dcfce7;
+}
+
+.option-item.wrong {
+  border-color: #ef4444;
+  background: #fee2e2;
+}
+
+.option-letter {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #6366f1;
+  margin-right: 20rpx;
+}
+
+.option-text {
+  font-size: 30rpx;
+  color: #333;
+}
+
+.result-section {
+  margin-top: 30rpx;
+  padding-top: 30rpx;
+  border-top: 2rpx solid #e2e8f0;
+  text-align: center;
+}
+
+.result-icon {
+  font-size: 80rpx;
+  margin-bottom: 20rpx;
+}
+
+.result-text {
+  display: block;
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 15rpx;
+}
+
+.explanation {
+  display: block;
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.6;
+}
+
+.actions {
+  padding-bottom: 40rpx;
+}
+
+.btn {
+  width: 100%;
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 44rpx;
+  font-size: 34rpx;
+  font-weight: bold;
+}
+
+.btn-primary {
+  background: #22c55e;
+  color: #fff;
+}
+
+.game-over {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+}
+
+.modal {
+  position: relative;
+  background: #fff;
+  border-radius: 30rpx;
+  padding: 50rpx;
+  text-align: center;
+  width: 85%;
+}
+
+.modal-title {
+  display: block;
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20rpx;
+}
+
+.modal-stars {
+  display: block;
+  font-size: 56rpx;
+  margin-bottom: 20rpx;
+}
+
+.modal-score {
+  display: block;
+  font-size: 36rpx;
+  color: #22c55e;
+  margin-bottom: 10rpx;
+}
+
+.modal-correct {
+  display: block;
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 30rpx;
+}

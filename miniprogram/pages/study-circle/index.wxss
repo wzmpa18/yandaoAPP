@@ -1,0 +1,155 @@
+.page-header {
+  text-align: center;
+  padding: 40rpx 0;
+}
+
+.page-title {
+  font-size: 56rpx;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.page-subtitle {
+  font-size: 28rpx;
+  color: #64748b;
+  margin-top: 12rpx;
+  display: block;
+}
+
+.language-tabs {
+  margin-bottom: 24rpx;
+}
+
+.tabs-scroll {
+  white-space: nowrap;
+}
+
+.tabs-list {
+  display: inline-flex;
+  gap: 16rpx;
+}
+
+.lang-tab {
+  background: #ffffff;
+  padding: 16rpx 32rpx;
+  border-radius: 32rpx;
+  font-size: 28rpx;
+  color: #64748b;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.06);
+}
+
+.lang-tab.active {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  color: #ffffff;
+}
+
+.post-list {
+  margin-bottom: 120rpx;
+}
+
+.post-card {
+  background: #ffffff;
+  border-radius: 24rpx;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+}
+
+.post-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.post-avatar {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 28rpx;
+  font-weight: 600;
+  margin-right: 16rpx;
+}
+
+.post-author-info {
+  flex: 1;
+}
+
+.post-author {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.post-time {
+  font-size: 22rpx;
+  color: #94a3b8;
+}
+
+.post-menu {
+  font-size: 32rpx;
+  color: #94a3b8;
+}
+
+.post-content {
+  font-size: 28rpx;
+  color: #475569;
+  line-height: 1.6;
+}
+
+.post-images {
+  display: flex;
+  gap: 12rpx;
+  margin-top: 20rpx;
+}
+
+.post-img {
+  width: 200rpx;
+  height: 200rpx;
+  border-radius: 16rpx;
+}
+
+.post-stats {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 24rpx;
+  padding-top: 20rpx;
+  border-top: 2rpx solid #f1f5f9;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.stat-icon {
+  font-size: 32rpx;
+}
+
+.stat-text {
+  font-size: 26rpx;
+  color: #64748b;
+}
+
+.fab-button {
+  position: fixed;
+  bottom: calc(100rpx + env(safe-area-inset-bottom));
+  right: 40rpx;
+  width: 100rpx;
+  height: 100rpx;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8rpx 24rpx rgba(34, 197, 94, 0.4);
+}
+
+.fab-icon {
+  font-size: 40rpx;
+}

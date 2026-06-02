@@ -1,0 +1,38 @@
+<view class="container">
+  <view class="header">
+    <view class="back-btn" bindtap="goBack">
+      <text class="back-icon">←</text>
+    </view>
+    <text class="title">社区公约</text>
+    <view class="placeholder"></view>
+  </view>
+
+  <scroll-view scroll-y class="content">
+    <view class="section">
+      <text class="section-title">一、社区规范</text>
+      <text class="section-content">
+        1.1 请文明用语，尊重他人，不得发布侮辱、诽谤、歧视性内容。
+      </text>
+      <text class="section-content">
+        1.2 不得发布违法违规、色情暴力、敏感政治内容。
+      </text>
+    </view>
+
+    <view class="section">
+      <text class="section-title">二、内容规范</text>
+      <text class="section-content">
+        2.1 发布内容应与语言学习相关，不得发布广告或无关信息。
+      </text>
+      <text class="section-content">
+        2.2 尊重知识产权，不得发布侵权内容。
+      </text>
+    </view>
+
+    <view class="section">
+      <text class="section-title">三、违规处理</text>
+      <text class="section-content">
+        3.1 违反公约者将受到警告、禁言或封号处理。
+      </text>
+    </view>
+  </scroll-view>
+</view>

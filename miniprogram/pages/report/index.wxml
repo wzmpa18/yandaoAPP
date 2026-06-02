@@ -1,0 +1,52 @@
+<view class="container">
+  <view class="page-header">
+    <text class="page-title">🚨 举报/反馈</text>
+    <text class="page-subtitle">请详细描述您要举报的内容</text>
+  </view>
+
+  <view class="report-form">
+    <view class="form-item">
+      <view class="form-label">举报类型</view>
+      <view class="type-list">
+        <view 
+          class="type-item" 
+          wx:for="{{reportTypes}}" 
+          wx:key="value"
+          style="background: {{selectedType === item.value ? '#22c55e' : '#f1f5f9'}}; color: {{selectedType === item.value ? '#ffffff' : '#64748b'}}"
+          bindtap="selectType"
+          data-type="{{item.value}}"
+        >
+          {{item.label}}
+        </view>
+      </view>
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">举报对象</view>
+      <input class="form-input" placeholder="用户名或ID" bindinput="onTargetInput" value="{{target}}" />
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">详细描述</view>
+      <textarea 
+        class="form-textarea" 
+        placeholder="请详细描述举报内容..." 
+        bindinput="onContentInput" 
+        value="{{content}}"
+        auto-height
+      />
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">证据材料（可选）</view>
+      <view class="upload-area">
+        <view class="upload-btn">
+          <text class="upload-icon">📷</text>
+          <text class="upload-text">添加截图或证据</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="submit-btn" bindtap="submitReport">提交举报</view>
+</view>

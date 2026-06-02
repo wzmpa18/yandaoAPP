@@ -1,0 +1,62 @@
+<view class="container">
+  <view class="header">
+    <view class="back-btn" bindtap="goBack">
+      <text class="back-icon">←</text>
+    </view>
+    <text class="title">🎯 音素级纠音</text>
+    <view class="placeholder"></view>
+  </view>
+
+  <view class="words-section">
+    <text class="section-title">选择练习单词</text>
+    <view class="words-list">
+      <view 
+        wx:for="{{words}}" 
+        wx:key="id" 
+        class="word-item {{currentWord?.id === item.id ? 'selected' : ''}}"
+        bindtap="selectWord"
+        data-id="{{item.id}}"
+      >
+        <text class="word-text">{{item.word}}</text>
+        <text class="word-phonetic">{{item.phonetic}}</text>
+        <text class="word-meaning">{{item.meaning}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{currentWord}}" class="practice-section">
+    <view class="word-display">
+      <text class="display-word">{{currentWord.word}}</text>
+      <text class="display-phonetic">{{currentWord.phonetic}}</text>
+      <text class="display-meaning">{{currentWord.meaning}}</text>
+    </view>
+
+    <view class="score-display">
+      <text class="score-label">发音评分</text>
+      <view class="score-ring">
+        <text class="score-value">{{score}}</text>
+        <text class="score-unit">分</text>
+      </view>
+      <text class="feedback-text">{{feedback}}</text>
+    </view>
+
+    <view class="phoneme-analysis">
+      <text class="analysis-title">音素分析</text>
+      <view wx:for="{{phonemeAnalysis}}" wx:key="index" class="phoneme-item">
+        <text class="phoneme-text">{{item.phoneme}}</text>
+        <view class="phoneme-status {{item.status}}">
+          <text>{{item.status === 'good' ? '✓' : item.status === 'warning' ? '!' : '✕'}}</text>
+        </view>
+        <text class="phoneme-tip">{{item.tip}}</text>
+      </view>
+    </view>
+
+    <button 
+      class="record-btn {{isRecording ? 'recording' : ''}}" 
+      bindtap="startRecording"
+      disabled="{{isRecording}}"
+    >
+      <text>{{isRecording ? '🎙️ 录音中...' : '🎤 开始录音'}}</text>
+    </button>
+  </view>
+</view>

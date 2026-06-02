@@ -1,0 +1,31 @@
+<view class="chat-container">
+  <view class="chat-header">
+    <view class="back-btn" bindtap="goBack">‹</view>
+    <view class="chat-info">
+      <text class="chat-name">日语达人</text>
+      <text class="chat-status">在线</text>
+    </view>
+    <view class="header-actions">
+      <text class="action-icon">⋮</text>
+    </view>
+  </view>
+
+  <scroll-view scroll-y class="chat-messages" scroll-top="{{scrollTop}}">
+    <view class="message-item" wx:for="{{messages}}" wx:key="id">
+      <view class="message-avatar">{{item.isMe ? '👤' : '👥'}}</view>
+      <view class="message-content" style="background: {{item.isMe ? '#22c55e' : '#f1f5f9'}}; color: {{item.isMe ? '#ffffff' : '#1e293b'}}">
+        {{item.content}}
+      </view>
+    </view>
+  </scroll-view>
+
+  <view class="chat-input-bar">
+    <view class="input-tools">
+      <text class="tool-icon">😊</text>
+      <text class="tool-icon">📷</text>
+      <text class="tool-icon">📁</text>
+    </view>
+    <input class="message-input" placeholder="输入消息..." bindinput="onInput" value="{{inputText}}" />
+    <view class="send-btn" bindtap="sendMessage">发送</view>
+  </view>
+</view>

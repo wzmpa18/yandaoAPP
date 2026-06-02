@@ -1,0 +1,104 @@
+<view class="container">
+  <view class="header-card">
+    <view class="user-section">
+      <view class="avatar avatar-lg">{{userInfo.nickname.charAt(0)}}</view>
+      <view class="user-info">
+        <text class="text-xl font-bold">{{userInfo.nickname}}</text>
+        <view class="flex items-center gap-2 mt-1">
+          <text class="badge">Lv.{{userInfo.level}}</text>
+          <text class="text-muted text-sm">{{userInfo.city || '未定位'}}</text>
+        </view>
+      </view>
+      <view class="study-gold">
+        <text class="gold-icon">💰</text>
+        <text class="gold-count">{{studyGold}}</text>
+      </view>
+    </view>
+    
+    <view class="progress-section mt-4">
+      <view class="flex justify-between items-center">
+        <text class="text-secondary">今日进度</text>
+        <text class="text-primary font-bold">{{todayProgress}}%</text>
+      </view>
+      <view class="progress-bar mt-2">
+        <view class="progress-fill" style="width: {{todayProgress}}%"></view>
+      </view>
+      <view class="flex justify-between mt-2">
+        <text class="text-muted text-sm">学习 {{studyMinutes}} 分钟</text>
+        <text class="text-muted text-sm">连续 {{userInfo.studyDays}} 天</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="quick-actions">
+    <view class="action-item" bindtap="goToAI">
+      <view class="action-icon bg-green">🤖</view>
+      <text class="action-text">AI陪练</text>
+    </view>
+    <view class="action-item" bindtap="goToGames">
+      <view class="action-icon bg-blue">🎮</view>
+      <text class="action-text">游戏学习</text>
+    </view>
+    <view class="action-item" bindtap="goToNewFeatures">
+      <view class="action-icon bg-gradient">✨</view>
+      <text class="action-text">新功能</text>
+    </view>
+    <view class="action-item" bindtap="goToFriends">
+      <view class="action-icon bg-purple">👥</view>
+      <text class="action-text">找语伴</text>
+    </view>
+    <view class="action-item" bindtap="goToCircle">
+      <view class="action-icon bg-orange">💬</view>
+      <text class="action-text">学习圈</text>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-header">
+      <text class="text-xl font-bold">今日推荐</text>
+      <text class="text-secondary text-sm">每日5位语伴</text>
+    </view>
+    <scroll-view scroll-x class="recommend-scroll">
+      <view class="recommend-list">
+        <view class="recommend-item" wx:for="{{todayRecommend}}" wx:key="userId" bindtap="goToChat">
+          <view class="recommend-avatar">{{item.nickname.charAt(0)}}</view>
+          <text class="recommend-name">{{item.nickname}}</text>
+          <text class="recommend-lang">{{item.targetLang}}</text>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <view class="card">
+    <view class="card-header">
+      <text class="text-xl font-bold">学习任务</text>
+      <text class="text-primary text-sm">查看全部</text>
+    </view>
+    <view class="task-list">
+      <view class="task-item" wx:for="{{tasks}}" wx:key="id">
+        <view class="task-icon">{{item.icon}}</view>
+        <view class="task-info">
+          <text class="task-name">{{item.name}}</text>
+          <text class="task-reward">{{item.reward}}</text>
+        </view>
+        <view class="task-status">
+          <view class="task-check" wx:if="{{item.completed}}">✓</view>
+          <text class="task-btn" wx:else>去完成</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-header">
+      <text class="text-xl font-bold">成就展示</text>
+      <text class="text-primary text-sm" bindtap="goToAchievements">全部成就</text>
+    </view>
+    <view class="achievement-grid">
+      <view class="achievement-item" wx:for="{{recentAchievements}}" wx:key="id">
+        <view class="achievement-icon">{{item.icon}}</view>
+        <text class="achievement-name">{{item.name}}</text>
+      </view>
+    </view>
+  </view>
+</view>

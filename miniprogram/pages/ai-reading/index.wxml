@@ -1,0 +1,81 @@
+<view class="container">
+  <view class="header">
+    <view class="back-btn" bindtap="goBack">
+      <text class="back-icon">←</text>
+    </view>
+    <text class="title">📚 AI选词阅读</text>
+    <view class="placeholder"></view>
+  </view>
+
+  <view class="level-filter">
+    <view 
+      wx:for="{{levels}}" 
+      wx:key="item" 
+      class="level-btn {{selectedLevel === item ? 'active' : ''}}"
+      bindtap="selectLevel"
+      data-level="{{item}}"
+    >
+      <text>{{item === 'all' ? '全部' : item}}</text>
+    </view>
+  </view>
+
+  <scroll-view scroll-y class="books-list">
+    <view 
+      wx:for="{{getFilteredBooks()}}" 
+      wx:key="id" 
+      class="book-card"
+      bindtap="openBook"
+      data-id="{{item.id}}"
+    >
+      <view class="book-cover">{{item.cover}}</view>
+      <view class="book-info">
+        <text class="book-title">{{item.title}}</text>
+        <text class="book-author">{{item.author}}</text>
+        <view class="book-meta">
+          <text class="book-level">Lv.{{item.level}}</text>
+          <text class="book-wordcount">{{item.wordCount}}词</text>
+          <text class="book-time">⏱️ {{item.estimatedTime}}</text>
+        </view>
+        <text class="book-desc">{{item.description}}</text>
+        <view wx:if="{{item.progress > 0}}" class="book-progress">
+          <view class="progress-bar">
+            <view class="progress-fill" style="width: {{item.progress}}%" />
+          </view>
+          <text class="progress-text">已阅读 {{item.progress}}%</text>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <view wx:if="{{showBookDetail && currentBook}}" class="modal-overlay" bindtap="closeDetail">
+    <view class="detail-modal" bindtap.stop>
+      <view class="modal-header">
+        <text class="modal-title">{{currentBook.title}}</text>
+        <view class="close-btn" bindtap="closeDetail">✕</view>
+      </view>
+      <view class="modal-body">
+        <view class="modal-cover">{{currentBook.cover}}</view>
+        <text class="modal-author">{{currentBook.author}}</text>
+        <text class="modal-desc">{{currentBook.description}}</text>
+        <view class="modal-stats">
+          <view class="stat-item">
+            <text class="stat-icon">📊</text>
+            <text class="stat-value">{{currentBook.level}}</text>
+            <text class="stat-label">难度等级</text>
+          </view>
+          <view class="stat-item">
+            <text class="stat-icon">📝</text>
+            <text class="stat-value">{{currentBook.wordCount}}</text>
+            <text class="stat-label">单词数</text>
+          </view>
+          <view class="stat-item">
+            <text class="stat-icon">⏱️</text>
+            <text class="stat-value">{{currentBook.estimatedTime}}</text>
+            <text class="stat-label">预计时长</text>
+          </view>
+        </view>
+        <button class="start-btn">📖 开始阅读</button>
+      </view>
+    </view>
+  </view>
+</view>

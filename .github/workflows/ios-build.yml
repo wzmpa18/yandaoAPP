@@ -1,0 +1,137 @@
+name: iOS & Android Build
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  android-build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        
+    - name: Install dependencies
+      run: npm install
+      
+    - name: Build web assets
+      run: npm run build
+      
+    - name: Install Capacitor Android
+      run: npm install @capacitor/android@8.3.4
+      
+    - name: Copy web assets to native
+      run: npx cap sync android
+      
+    - name: Set up JDK
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+        
+    - name: Build APK
+      run: |
+        cd android
+        ls -la
+        chmod +x gradlew
+        ./gradlew assembleRelease -q
+      
+    - name: List APK files
+      run: find android -name "*.apk" -type f
+      
+    - name: Upload APK to R2
+      uses: jakejarvis/s3-sync-action@master
+      with:
+        args: --acl public-read --follow-symlinks
+      env:
+        AWS_S3_BUCKET: ${{ secrets.R2_BUCKET }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_KEY }}
+        AWS_S3_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+        SOURCE_DIR: android/app/build/outputs/apk/release
+        
+    - name: Upload APK artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-release.apk
+        path: android/app/build/outputs/apk/release/app-release.apk
+
+  ios-build:
+    runs-on: macos-14
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        
+    - name: Install dependencies
+      run: npm install
+      
+    - name: Build web assets
+      run: npm run build
+      
+    - name: Install Capacitor iOS
+      run: npm install @capacitor/ios@8.3.4
+      
+    - name: Copy web assets to native
+      run: npx cap sync ios
+      
+    - name: Install CocoaPods
+      run: gem install cocoapods
+      
+    - name: Install pods
+      run: cd ios && pod install && cd ..
+      
+    - name: Set up Apple API Key for signing
+      uses: apple-actions/import-codesign-certs@v2
+      with:
+        p8-private-key: ${{ secrets.APPLE_P8_PRIVATE_KEY }}
+        p8-key-id: ${{ secrets.APPLE_KEY_ID }}
+        p8-issuer-id: ${{ secrets.APPLE_ISSUER_ID }}
+        keychain-password: ${{ secrets.KEYCHAIN_PASSWORD }}
+        team-id: ${{ secrets.APPLE_TEAM_ID }}
+        
+    - name: Create exportOptions.plist for App Store
+      run: |
+        mkdir -p ios
+        echo '<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"><plist version="1.0"><dict><key>method</key><string>app-store</string><key>teamID</key><string>'${{ secrets.APPLE_TEAM_ID }}'</string><key>uploadSymbols</key><true/><key>uploadBitcode</key><false/><key>signingStyle</key><string>automatic</string></dict></plist>' > ios/exportOptions.plist
+      
+    - name: Build IPA with Xcode
+      run: |
+        xcodebuild -workspace ios/App/App.xcworkspace \
+          -scheme App \
+          -configuration Release \
+          -archivePath build/App.xcarchive \
+          archive -allowProvisioningUpdates -quiet
+        xcodebuild -exportArchive \
+          -archivePath build/App.xcarchive \
+          -exportPath build/ipa \
+          -exportOptionsPlist ios/exportOptions.plist -quiet
+      
+    - name: Upload IPA to R2
+      uses: jakejarvis/s3-sync-action@master
+      with:
+        args: --acl public-read
+      env:
+        AWS_S3_BUCKET: ${{ secrets.R2_BUCKET }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_KEY }}
+        AWS_S3_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+        SOURCE_DIR: build/ipa
+        
+    - name: Upload IPA artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: App.ipa
+        path: build/ipa/App.ipa

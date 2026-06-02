@@ -1,0 +1,68 @@
+<view class="container">
+  <view class="header">
+    <view class="header-left" bindtap="goBack">
+      <text class="back-icon">←</text>
+    </view>
+    <view class="header-center">
+      <text class="title">语法星球</text>
+    </view>
+    <view class="header-right">
+      <view class="stars">
+        <text wx:for="{{starArray}}" wx:key="index" class="star">{{item}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="game-info">
+    <view class="progress-bar">
+      <view class="progress-fill" style="width: {{progressPercent}}%"></view>
+    </view>
+    <view class="info-row">
+      <view class="info-item">
+        <text class="info-label">题目</text>
+        <text class="info-value">{{currentQuestion + 1}}/{{questions.length}}</text>
+      </view>
+      <view class="info-item">
+        <text class="info-label">得分</text>
+        <text class="info-value">{{score}}</text>
+      </view>
+      <view class="info-item">
+        <text class="info-label">生命</text>
+        <text class="info-value lives">{{lifeHearts}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="question-card">
+    <text class="question-text">{{currentQuestionText}}</text>
+    
+    <view class="options">
+      <view wx:for="{{currentOptions}}" wx:key="index" class="option-item {{selectedAnswer === index ? 'selected' : ''}} {{showResult && index === currentAnswer ? 'correct' : ''}} {{showResult && selectedAnswer === index && !isCorrect ? 'wrong' : ''}}" data-index="{{index}}" bindtap="selectAnswer">
+        <text class="option-letter">{{optionLetters[index]}}.</text>
+        <text class="option-text">{{item}}</text>
+      </view>
+    </view>
+
+    <view wx:if="{{showResult}}" class="result-section">
+      <view class="result-icon">{{isCorrect ? '🎉' : '😢'}}</view>
+      <text class="result-text">{{isCorrect ? '回答正确!' : '回答错误'}}</text>
+      <text class="explanation">解析: {{currentExplanation}}</text>
+    </view>
+  </view>
+
+  <view class="actions">
+    <view wx:if="!showResult" class="btn btn-primary" bindtap="submitAnswer">确认答案</view>
+    <view wx:else class="btn btn-primary" bindtap="nextQuestion">{{currentQuestion >= questions.length - 1 ? '查看结果' : '下一题'}}</view>
+  </view>
+
+  <view wx:if="{{gameOver}}" class="game-over">
+    <view class="overlay"></view>
+    <view class="modal">
+      <text class="modal-title">游戏结束!</text>
+      <text class="modal-stars">{{resultStars}}</text>
+      <text class="modal-score">最终得分: {{score}}</text>
+      <text class="modal-correct">正确题数: {{correctCount}}/{{questions.length}}</text>
+      <view class="btn btn-primary" bindtap="restart">再玩一次</view>
+    </view>
+  </view>
+</view>

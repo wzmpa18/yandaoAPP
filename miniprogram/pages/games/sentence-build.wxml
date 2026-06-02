@@ -1,0 +1,71 @@
+<view class="container">
+  <view class="header">
+    <view class="header-left" bindtap="goBack">
+      <text class="back-icon">←</text>
+    </view>
+    <view class="header-center">
+      <text class="title">连词成句</text>
+    </view>
+    <view class="header-right">
+      <view class="score">得分: {{score}}</view>
+    </view>
+  </view>
+
+  <view class="game-info">
+    <view class="info-row">
+      <view class="info-item">
+        <text class="info-label">关卡</text>
+        <text class="info-value">{{currentLevel + 1}}/{{levels.length}}</text>
+      </view>
+      <view class="info-item">
+        <text class="info-label">时间</text>
+        <text class="info-value">{{formatTime(time)}}</text>
+      </view>
+    </view>
+    <view class="hint-box">
+      <text class="hint-icon">💡</text>
+      <text class="hint-text">提示: {{currentHint}}</text>
+    </view>
+  </view>
+
+  <view class="sentence-area">
+    <text class="area-title">请排列成正确的句子:</text>
+    <view class="selected-words">
+      <view wx:for="{{selectedWords}}" wx:key="index" class="selected-word" data-index="{{index}}" bindtap="removeWord">
+        {{item}}
+        <text class="remove-icon">×</text>
+      </view>
+      <view wx:if="{{selectedWords.length === 0}}" class="placeholder">点击下方单词开始排列</view>
+    </view>
+  </view>
+
+  <view class="words-area">
+    <text class="area-title">可用单词:</text>
+    <view class="word-bank">
+      <view wx:for="{{shuffledWords}}" wx:key="index" class="word-item" data-word="{{item}}" bindtap="selectWord">
+        {{item}}
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{showResult}}" class="result-section">
+    <view class="result-icon">{{isCorrect ? '🎉' : '😢'}}</view>
+    <text class="result-text">{{isCorrect ? '回答正确!' : '回答错误'}}</text>
+    <text wx:if="!isCorrect" class="correct-answer">正确答案: {{correctAnswer}}</text>
+  </view>
+
+  <view class="actions">
+    <view wx:if="!showResult" class="btn btn-primary" bindtap="submitAnswer">确认答案</view>
+    <view wx:else class="btn btn-primary" bindtap="nextLevel">{{currentLevel >= levels.length - 1 ? '查看结果' : '下一关'}}</view>
+  </view>
+
+  <view wx:if="{{gameOver}}" class="game-over">
+    <view class="overlay"></view>
+    <view class="modal">
+      <text class="modal-icon">{{win ? '🏆' : '💪'}}</text>
+      <text class="modal-title">{{win ? '恭喜通关!' : '继续加油!'}}</text>
+      <text class="modal-score">最终得分: {{score}}</text>
+      <view class="btn btn-primary" bindtap="restart">再玩一次</view>
+    </view>
+  </view>
+</view>

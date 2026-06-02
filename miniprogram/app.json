@@ -1,0 +1,78 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/games/index",
+    "pages/games/word-hunter",
+    "pages/games/grammar-planet",
+    "pages/games/escape-room",
+    "pages/games/sentence-build",
+    "pages/ai-coach/index",
+    "pages/achievements/index",
+    "pages/profile/index",
+    "pages/profile/referral",
+    "pages/friends/index",
+    "pages/friends/search",
+    "pages/friends/chat",
+    "pages/study-circle/index",
+    "pages/study-circle/post",
+    "pages/privacy/index",
+    "pages/report/index",
+    "pages/new-features/index",
+    "pages/ai-writing/index",
+    "pages/ai-reading/index",
+    "pages/phoneme-coach/index",
+    "pages/learning-dashboard/index",
+    "pages/agreements/privacy",
+    "pages/agreements/service",
+    "pages/agreements/disclaimer",
+    "pages/agreements/complaint",
+    "pages/agreements/community",
+    "pages/register/index"
+  ],
+  "window": {
+    "backgroundTextStyle": "dark",
+    "navigationBarBackgroundColor": "#22c55e",
+    "navigationBarTitleText": "言道",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f8fafc"
+  },
+  "tabBar": {
+    "color": "#64748b",
+    "selectedColor": "#22c55e",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "images/tab-home.png",
+        "selectedIconPath": "images/tab-home-active.png"
+      },
+      {
+        "pagePath": "pages/games/index",
+        "text": "游戏",
+        "iconPath": "images/tab-game.png",
+        "selectedIconPath": "images/tab-game-active.png"
+      },
+      {
+        "pagePath": "pages/friends/index",
+        "text": "语伴",
+        "iconPath": "images/tab-friends.png",
+        "selectedIconPath": "images/tab-friends-active.png"
+      },
+      {
+        "pagePath": "pages/profile/index",
+        "text": "我的",
+        "iconPath": "images/tab-profile.png",
+        "selectedIconPath": "images/tab-profile-active.png"
+      }
+    ]
+  },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "用于查找同城语伴"
+    }
+  },
+  "requiredBackgroundModes": ["audio"],
+  "sitemapLocation": "sitemap.json"
+}

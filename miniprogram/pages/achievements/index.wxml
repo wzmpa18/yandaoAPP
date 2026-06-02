@@ -1,0 +1,41 @@
+<view class="container">
+  <view class="page-header">
+    <text class="page-title">🏆 成就系统</text>
+    <text class="page-subtitle">解锁成就，见证你的成长</text>
+  </view>
+
+  <view class="progress-card">
+    <view class="progress-header">
+      <text class="progress-title">成就进度</text>
+      <text class="progress-count">{{completedCount}}/{{totalCount}}</text>
+    </view>
+    <view class="progress-bar-large">
+      <view class="progress-fill-large" style="width: {{progressPercent}}%"></view>
+    </view>
+    <text class="progress-percent">{{progressPercent}}%</text>
+  </view>
+
+  <view class="achievement-categories">
+    <view class="category-tabs">
+      <view class="category-tab active">全部</view>
+      <view class="category-tab">学习</view>
+      <view class="category-tab">社交</view>
+      <view class="category-tab">游戏</view>
+    </view>
+  </view>
+
+  <view class="achievement-grid">
+    <view class="achievement-card" wx:for="{{achievements}}" wx:key="id">
+      <view class="achievement-icon" style="background: {{item.unlocked ? '#22c55e' : '#e2e8f0'}}">
+        {{item.unlocked ? item.icon : '🔒'}}
+      </view>
+      <text class="achievement-name">{{item.name}}</text>
+      <text class="achievement-desc">{{item.description}}</text>
+      <view class="achievement-status">
+        <text class="status-text" style="color: {{item.unlocked ? '#22c55e' : '#94a3b8'}}">
+          {{item.unlocked ? '已解锁' : '未解锁'}}
+        </text>
+      </view>
+    </view>
+  </view>
+</view>

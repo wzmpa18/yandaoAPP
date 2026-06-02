@@ -1,0 +1,74 @@
+<view class="container">
+  <view class="header">
+    <view class="header-left" bindtap="goBack">
+      <text class="back-icon">←</text>
+    </view>
+    <view class="header-center">
+      <text class="title">密室逃脱</text>
+    </view>
+    <view class="header-right">
+      <view class="timer">{{formatTime(time)}}</view>
+    </view>
+  </view>
+
+  <view class="game-info">
+    <view class="info-row">
+      <view class="info-item">
+        <text class="info-label">得分</text>
+        <text class="info-value">{{score}}</text>
+      </view>
+      <view class="info-item">
+        <text class="info-label">收集</text>
+        <text class="info-value items">{{collectedItemsJoin || '无'}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="rooms-grid">
+    <view wx:for="{{rooms}}" wx:key="index" class="room-item {{index > 0 && !rooms[index - 1].unlocked ? 'locked' : ''}}" data-index="{{index}}" bindtap="enterRoom">
+      <view class="room-icon" style="background: {{item.background}}">
+        <text>{{item.icon}}</text>
+      </view>
+      <text class="room-name">{{item.name}}</text>
+      <view class="room-status">
+        <text>{{item.unlocked ? '✓ 已解锁' : (index === 0 ? '开始' : '🔒')}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{showPuzzle}}" class="puzzle-modal">
+    <view class="overlay" bindtap="closePuzzle"></view>
+    <view class="puzzle-content">
+      <text class="puzzle-title">{{currentRoomName}}</text>
+      <text class="puzzle-question">{{currentQuestion}}</text>
+
+      <view wx:if="{{showHint}}" class="hint-box">
+        <text class="hint-icon">💡</text>
+        <text class="hint-text">{{hintText}}</text>
+      </view>
+
+      <view class="puzzle-options">
+        <view wx:for="{{puzzleOptions}}" wx:key="index" class="option-item" data-index="{{index}}" bindtap="selectAnswer">
+          <text class="option-letter">{{optionLetters[index]}}</text>
+          <text class="option-text">{{item}}</text>
+        </view>
+      </view>
+
+      <view class="puzzle-actions">
+        <view class="btn btn-secondary" bindtap="showHint">💡 提示</view>
+        <view class="btn btn-cancel" bindtap="closePuzzle">取消</view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{gameOver}}" class="game-over">
+    <view class="overlay"></view>
+    <view class="modal">
+      <text class="modal-icon">{{win ? '🏆' : '⏰'}}</text>
+      <text class="modal-title">{{win ? '恭喜通关!' : '游戏结束'}}</text>
+      <text class="modal-time">用时: {{formatTime(time)}}</text>
+      <text class="modal-score">最终得分: {{score}}</text>
+      <view class="btn btn-primary" bindtap="restart">再玩一次</view>
+    </view>
+  </view>
+</view>

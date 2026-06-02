@@ -1,0 +1,63 @@
+<view class="container">
+  <view class="header">
+    <view class="back-btn" bindtap="goBack">
+      <text class="back-icon">←</text>
+    </view>
+    <text class="title">✨ 新功能体验</text>
+    <view class="placeholder"></view>
+  </view>
+
+  <view class="features-grid">
+    <view 
+      wx:for="{{features}}" 
+      wx:key="key" 
+      class="feature-card"
+      bindtap="navigateToFeature"
+      data-key="{{item.key}}"
+    >
+      <text class="feature-icon">{{item.icon}}</text>
+      <text class="feature-title">{{item.title}}</text>
+      <text class="feature-desc">{{item.desc}}</text>
+    </view>
+  </view>
+
+  <view class="section">
+    <text class="section-title">🎯 AI学习助手升级</text>
+    <view class="intro-cards">
+      <view class="intro-card">
+        <text class="intro-icon">✍️</text>
+        <view class="intro-content">
+          <text class="intro-title">AI作文教练</text>
+          <text class="intro-desc">智能语法批改，优化句式表达</text>
+        </view>
+      </view>
+      <view class="intro-card">
+        <text class="intro-icon">📚</text>
+        <view class="intro-content">
+          <text class="intro-title">AI选词阅读</text>
+          <text class="intro-desc">根据词汇量推荐分级读物</text>
+        </view>
+      </view>
+      <view class="intro-card">
+        <text class="intro-icon">🎯</text>
+        <view class="intro-content">
+          <text class="intro-title">音素级纠音</text>
+          <text class="intro-desc">精准分析发音，给出改进建议</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section">
+    <text class="section-title">📊 学习数据看板</text>
+    <view class="intro-cards">
+      <view class="intro-card">
+        <text class="intro-icon">📈</text>
+        <view class="intro-content">
+          <text class="intro-title">学习数据板</text>
+          <text class="intro-desc">可视化追踪学习进度</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

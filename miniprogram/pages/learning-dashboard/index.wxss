@@ -1,0 +1,269 @@
+.container {
+  min-height: 100vh;
+  background: #f8fafc;
+  padding-bottom: 30rpx;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 30rpx;
+  background: #22c55e;
+}
+
+.back-btn {
+  width: 60rpx;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.2);
+  border-radius: 50%;
+}
+
+.back-icon {
+  color: #fff;
+  font-size: 36rpx;
+}
+
+.title {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #fff;
+}
+
+.placeholder {
+  width: 60rpx;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15rpx;
+  padding: 30rpx;
+}
+
+.stat-card {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 25rpx;
+  text-align: center;
+  box-shadow: 0 4rpx 20rpx rgba(0,0,0,0.05);
+}
+
+.stat-icon {
+  font-size: 48rpx;
+  display: block;
+  margin-bottom: 10rpx;
+}
+
+.stat-value {
+  font-size: 44rpx;
+  font-weight: 700;
+  color: #22c55e;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.stat-label {
+  font-size: 24rpx;
+  color: #64748b;
+}
+
+.section {
+  padding: 30rpx;
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 20rpx;
+  display: block;
+}
+
+.chart-container {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+  height: 200rpx;
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0,0,0,0.05);
+}
+
+.chart-bar-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+.chart-bar {
+  width: 40rpx;
+  background: linear-gradient(180deg, #22c55e, #16a34a);
+  border-radius: 8rpx 8rpx 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 20rpx;
+}
+
+.bar-value {
+  font-size: 20rpx;
+  color: #fff;
+  font-weight: 600;
+}
+
+.bar-label {
+  font-size: 20rpx;
+  color: #64748b;
+  margin-top: 10rpx;
+}
+
+.chart-legend {
+  margin-top: 15rpx;
+  text-align: center;
+}
+
+.legend-item {
+  font-size: 24rpx;
+  color: #64748b;
+}
+
+.reminder-list {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 20rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0,0,0,0.05);
+}
+
+.reminder-item {
+  display: flex;
+  align-items: center;
+  padding: 15rpx 0;
+  border-bottom: 1rpx solid #f1f5f9;
+}
+
+.reminder-item:last-child {
+  border-bottom: none;
+}
+
+.reminder-word {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1e293b;
+  width: 180rpx;
+}
+
+.reminder-meaning {
+  font-size: 26rpx;
+  color: #64748b;
+  flex: 1;
+}
+
+.reminder-level {
+  font-size: 20rpx;
+  padding: 6rpx 12rpx;
+  border-radius: 8rpx;
+}
+
+.reminder-level.high {
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+.reminder-level.medium {
+  background: #fef3c7;
+  color: #f59e0b;
+}
+
+.reminder-level.low {
+  background: #dcfce7;
+  color: #22c55e;
+}
+
+.task-list {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 10rpx 20rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0,0,0,0.05);
+}
+
+.task-item {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #f1f5f9;
+}
+
+.task-item:last-child {
+  border-bottom: none;
+}
+
+.task-item.completed {
+  opacity: 0.6;
+}
+
+.task-checkbox {
+  width: 44rpx;
+  height: 44rpx;
+  border-radius: 50%;
+  border: 2rpx solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20rpx;
+  font-size: 24rpx;
+  color: #fff;
+}
+
+.task-item.completed .task-checkbox {
+  background: #22c55e;
+  border-color: #22c55e;
+}
+
+.task-title {
+  flex: 1;
+  font-size: 28rpx;
+  color: #1e293b;
+}
+
+.task-item.completed .task-title {
+  text-decoration: line-through;
+  color: #94a3b8;
+}
+
+.task-xp {
+  font-size: 24rpx;
+  color: #22c55e;
+  font-weight: 600;
+}
+
+.task-progress {
+  margin-top: 20rpx;
+  display: flex;
+  align-items: center;
+  gap: 15rpx;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 16rpx;
+  background: #e2e8f0;
+  border-radius: 8rpx;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #22c55e, #16a34a);
+  border-radius: 8rpx;
+}
+
+.progress-text {
+  font-size: 24rpx;
+  color: #64748b;
+}

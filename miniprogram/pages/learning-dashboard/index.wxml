@@ -1,0 +1,85 @@
+<view class="container">
+  <view class="header">
+    <view class="back-btn" bindtap="goBack">
+      <text class="back-icon">←</text>
+    </view>
+    <text class="title">📊 学习数据板</text>
+    <view class="placeholder"></view>
+  </view>
+
+  <view class="stats-grid">
+    <view class="stat-card">
+      <text class="stat-icon">✨</text>
+      <text class="stat-value">{{stats.totalXP}}</text>
+      <text class="stat-label">总 XP</text>
+    </view>
+    <view class="stat-card">
+      <text class="stat-icon">🔥</text>
+      <text class="stat-value">{{stats.streak}}</text>
+      <text class="stat-label">连续天数</text>
+    </view>
+    <view class="stat-card">
+      <text class="stat-icon">📚</text>
+      <text class="stat-value">{{stats.totalWords}}</text>
+      <text class="stat-label">累计学词</text>
+    </view>
+    <view class="stat-card">
+      <text class="stat-icon">⏱️</text>
+      <text class="stat-value">{{stats.studyMinutes}}</text>
+      <text class="stat-label">今日时长(分)</text>
+    </view>
+  </view>
+
+  <view class="section">
+    <text class="section-title">📈 本周学习趋势</text>
+    <view class="chart-container">
+      <view wx:for="{{weeklyData}}" wx:key="day" class="chart-bar-wrapper">
+        <view class="chart-bar" style="height: {{(item.words / 35) * 100}}%">
+          <text class="bar-value">{{item.words}}</text>
+        </view>
+        <text class="bar-label">{{item.day}}</text>
+      </view>
+    </view>
+    <view class="chart-legend">
+      <text class="legend-item">本周学词：{{stats.weekWords}}个</text>
+    </view>
+  </view>
+
+  <view class="section">
+    <text class="section-title">🔔 遗忘曲线提醒</text>
+    <view class="reminder-list">
+      <view wx:for="{{forgetReminders}}" wx:key="word" class="reminder-item">
+        <view class="reminder-word">{{item.word}}</view>
+        <view class="reminder-meaning">{{item.meaning}}</view>
+        <view class={`reminder-level ${item.level}`}>
+          <text>{{item.level === 'high' ? '急需复习' : item.level === 'medium' ? '建议复习' : '轻松回顾'}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section">
+    <text class="section-title">📋 今日任务</text>
+    <view class="task-list">
+      <view 
+        wx:for="{{todayTasks}}" 
+        wx:key="id" 
+        class="task-item {{item.completed ? 'completed' : ''}}"
+        bindtap="toggleTask"
+        data-id="{{item.id}}"
+      >
+        <view class="task-checkbox">
+          <text>{{item.completed ? '✓' : ''}}</text>
+        </view>
+        <text class="task-title">{{item.title}}</text>
+        <text class="task-xp">+{{item.xp}} XP</text>
+      </view>
+    </view>
+    <view class="task-progress">
+      <view class="progress-bar">
+        <view class="progress-fill" style="width: {{(todayTasks.filter(t => t.completed).length / todayTasks.length) * 100}}%" />
+      </view>
+      <text class="progress-text">已完成 {{todayTasks.filter(t => t.completed).length}} / {{todayTasks.length}}</text>
+    </view>
+  </view>
+</view>

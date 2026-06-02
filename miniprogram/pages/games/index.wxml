@@ -1,0 +1,88 @@
+<view class="container">
+  <view class="page-header">
+    <text class="page-title">🎮 游戏学习</text>
+    <text class="page-subtitle">在游戏中轻松学语言</text>
+  </view>
+
+  <view class="games-grid">
+    <view class="game-card" bindtap="goToGame" data-game="word-hunter">
+      <view class="game-icon bg-orange">🔍</view>
+      <text class="game-title">单词猎人</text>
+      <text class="game-desc">在场景中找出隐藏的单词</text>
+      <view class="game-stats">
+        <text class="stat-item">🏆 {{gameStats.wordHunter.best}}</text>
+        <text class="stat-item">🎯 {{gameStats.wordHunter.score}}</text>
+      </view>
+    </view>
+
+    <view class="game-card" bindtap="goToGame" data-game="grammar-planet">
+      <view class="game-icon bg-purple">🌍</view>
+      <text class="game-title">语法星球</text>
+      <text class="game-desc">探索语法规则的奇妙世界</text>
+      <view class="game-stats">
+        <text class="stat-item">🏆 {{gameStats.grammarPlanet.best}}</text>
+        <text class="stat-item">🎯 {{gameStats.grammarPlanet.score}}</text>
+      </view>
+    </view>
+
+    <view class="game-card" bindtap="goToGame" data-game="escape-room">
+      <view class="game-icon bg-red">🔐</view>
+      <text class="game-title">密室逃脱</text>
+      <text class="game-desc">解开谜题，逃离密室</text>
+      <view class="game-stats">
+        <text class="stat-item">🏆 {{gameStats.escapeRoom.best}}</text>
+        <text class="stat-item">🎯 {{gameStats.escapeRoom.score}}</text>
+      </view>
+    </view>
+
+    <view class="game-card" bindtap="goToGame" data-game="sentence-build">
+      <view class="game-icon bg-blue">📝</view>
+      <text class="game-title">连词成句</text>
+      <text class="game-desc">组合单词，构建正确句子</text>
+      <view class="game-stats">
+        <text class="stat-item">🏆 {{gameStats.sentenceBuild.best}}</text>
+        <text class="stat-item">🎯 {{gameStats.sentenceBuild.score}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-header">
+      <text class="text-xl font-bold">游戏排行榜</text>
+      <text class="text-secondary text-sm">本周</text>
+    </view>
+    <view class="ranking-list">
+      <view class="ranking-item" wx:for="{{ranking}}" wx:key="userId">
+        <view class="rank-badge" style="background: {{item.rank <= 3 ? ['#fbbf24', '#9ca3af', '#d97706'][item.rank-1] : '#e2e8f0'}}">
+          {{item.rank}}
+        </view>
+        <view class="ranking-avatar">{{item.nickname.charAt(0)}}</view>
+        <view class="ranking-info">
+          <text class="ranking-name">{{item.nickname}}</text>
+          <text class="ranking-score">{{item.score}} 分</text>
+        </view>
+        <text class="ranking-level">{{item.level}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-header">
+      <text class="text-xl font-bold">游戏说明</text>
+    </view>
+    <view class="game-rules">
+      <view class="rule-item">
+        <text class="rule-icon">🎯</text>
+        <text class="rule-text">完成游戏可获得学习金和经验</text>
+      </view>
+      <view class="rule-item">
+        <text class="rule-icon">🏆</text>
+        <text class="rule-text">排行榜每周一0点重置</text>
+      </view>
+      <view class="rule-item">
+        <text class="rule-icon">💡</text>
+        <text class="rule-text">连续7天游戏可获得额外奖励</text>
+      </view>
+    </view>
+  </view>
+</view>

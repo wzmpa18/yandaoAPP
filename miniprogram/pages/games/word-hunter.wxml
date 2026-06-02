@@ -1,0 +1,62 @@
+<view class="container">
+  <view class="header">
+    <view class="header-left" bindtap="goBack">
+      <text class="back-icon">←</text>
+    </view>
+    <view class="header-center">
+      <text class="title">单词猎人</text>
+    </view>
+    <view class="header-right">
+      <view class="score">得分: {{score}}</view>
+    </view>
+  </view>
+
+  <view class="game-info">
+    <view class="time-bar">
+      <view class="time-label">剩余时间</view>
+      <view class="time-progress">
+        <view class="time-fill" style="width: {{(timeLeft / 120) * 100}}%"></view>
+      </view>
+      <view class="time-text">{{timeLeft}}秒</view>
+    </view>
+  </view>
+
+  <view class="words-list">
+    <text class="list-title">待找单词:</text>
+    <view class="words-grid">
+      <view wx:for="{{words}}" wx:key="index" class="word-item {{isWordFound(item) ? 'found' : ''}}">
+        {{isWordFound(item) ? '✓ ' : ''}}{{item}}
+      </view>
+    </view>
+  </view>
+
+  <view class="grid-container">
+    <view class="grid">
+      <view wx:for="{{grid}}" wx:key="index" class="grid-row">
+        <view wx:for="{{item}}" wx:for-item="letter" wx:for-index="idx" class="cell {{isCellSelected(idx, index) ? 'selected' : ''}}" data-x="{{idx}}" data-y="{{index}}" bindtap="selectCell">
+          {{letter}}
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="current-word">
+    <text class="word-label">当前单词:</text>
+    <text class="word-content">{{currentWord || '点击字母开始拼写'}}</text>
+  </view>
+
+  <view class="actions">
+    <view class="btn btn-secondary" bindtap="clearSelection">清除选择</view>
+    <view class="btn btn-primary" bindtap="checkWord">确认单词</view>
+  </view>
+
+  <view wx:if="{{gameOver}}" class="game-over">
+    <view class="overlay"></view>
+    <view class="modal">
+      <text class="modal-title">游戏结束!</text>
+      <text class="modal-score">最终得分: {{score}}</text>
+      <text class="modal-found">找到单词: {{foundCount}}/{{words.length}}</text>
+      <view class="btn btn-primary" bindtap="restart">再玩一次</view>
+    </view>
+  </view>
+</view>

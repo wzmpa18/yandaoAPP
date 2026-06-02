@@ -1,0 +1,71 @@
+<view class="container">
+  <view class="header">
+    <view class="back-btn" bindtap="goBack">
+      <text class="back-icon">←</text>
+    </view>
+    <text class="title">隐私政策</text>
+    <view class="placeholder"></view>
+  </view>
+
+  <scroll-view scroll-y class="content">
+    <view class="section">
+      <text class="section-title">一、隐私政策概述</text>
+      <text class="section-content">
+        「言道」（以下简称「我们」）重视用户隐私保护。本隐私政策旨在说明我们如何收集、使用、存储和保护您的个人信息。
+      </text>
+    </view>
+
+    <view class="section">
+      <text class="section-title">二、信息收集与使用</text>
+      <text class="section-content">
+        2.1 注册信息：当您注册账号时，我们会收集您的手机号、昵称等信息，用于身份验证和账号管理。
+      </text>
+      <text class="section-content">
+        2.2 学习数据：我们会收集您的学习记录、成绩、进度等数据，用于个性化学习推荐和服务优化。
+      </text>
+      <text class="section-content">
+        2.3 设备信息：我们可能收集您的设备型号、操作系统、IP地址等信息，用于保障服务安全和稳定性。
+      </text>
+    </view>
+
+    <view class="section">
+      <text class="section-title">三、儿童隐私保护</text>
+      <text class="section-content">
+        3.1 我们特别重视未成年人的隐私保护。对于14周岁以下的未成年人，我们仅在法定监护人同意的情况下收集和使用其信息。
+      </text>
+      <text class="section-content">
+        3.2 未成年人使用本服务时，监护人应全程陪同，并妥善保管账号信息。
+      </text>
+      <text class="section-content">
+        3.3 我们不会向未成年人推送商业广告，也不会收集未成年人的位置信息用于商业目的。
+      </text>
+    </view>
+
+    <view class="section">
+      <text class="section-title">四、信息存储与安全</text>
+      <text class="section-content">
+        4.1 您的信息将存储在安全的服务器上，并采取加密等技术手段保护。
+      </text>
+      <text class="section-content">
+        4.2 我们仅授权必要的员工访问您的信息，并签署保密协议。
+      </text>
+    </view>
+
+    <view class="section">
+      <text class="section-title">五、您的权利</text>
+      <text class="section-content">
+        5.1 您有权访问、更正或删除您的个人信息。
+      </text>
+      <text class="section-content">
+        5.2 您可以随时注销账号，我们将在15个工作日内删除您的信息。
+      </text>
+    </view>
+
+    <view class="section">
+      <text class="section-title">六、变更与通知</text>
+      <text class="section-content">
+        6.1 我们可能不定期更新本政策，更新后将通过APP通知您。
+      </text>
+    </view>
+  </scroll-view>
+</view>

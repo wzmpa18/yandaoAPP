@@ -1,0 +1,42 @@
+<view class="container">
+  <view class="search-header">
+    <view class="search-input-wrap">
+      <text class="search-icon">🔍</text>
+      <input class="search-input" placeholder="搜索语伴..." bindinput="onSearchInput" value="{{keyword}}" />
+      <view class="clear-btn" wx:if="{{keyword}}" bindtap="clearSearch">✕</view>
+    </view>
+  </view>
+
+  <view class="filter-section">
+    <view class="filter-item" bindtap="toggleFilter" data-filter="lang">
+      <text class="filter-icon">🌐</text>
+      <text class="filter-text">语言</text>
+      <text class="filter-arrow">▼</text>
+    </view>
+    <view class="filter-item" bindtap="toggleFilter" data-filter="city">
+      <text class="filter-icon">📍</text>
+      <text class="filter-text">城市</text>
+      <text class="filter-arrow">▼</text>
+    </view>
+  </view>
+
+  <view class="search-results">
+    <view class="result-card" wx:for="{{results}}" wx:key="userId" bindtap="goToChat">
+      <view class="result-avatar">{{item.nickname.charAt(0)}}</view>
+      <view class="result-info">
+        <view class="result-name-row">
+          <text class="result-name">{{item.nickname}}</text>
+          <text class="result-lang">{{item.targetLang}}</text>
+        </view>
+        <text class="result-desc">{{item.description}}</text>
+      </view>
+      <view class="add-btn">+ 关注</view>
+    </view>
+  </view>
+
+  <view class="empty-state" wx:if="{{!results.length}}">
+    <text class="empty-icon">🔍</text>
+    <text class="empty-text">暂无匹配结果</text>
+    <text class="empty-hint">尝试其他关键词或筛选条件</text>
+  </view>
+</view>

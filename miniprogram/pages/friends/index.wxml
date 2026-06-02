@@ -1,0 +1,84 @@
+<view class="container">
+  <view class="page-header">
+    <text class="page-title">👥 语伴交友</text>
+    <text class="page-subtitle">找到志同道合的学习伙伴</text>
+  </view>
+
+  <view class="filter-section">
+    <view class="filter-tabs">
+      <view class="filter-tab active">同城语伴</view>
+      <view class="filter-tab">推荐匹配</view>
+      <view class="filter-tab">我的好友</view>
+    </view>
+  </view>
+
+  <view class="city-section">
+    <view class="city-btn" bindtap="changeCity">
+      <text class="city-icon">📍</text>
+      <text class="city-name">{{currentCity}}</text>
+      <text class="city-arrow">▼</text>
+    </view>
+    <view class="search-btn" bindtap="goToSearch">
+      <text class="search-icon">🔍</text>
+      <text class="search-placeholder">搜索语伴</text>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-header">
+      <text class="text-xl font-bold">今日推荐</text>
+      <text class="text-secondary text-sm">每日自动推荐5位</text>
+    </view>
+    <view class="recommend-list">
+      <view class="friend-card" wx:for="{{recommendList}}" wx:key="userId" bindtap="goToChat">
+        <view class="friend-avatar">{{item.nickname.charAt(0)}}</view>
+        <view class="friend-info">
+          <view class="friend-name-row">
+            <text class="friend-name">{{item.nickname}}</text>
+            <text class="friend-lang">{{item.targetLang}}</text>
+          </view>
+          <text class="friend-desc">{{item.description}}</text>
+          <view class="friend-tags">
+            <text class="friend-tag" wx:for="{{item.tags}}" wx:key="*this">{{item}}</text>
+          </view>
+        </view>
+        <view class="add-btn">+ 关注</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-header">
+      <text class="text-xl font-bold">同城语伴</text>
+      <text class="text-primary text-sm">查看全部</text>
+    </view>
+    <view class="city-list">
+      <view class="friend-card" wx:for="{{cityFriends}}" wx:key="userId" bindtap="goToChat">
+        <view class="friend-avatar">{{item.nickname.charAt(0)}}</view>
+        <view class="friend-info">
+          <view class="friend-name-row">
+            <text class="friend-name">{{item.nickname}}</text>
+            <text class="friend-dist">{{item.distance}}</text>
+          </view>
+          <text class="friend-desc">{{item.description}}</text>
+        </view>
+        <view class="add-btn" wx:if="{{!item.followed}}">+ 关注</view>
+        <view class="added-btn" wx:else>已关注</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-header">
+      <text class="text-xl font-bold">学习圈入口</text>
+    </view>
+    <view class="circle-entry" bindtap="goToCircle">
+      <view class="circle-icon">💬</view>
+      <view class="circle-info">
+        <text class="circle-title">语言学习圈</text>
+        <text class="circle-desc">按语言分社群，一起学习进步</text>
+      </view>
+      <text class="circle-arrow">›</text>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,86 @@
+.page-header {
+  text-align: center;
+  padding: 40rpx 0;
+}
+
+.page-title {
+  font-size: 48rpx;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.post-form {
+  background: #ffffff;
+  border-radius: 32rpx;
+  padding: 32rpx;
+  margin-bottom: 32rpx;
+}
+
+.form-item {
+  margin-bottom: 32rpx;
+}
+
+.form-item:last-child {
+  margin-bottom: 0;
+}
+
+.content-input {
+  width: 100%;
+  min-height: 300rpx;
+  font-size: 30rpx;
+  color: #1e293b;
+  line-height: 1.6;
+}
+
+.section-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 20rpx;
+}
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.tag-item {
+  padding: 16rpx 28rpx;
+  border-radius: 32rpx;
+  font-size: 26rpx;
+}
+
+.upload-area {
+  border: 2rpx dashed #e2e8f0;
+  border-radius: 24rpx;
+  padding: 48rpx;
+  text-align: center;
+}
+
+.upload-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.upload-icon {
+  font-size: 64rpx;
+  margin-bottom: 16rpx;
+}
+
+.upload-text {
+  font-size: 28rpx;
+  color: #64748b;
+}
+
+.submit-btn {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  color: #ffffff;
+  padding: 28rpx;
+  border-radius: 40rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  text-align: center;
+  box-shadow: 0 8rpx 24rpx rgba(34, 197, 94, 0.3);
+}

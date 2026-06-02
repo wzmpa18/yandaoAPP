@@ -1,0 +1,134 @@
+.page-header {
+  text-align: center;
+  padding: 40rpx 0;
+}
+
+.page-title {
+  font-size: 56rpx;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.page-subtitle {
+  font-size: 28rpx;
+  color: #64748b;
+  margin-top: 12rpx;
+  display: block;
+}
+
+.progress-card {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  border-radius: 32rpx;
+  padding: 40rpx;
+  margin-bottom: 32rpx;
+  color: #ffffff;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.progress-title {
+  font-size: 32rpx;
+  font-weight: 600;
+}
+
+.progress-count {
+  font-size: 28rpx;
+  opacity: 0.9;
+}
+
+.progress-bar-large {
+  height: 24rpx;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 12rpx;
+  overflow: hidden;
+}
+
+.progress-fill-large {
+  height: 100%;
+  background: #ffffff;
+  border-radius: 12rpx;
+  transition: width 0.5s ease;
+}
+
+.progress-percent {
+  text-align: right;
+  font-size: 28rpx;
+  margin-top: 12rpx;
+  opacity: 0.9;
+}
+
+.category-tabs {
+  display: flex;
+  background: #ffffff;
+  border-radius: 24rpx;
+  padding: 8rpx;
+  margin-bottom: 32rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+}
+
+.category-tab {
+  flex: 1;
+  text-align: center;
+  padding: 20rpx;
+  border-radius: 20rpx;
+  font-size: 28rpx;
+  color: #64748b;
+}
+
+.category-tab.active {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  color: #ffffff;
+}
+
+.achievement-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24rpx;
+}
+
+.achievement-card {
+  background: #ffffff;
+  border-radius: 24rpx;
+  padding: 24rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+  text-align: center;
+}
+
+.achievement-icon {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  margin: 0 auto 16rpx;
+}
+
+.achievement-name {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #1e293b;
+  display: block;
+}
+
+.achievement-desc {
+  font-size: 22rpx;
+  color: #64748b;
+  margin-top: 8rpx;
+  display: block;
+}
+
+.achievement-status {
+  margin-top: 12rpx;
+}
+
+.status-text {
+  font-size: 22rpx;
+  font-weight: 500;
+}

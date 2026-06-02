@@ -1,0 +1,45 @@
+<view class="container">
+  <view class="page-header">
+    <text class="page-title">✏️ 发布动态</text>
+  </view>
+
+  <view class="post-form">
+    <view class="form-item">
+      <textarea 
+        class="content-input" 
+        placeholder="分享你的学习心得..." 
+        bindinput="onContentInput" 
+        value="{{content}}"
+        auto-height
+      />
+    </view>
+
+    <view class="form-item">
+      <view class="section-title">选择语言标签</view>
+      <view class="tag-list">
+        <view 
+          class="tag-item" 
+          wx:for="{{tags}}" 
+          wx:key="code"
+          style="background: {{selectedTags.includes(item.code) ? '#22c55e' : '#f1f5f9'}}; color: {{selectedTags.includes(item.code) ? '#ffffff' : '#64748b'}}"
+          bindtap="toggleTag"
+          data-tag="{{item.code}}"
+        >
+          {{item.name}}
+        </view>
+      </view>
+    </view>
+
+    <view class="form-item">
+      <view class="section-title">添加图片（可选）</view>
+      <view class="upload-area">
+        <view class="upload-btn">
+          <text class="upload-icon">📷</text>
+          <text class="upload-text">添加图片</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="submit-btn" bindtap="submitPost">发布动态</view>
+</view>

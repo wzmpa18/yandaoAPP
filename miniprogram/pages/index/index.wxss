@@ -1,0 +1,247 @@
+.header-card {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  border-radius: 32rpx;
+  padding: 40rpx;
+  margin-bottom: 32rpx;
+  color: #ffffff;
+}
+
+.user-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.user-info {
+  flex: 1;
+  margin-left: 24rpx;
+}
+
+.user-info .text-xl {
+  font-size: 40rpx;
+  font-weight: 700;
+}
+
+.study-gold {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 24rpx;
+  padding: 16rpx 24rpx;
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.gold-icon {
+  font-size: 32rpx;
+}
+
+.gold-count {
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.progress-section {
+  margin-top: 32rpx;
+}
+
+.progress-section .progress-bar {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.progress-section .progress-fill {
+  background: #ffffff;
+}
+
+.text-muted {
+  opacity: 0.8;
+}
+
+.text-sm {
+  font-size: 26rpx;
+}
+
+.quick-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 32rpx;
+}
+
+.action-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24rpx 16rpx;
+  background: #ffffff;
+  border-radius: 24rpx;
+  margin: 0 8rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+}
+
+.action-icon {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  margin-bottom: 12rpx;
+}
+
+.action-icon.bg-green {
+  background: #dcfce7;
+}
+
+.action-icon.bg-blue {
+  background: #dbeafe;
+}
+
+.action-icon.bg-purple {
+  background: #ede9fe;
+}
+
+.action-icon.bg-orange {
+  background: #ffedd5;
+}
+
+.action-icon.bg-gradient {
+  background: linear-gradient(135deg, #a855f7, #ec4899);
+}
+
+.action-text {
+  font-size: 24rpx;
+  color: #475569;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.recommend-scroll {
+  white-space: nowrap;
+}
+
+.recommend-list {
+  display: inline-flex;
+  gap: 24rpx;
+}
+
+.recommend-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 120rpx;
+}
+
+.recommend-avatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 32rpx;
+  font-weight: 600;
+  margin-bottom: 12rpx;
+}
+
+.recommend-name {
+  font-size: 24rpx;
+  color: #1e293b;
+  font-weight: 500;
+}
+
+.recommend-lang {
+  font-size: 20rpx;
+  color: #94a3b8;
+}
+
+.task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.task-item {
+  display: flex;
+  align-items: center;
+  padding: 20rpx;
+  background: #f8fafc;
+  border-radius: 16rpx;
+}
+
+.task-icon {
+  font-size: 36rpx;
+  margin-right: 20rpx;
+}
+
+.task-info {
+  flex: 1;
+}
+
+.task-name {
+  font-size: 28rpx;
+  color: #1e293b;
+  font-weight: 500;
+}
+
+.task-reward {
+  font-size: 22rpx;
+  color: #22c55e;
+}
+
+.task-status {
+  margin-left: 16rpx;
+}
+
+.task-check {
+  width: 40rpx;
+  height: 40rpx;
+  background: #22c55e;
+  border-radius: 50%;
+  color: #ffffff;
+  font-size: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.task-btn {
+  font-size: 24rpx;
+  color: #22c55e;
+  padding: 8rpx 16rpx;
+  border: 2rpx solid #22c55e;
+  border-radius: 20rpx;
+}
+
+.achievement-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24rpx;
+}
+
+.achievement-item {
+  width: calc(33.33% - 16rpx);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24rpx 16rpx;
+  background: #f8fafc;
+  border-radius: 16rpx;
+}
+
+.achievement-icon {
+  font-size: 48rpx;
+  margin-bottom: 12rpx;
+}
+
+.achievement-name {
+  font-size: 24rpx;
+  color: #475569;
+}
