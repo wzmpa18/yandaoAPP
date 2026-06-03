@@ -12,56 +12,46 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      
-    - name: Set up Node.js
+
+    - name: Set up Node.js 22
       uses: actions/setup-node@v4
       with:
         node-version: '22'
         cache: 'npm'
-        
+
     - name: Install dependencies
-      run: npm ci
-      
+      run: npm install
+
     - name: Build web assets
       run: npm run build
-      
+
     - name: Install Capacitor CLI
       run: npm install -g @capacitor/cli
-      
+
     - name: Sync Capacitor
       run: npx cap sync android
-      
+
     - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: 'temurin'
-        
-    - name: Clean Gradle cache
-      run: |
-        cd android
-        chmod +x gradlew
-        ./gradlew clean --no-daemon
-        
+
     - name: Build APK
       run: |
         cd android
-        ./gradlew assembleRelease --no-daemon -x lint
-      
+        chmod +x gradlew
+        ./gradlew clean assembleRelease -q
+
     - name: List APK files
-      run: find android -name "*.apk" -type f -exec ls -la {} \;
-      
+      run: ls -la android/app/build/outputs/apk/release/
+
     - name: Upload APK to R2
-      uses: jakejarvis/s3-sync-action@master
+      uses: cloudflare/wrangler-action@3.0.0
       with:
-        args: --acl public-read --follow-symlinks
-      env:
-        AWS_S3_BUCKET: ${{ secrets.R2_BUCKET }}
-        AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_KEY }}
-        AWS_S3_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
-        SOURCE_DIR: android/app/build/outputs/apk/release
-        
+        apiToken: ${{ secrets.CF_API_TOKEN }}
+        command: r2 cp android/app/build/outputs/apk/release/app-release.apk yandao-app/app-release.apk
+
     - name: Upload APK artifact
       uses: actions/upload-artifact@v4
       with:
