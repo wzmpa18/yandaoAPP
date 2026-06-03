@@ -30,17 +30,21 @@ jobs:
     - name: Copy web assets to native
       run: npx cap sync android
       
-    - name: Set up JDK
+    - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
-        java-version: '21'
+        java-version: '17'
         distribution: 'temurin'
+        
+    - name: Clean Gradle cache
+      run: |
+        cd android
+        chmod +x gradlew
+        ./gradlew clean -q
         
     - name: Build APK
       run: |
         cd android
-        ls -la
-        chmod +x gradlew
         ./gradlew assembleRelease -q
       
     - name: List APK files
@@ -91,7 +95,7 @@ jobs:
       run: gem install cocoapods
       
     - name: Install pods
-      run: cd ios && pod install && cd ..
+      run: cd ios/App && pod install && cd ../..
       
     - name: Set up Apple API Key for signing
       uses: apple-actions/import-codesign-certs@v2
