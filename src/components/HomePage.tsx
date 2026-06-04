@@ -1,11 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase } from '../data/supabase';
 import { TaijiCompass, KoiFish } from './TaijiCompass';
 import { Language, getLangZh } from './LanguageSelector';
 import { FlipCard } from './FlipCard';
 import { AudioShadow } from './AudioShadow';
 import { FloatingBack } from './FloatingBack';
 import { Confetti } from './Confetti';
+import { GridSkeleton, PageLoading } from './Skeleton';
+import { getCache, setCache } from '../lib/cache';
+import { getScenarios, getPhrases, getHacks, isOfflineMode, OfflineScenario, OfflinePhrase, OfflineHack } from '../lib/offlineData';
+
+/* 学习模式 */
+type StudyMode = 'daily' | 'exam' | 'interest';
+const STUDY_MODES: { key: StudyMode; label: string; icon: string; desc: string }[] = [
+  { key: 'daily', label: '日常交流', icon: '💬', desc: '旅行、购物、餐厅等日常场景' },
+  { key: 'exam', label: '能力考试', icon: '📝', desc: 'JLPT/TOEFL/HSK 备考强化' },
+  { key: 'interest', label: '兴趣学习', icon: '🎯', desc: '动漫、音乐、文化等兴趣驱动' },
+];
 
 /* ──────────────────── Types ──────────────────── */
 
@@ -84,11 +95,27 @@ export const HomePage: React.FC<HomePageProps> = ({
   const [route, setRoute]             = useState<Route>({ view: 'home' });
   const [completed, setCompleted]     = useState<Set<string>>(loadCompleted);
   const [confetti, setConfetti]       = useState(false);
+  const [studyMode, setStudyMode]     = useState<StudyMode>('daily');
+  const [toastMsg, setToastMsg]       = useState('');
 
   const currentLang = (externalLanguages ?? []).find((l) => l.code === activeLang);
 
+  /* 显示 toast */
+  const showToast = (msg: string) => {
+    setToastMsg(msg);
+    setTimeout(() => setToastMsg(''), 2500);
+  };
+
   // Re-fetch scenarios when external lang changes
   useEffect(() => {
+    const cacheKey = `scenarios_${externalLang || 'ja'}`;
+    const cached = getCache<Scenario[]>(cacheKey, 300000); // 5 min cache
+    if (cached) {
+      setScenarios(cached);
+      setLoadingScen(false);
+      return;
+    }
+
     setLoadingScen(true);
     setRoute({ view: 'home' });
     supabase
@@ -97,17 +124,40 @@ export const HomePage: React.FC<HomePageProps> = ({
       .eq('language_code', externalLang || 'ja')
       .order('order_index')
       .then(async ({ data }) => {
-        const rows = data ?? [];
+        const rows = (data ?? []) as Scenario[];
+        // If Supabase returned empty, use offline data
+        if (rows.length === 0 || isOfflineMode()) {
+          const offline = getScenarios(externalLang || 'ja') as unknown as Scenario[];
+          setScenarios(offline);
+          setCache(cacheKey, offline);
+          setLoadingScen(false);
+          return;
+        }
         const withCounts = await Promise.all(
           rows.map(async (s: Scenario) => {
+            const countKey = `phrase_count_${s.id}`;
+            const cachedCount = getCache<number>(countKey, 600000);
+            if (cachedCount !== null) {
+              return { ...s, phrase_count: cachedCount };
+            }
             const { count } = await supabase
               .from('phrases')
               .select('*', { count: 'exact', head: true })
               .eq('scenario_id', s.id);
-            return { ...s, phrase_count: count ?? 0 };
+            const c = count ?? (isOfflineMode() ? 10 : 0);
+            setCache(countKey, c);
+            return { ...s, phrase_count: c };
           })
         );
         setScenarios(withCounts);
+        setCache(cacheKey, withCounts);
+        setLoadingScen(false);
+      })
+      .catch(() => {
+        // Supabase connection error — use offline data
+        const offline = getScenarios(externalLang || 'ja') as unknown as Scenario[];
+        setScenarios(offline);
+        setCache(cacheKey, offline);
         setLoadingScen(false);
       });
   }, [externalLang]);
@@ -158,7 +208,13 @@ export const HomePage: React.FC<HomePageProps> = ({
   return (
     <>
       <Confetti active={confetti} />
-      <div className="zen-page">
+      {/* Toast */}
+      {toastMsg && (
+        <div className="ai-toast">
+          <span>{toastMsg}</span>
+        </div>
+      )}
+      <div className="zen-page page-fade-in">
 
         {/* Hero */}
         <section className="zen-hero">
@@ -166,9 +222,73 @@ export const HomePage: React.FC<HomePageProps> = ({
             <KoiFish size={48} />
             <h1 className="zen-hero-title">{currentLang ? getLangZh(currentLang) : '语言'} 学习路线</h1>
             <p className="zen-hero-sub">{currentLang?.name_native ?? ''} · 真实场景对话</p>
+            <p className="zen-hero-ai-note">✨ 区别于多邻国：AI 实时动态生成专属学习素材</p>
           </div>
           <div className="zen-hero-taiji">
             <TaijiCompass size={80} />
+          </div>
+        </section>
+
+        {/* 学习模式切换 */}
+        <section className="zen-mode-section">
+          <h2 className="zen-section-title">学习模式</h2>
+          <div className="study-mode-selector">
+            {STUDY_MODES.map(mode => (
+              <button
+                key={mode.key}
+                className={`study-mode-btn ${studyMode === mode.key ? 'active' : ''}`}
+                onClick={() => {
+                  setStudyMode(mode.key);
+                  showToast(`已切换到「${mode.label}」模式 — 内容将针对性调整`);
+                }}
+              >
+                <span className="study-mode-icon">{mode.icon}</span>
+                <div className="study-mode-info">
+                  <span className="study-mode-label">{mode.label}</span>
+                  <span className="study-mode-desc">{mode.desc}</span>
+                </div>
+              </button>
+            ))}
+          </div>
+        </section>
+
+        {/* AI 补充内容 */}
+        <section className="zen-ai-section">
+          <h2 className="zen-section-title">🤖 AI 智能辅助</h2>
+          <div className="ai-supplement-grid">
+            <button
+              className="ai-supplement-btn"
+              onClick={() => showToast('AI 功能即将开放 — 将根据你的水平生成更多练习题')}
+            >
+              <span className="ai-supplement-icon">📝</span>
+              <div className="ai-supplement-info">
+                <span className="ai-supplement-label">AI 帮我生成更多练习题</span>
+                <span className="ai-supplement-desc">根据当前进度智能出题</span>
+              </div>
+              <span className="ai-supplement-badge">即将开放</span>
+            </button>
+            <button
+              className="ai-supplement-btn"
+              onClick={() => showToast('AI 功能即将开放 — 将根据你的水平智能推荐内容')}
+            >
+              <span className="ai-supplement-icon">🎯</span>
+              <div className="ai-supplement-info">
+                <span className="ai-supplement-label">AI 根据我的水平推荐内容</span>
+                <span className="ai-supplement-desc">个性化难度匹配</span>
+              </div>
+              <span className="ai-supplement-badge">即将开放</span>
+            </button>
+            <button
+              className="ai-supplement-btn"
+              onClick={() => showToast('AI 功能即将开放 — 将为你补充更多场景对话')}
+            >
+              <span className="ai-supplement-icon">💬</span>
+              <div className="ai-supplement-info">
+                <span className="ai-supplement-label">AI 补充这个场景的更多对话</span>
+                <span className="ai-supplement-desc">扩展真实语境表达</span>
+              </div>
+              <span className="ai-supplement-badge">即将开放</span>
+            </button>
           </div>
         </section>
 
@@ -178,7 +298,7 @@ export const HomePage: React.FC<HomePageProps> = ({
           <p className="zen-section-desc">Choose your real-world scenario</p>
 
           {loadingScen ? (
-            <div className="zen-grid-loading"><TaijiCompass size={36} /></div>
+            <GridSkeleton cells={9} />
           ) : (
             <CompassGrid
               scenarios={scenarios}
@@ -259,17 +379,61 @@ const ScenarioPage: React.FC<ScenarioPageProps> = ({
   const prevComplete            = React.useRef(false);
 
   useEffect(() => {
+    // Try cache first
+    const cachedScenario = getCache<Scenario>(`scenario_${scenarioId}`, 300000);
+    const cachedPhrases = getCache<Phrase[]>(`phrases_${scenarioId}`, 300000);
+    const cachedHacks = getCache<Hack[]>(`hacks_${scenarioId}`, 300000);
+    if (cachedScenario && cachedPhrases) {
+      setScenario(cachedScenario);
+      setPhrases(cachedPhrases);
+      setHacks(cachedHacks ?? []);
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     setIdx(0);
     setShadow(false);
+
+    // Try Supabase, fallback to offline data
     Promise.all([
       supabase.from('scenarios').select('*').eq('id', scenarioId).maybeSingle(),
       supabase.from('phrases').select('*').eq('scenario_id', scenarioId).order('order_index'),
       supabase.from('hacks').select('*'),
     ]).then(([sRes, pRes, hRes]) => {
-      setScenario(sRes.data);
-      setPhrases(pRes.data ?? []);
-      setHacks(hRes.data ?? []);
+      let s = sRes.data as Scenario | null;
+      let p = (pRes.data ?? []) as Phrase[];
+      let h = (hRes.data ?? []) as Hack[];
+
+      // If Supabase returned empty, use offline data
+      if (!s || isOfflineMode()) {
+        const offlineScenarios = getScenarios(scenarioId.split('_')[1] || 'ja');
+        s = offlineScenarios.find(sc => sc.id === scenarioId) as unknown as Scenario || null;
+      }
+      if (p.length === 0 || isOfflineMode()) {
+        p = getPhrases(scenarioId) as unknown as Phrase[];
+      }
+      if (h.length === 0 || isOfflineMode()) {
+        h = getHacks() as unknown as Hack[];
+      }
+
+      setScenario(s);
+      setPhrases(p);
+      setHacks(h);
+      if (s) setCache(`scenario_${scenarioId}`, s);
+      if (p.length) setCache(`phrases_${scenarioId}`, p);
+      if (h.length) setCache(`hacks_${scenarioId}`, h);
+      setLoading(false);
+    }).catch(() => {
+      // Network error — use offline data
+      const langCode = scenarioId.split('_')[1] || 'ja';
+      const offlineScenarios = getScenarios(langCode);
+      const s = offlineScenarios.find(sc => sc.id === scenarioId) as unknown as Scenario || null;
+      const p = getPhrases(scenarioId) as unknown as Phrase[];
+      const h = getHacks() as unknown as Hack[];
+      setScenario(s);
+      setPhrases(p);
+      setHacks(h);
       setLoading(false);
     });
   }, [scenarioId]);
@@ -291,16 +455,15 @@ const ScenarioPage: React.FC<ScenarioPageProps> = ({
 
   if (loading || !scenario) {
     return (
-      <div className="zen-loading">
+      <div className="zen-page page-fade-in">
         <FloatingBack onClick={onBack} />
-        <TaijiCompass size={56} />
-        <p className="zen-loading-text">Loading…</p>
+        <PageLoading message="Loading scenario…" />
       </div>
     );
   }
 
   return (
-    <div className="zen-page">
+    <div className="zen-page page-fade-in">
       <FloatingBack onClick={onBack} />
 
       <header className="zen-scenario-header" style={{ '--accent': scenario.color } as React.CSSProperties}>
@@ -331,6 +494,38 @@ const ScenarioPage: React.FC<ScenarioPageProps> = ({
         </div>
       )}
 
+      {/* AI 补充按钮 — 场景内 */}
+      <div className="zen-scene-ai-bar">
+        <button
+          className="zen-scene-ai-btn"
+          onClick={() => {
+            try {
+              const toast = document.createElement('div');
+              toast.className = 'ai-toast';
+              toast.textContent = 'AI 功能即将开放 — 将为你生成更多同类场景对话';
+              document.body.appendChild(toast);
+              setTimeout(() => toast.remove(), 2500);
+            } catch { /* 静默 */ }
+          }}
+        >
+          🤖 AI 帮我生成更多同类对话
+        </button>
+        <button
+          className="zen-scene-ai-btn"
+          onClick={() => {
+            try {
+              const toast = document.createElement('div');
+              toast.className = 'ai-toast';
+              toast.textContent = 'AI 功能即将开放 — 将为你推荐下一个适合的场景';
+              document.body.appendChild(toast);
+              setTimeout(() => toast.remove(), 2500);
+            } catch { /* 静默 */ }
+          }}
+        >
+          🎯 AI 推荐下一个学习场景
+        </button>
+      </div>
+
       {phrase && (
         <div className="zen-flip-section">
           <FlipCard
@@ -347,6 +542,7 @@ const ScenarioPage: React.FC<ScenarioPageProps> = ({
             isCompleted={completed.has(phrase.id)}
             isLocked={isLocked(idx)}
             onMarkComplete={() => onMark(phrase.id, phrases.length)}
+            langCode={scenario.language_code}
           />
         </div>
       )}
@@ -363,7 +559,7 @@ const ScenarioPage: React.FC<ScenarioPageProps> = ({
 
       {phrase && shadow && (
         <div className="zen-shadow-section">
-          <AudioShadow phrase={phrase.target_lang} pronunciation={phrase.pronunciation} />
+          <AudioShadow phrase={phrase.target_lang} pronunciation={phrase.pronunciation} langCode={scenario.language_code} />
           <button className="zen-shadow-close" onClick={() => setShadow(false)}>Close</button>
         </div>
       )}

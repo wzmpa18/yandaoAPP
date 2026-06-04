@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { FloatingBack } from './FloatingBack';
+import { callAI } from '../lib/aiClient';
+import { speakWithPreset, stopSpeaking } from '../lib/voiceProfile';
 
 interface AICoachProps {
   langCode: string;
@@ -190,9 +192,28 @@ function pickTemplate(role: Role, input: string): string {
   return role.templates[idx];
 }
 
-async function aiGenerateResponse(role: RoleKey, input: string, _langCode: string, _level: string): Promise<string> {
-  const r = ROLES.find((r) => r.key === role)!;
-  return pickTemplate(r, input);
+const ROLE_SYSTEM_PROMPTS: Record<RoleKey, string> = {
+  panda: '你是一只温柔的熊猫老师，教用户学习外语。你总是鼓励、耐心、正面积极。回答要简短（2-3句），使用表情符号。',
+  tsundere: '你是一个毒舌傲娇的语言陪练。表面上很刻薄但其实很关心用户。回答要简短毒舌但有帮助（2-3句），可以带一点傲娇语气。',
+  funny: '你是一个搞笑的语伴朋友。说话幽默，喜欢用网络梗。回答要简短有趣（2-3句），让人开心。',
+  sweet: '你是一个甜蜜的语伴，说话温柔像恋人一样。回答要甜蜜温暖（2-3句），给人鼓励和爱意。',
+};
+
+async function aiGenerateResponse(role: RoleKey, input: string, langCode: string, level: string): Promise<string> {
+  if (!input.trim()) return ROLES.find(r => r.key === role)!.greet;
+  
+  try {
+    const systemPrompt = ROLE_SYSTEM_PROMPTS[role];
+    const levelLabel = level === 'beginner' ? '初级' : level === 'intermediate' ? '中级' : '高级';
+    const response = await callAI(
+      `[角色]: ${systemPrompt}\n[用户语言]: ${langCode}\n[用户水平]: ${levelLabel}\n[用户说]: ${input}\n\n请用中文简短回复（2-3句），保持角色风格。`,
+      { max_tokens: 200 }
+    );
+    if (response && response.trim()) return response.trim();
+  } catch {
+    // AI 不可用，降级到模板
+  }
+  return pickTemplate(ROLES.find(r => r.key === role)!, input);
 }
 
 export const AICoach: React.FC<AICoachProps> = ({ langCode, langName, userLevel, onBack }) => {
@@ -203,6 +224,8 @@ export const AICoach: React.FC<AICoachProps> = ({ langCode, langName, userLevel,
   const [sessionStart] = useState(Date.now());
   const [sessionDuration, setSessionDuration] = useState(0);
   const [showBadge, setShowBadge] = useState(false);
+  const [ttsEnabled, setTtsEnabled] = useState(true);
+  const [ttsSpeaking, setTtsSpeaking] = useState(false);
 
   // Voice state
   const [voiceStatus, setVoiceStatus] = useState<VoiceStatus>('idle');
@@ -244,6 +267,11 @@ export const AICoach: React.FC<AICoachProps> = ({ langCode, langName, userLevel,
     const reply = await aiGenerateResponse(selectedRole, msg, langCode, userLevel);
     setMessages((m) => [...m, { from: 'ai', text: reply, ts: Date.now() }]);
     setLoading(false);
+    // TTS 朗读 AI 回复
+    if (ttsEnabled && reply) {
+      setTtsSpeaking(true);
+      speakWithPreset(reply, langCode).finally(() => setTtsSpeaking(false));
+    }
   }
 
   const startVoiceInput = useCallback(() => {
@@ -482,6 +510,11 @@ export const AICoach: React.FC<AICoachProps> = ({ langCode, langName, userLevel,
       </div>
 
       <div className="aic-bottom-actions">
+        <button className={`aic-tts-toggle ${ttsEnabled ? 'on' : ''}`}
+          onClick={() => { setTtsEnabled(!ttsEnabled); if (ttsEnabled) stopSpeaking(); }}
+          title={ttsEnabled ? '关闭语音朗读' : '开启语音朗读'}>
+          {ttsEnabled ? '🔊 语音开' : '🔇 语音关'}
+        </button>
         {!practiceMode && (
           <button className="aic-pron-trigger" onClick={startPronunciationPractice}>🎯 发音跟读练习</button>
         )}

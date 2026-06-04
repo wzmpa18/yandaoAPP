@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase } from '../data/supabase';
 
 const SESSION_KEY_STORE = 'yandao_session_v5';
 const SHIELD_COST_DIAMONDS = 50;

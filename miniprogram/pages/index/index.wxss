@@ -71,11 +71,16 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 24rpx 16rpx;
+  padding: 24rpx 12rpx;
   background: #ffffff;
   border-radius: 24rpx;
-  margin: 0 8rpx;
+  margin: 0 6rpx;
   box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s;
+}
+
+.action-item:active {
+  transform: scale(0.95);
 }
 
 .action-icon {
@@ -105,10 +110,6 @@
   background: #ffedd5;
 }
 
-.action-icon.bg-gradient {
-  background: linear-gradient(135deg, #a855f7, #ec4899);
-}
-
 .action-text {
   font-size: 24rpx;
   color: #475569;
@@ -134,7 +135,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 120rpx;
+  width: 130rpx;
 }
 
 .recommend-avatar {
@@ -155,6 +156,10 @@
   font-size: 24rpx;
   color: #1e293b;
   font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 130rpx;
 }
 
 .recommend-lang {
@@ -223,25 +228,42 @@
 .achievement-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 24rpx;
+  gap: 16rpx;
 }
 
 .achievement-item {
-  width: calc(33.33% - 16rpx);
+  width: calc(33.33% - 12rpx);
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 24rpx 16rpx;
+  padding: 24rpx 12rpx;
   background: #f8fafc;
   border-radius: 16rpx;
+  transition: all 0.3s;
+}
+
+.achievement-item.unlocked {
+  background: #f0fdf4;
+  border: 2rpx solid #22c55e;
+}
+
+.achievement-item.locked {
+  opacity: 0.5;
 }
 
 .achievement-icon {
   font-size: 48rpx;
-  margin-bottom: 12rpx;
+  margin-bottom: 8rpx;
 }
 
 .achievement-name {
   font-size: 24rpx;
   color: #475569;
+  font-weight: 500;
+}
+
+.achievement-desc {
+  font-size: 20rpx;
+  color: #94a3b8;
+  margin-top: 4rpx;
 }

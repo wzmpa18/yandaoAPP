@@ -1,6 +1,9 @@
-import { jokeTemplates, radioTemplates, grammarTemplates, wordBanks, extraVariables, type Template } from './templates';
+import { jokeTemplates, radioTemplates, grammarTemplates, storyTemplates, wordBanks, extraVariables, type Template } from './templates';
 import { mockDatabase, type ContentItem } from '../data/database';
-import { supabase } from '../data/supabase';
+import { getProviderSync } from '../providers';
+
+// 延迟获取 data provider，避免模块初始化时序问题
+function dp() { try { return getProviderSync().data; } catch { throw new Error('[ContentGenerator] Provider not available'); } }
 
 export interface GeneratedContent {
   id: string;
@@ -88,10 +91,22 @@ class ContentGenerator {
     const wordBank = wordBanks[language];
     const extras = extraVariables[language] || {};
 
+    // 1. Try language-specific extras first
     if (extras[variableName]) {
       return this.getRandomItem(extras[variableName]);
     }
 
+    // 2. Try any language's extras as fallback (e.g., zh extras for ja, or en for all)
+    if (!extras[variableName]) {
+      for (const lang of [language, 'zh', 'ja', 'ko', 'en']) {
+        const fallback = extraVariables[lang];
+        if (fallback && fallback[variableName]) {
+          return this.getRandomItem(fallback[variableName]);
+        }
+      }
+    }
+
+    // 3. Map common variable names to wordBank categories
     switch (variableName.toLowerCase()) {
       case 'person':
       case 'people':
@@ -127,13 +142,24 @@ class ContentGenerator {
       case 'day_of_week':
         return this.getRandomItem(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']);
       case 'topic':
-        return this.getRandomItem(['learning languages', 'travel', 'food', 'technology', 'sports', 'music', 'books', 'movies']);
+      case '主题':
+      case 'トピック':
+      case 'sujet':
+      case 'tema':
+      case 'thema':
+      case 'argomento':
+        return this.getRandomItem(['learning languages', 'travel', 'food', 'technology', 'sports', 'music', 'books', 'movies', 'culture', 'history']);
       case 'fun_fact':
+      case 'funfact':
         return this.getRandomItem([
           'The shortest war in history was between Britain and Zanzibar in 1896. It lasted 38 minutes.',
-          'Honey never spoils.',
-          'Octopuses have three hearts.',
+          'Honey never spoils. Archaeologists found 3000-year-old honey in Egyptian tombs.',
+          'Octopuses have three hearts, blue blood, and nine brains.',
           'Bananas are berries, but strawberries are not.',
+          'A day on Venus is longer than a year on Venus.',
+          'The Eiffel Tower can grow 15 cm taller in summer due to thermal expansion.',
+          'Koalas have fingerprints almost identical to humans.',
+          'The human nose can detect over 1 trillion different scents.',
         ]);
       case 'question':
         return this.getRandomItem([
@@ -141,44 +167,75 @@ class ContentGenerator {
           'How do you practice speaking?',
           'What language are you learning now?',
           'Do you prefer reading or listening?',
+          'What motivates you to learn a new language?',
+          'Have you ever had a funny language mix-up?',
         ]);
       case 'guest_name':
-        return this.getRandomItem(['Alex', 'Sarah', 'Mike', 'Emma', 'David', 'Lisa']);
+      case 'guestname':
+        return this.getRandomItem(['Alex', 'Sarah', 'Mike', 'Emma', 'David', 'Lisa', 'John', 'Maria', 'Hiroshi', 'Yuki', 'Min-ji', 'Sofia', 'Luis', 'Anna', 'Omar', 'Wei']);
       case 'theme':
-        return this.getRandomItem(['language learning tips', 'cultural insights', 'travel stories', 'study habits']);
+        return this.getRandomItem(['language learning tips', 'cultural insights', 'travel stories', 'study habits', 'memory techniques', 'pronunciation tips', 'grammar deep dive', 'vocabulary building']);
       case 'point1':
       case 'point2':
       case 'point3':
         return this.getRandomItem([
-          'setting realistic goals',
-          'practicing daily',
-          'using flashcards',
-          'finding a language partner',
-          'watching movies',
-          'reading books',
+          'setting realistic goals', 'practicing daily', 'using flashcards', 'finding a language partner',
+          'watching movies with subtitles', 'reading graded readers', 'listening to podcasts', 'writing a journal',
+          'shadowing native speakers', 'using mnemonics', 'learning word roots', 'immersing in music',
         ]);
       case 'segment_name':
-        return this.getRandomItem([
-          'Ask the Expert',
-          'Listener Stories',
-          'Tips and Tricks',
-          'Culture Corner',
-        ]);
+      case 'segmentname':
+        return this.getRandomItem(['Ask the Expert', 'Listener Stories', 'Tips and Tricks', 'Culture Corner', 'Grammar Spotlight', 'Vocab Vault', 'Pronunciation Lab', 'Daily Challenge']);
       case 'number':
-        return this.getRandomItem(['3', '5', '7', '10']);
+        return this.getRandomItem(['3', '5', '7', '10', '12', '15', '20']);
       case 'time':
-        return this.getRandomItem(['one week', 'one month', 'three months', 'one year']);
+        return this.getRandomItem(['one week', 'one month', 'three months', 'six months', 'one year']);
       case 'verb':
-        return this.getRandomItem(['study', 'learn', 'practice', 'speak', 'read', 'write']);
+        return this.getRandomItem(['study', 'learn', 'practice', 'speak', 'read', 'write', 'listen', 'memorize', 'review']);
       case 'preposition':
-        return this.getRandomItem(['at', 'in', 'on', 'to', 'for', 'with']);
+        return this.getRandomItem(['at', 'in', 'on', 'to', 'for', 'with', 'from', 'about', 'into', 'through']);
       case 'article':
         return this.getRandomItem(['a', 'an', 'the', '-']);
       case 'pronoun':
-        return this.getRandomItem(['He', 'She', 'They', 'We']);
+        return this.getRandomItem(['He', 'She', 'They', 'We', 'It', 'I', 'You']);
       case 'conjunction':
-        return this.getRandomItem(['and', 'but', 'or', 'because', 'so']);
+        return this.getRandomItem(['and', 'but', 'or', 'because', 'so', 'although', 'however', 'therefore']);
+      case 'name':
+      case '人名':
+        return this.getRandomItem(['Alex', 'Sarah', 'Mike', 'Emma', 'David', 'Lisa', 'John', 'Maria', 'Hiroshi', 'Yuki', 'Min-ji', 'Sofia', 'Luis', 'Anna', 'Omar', 'Wei', 'Tom', 'Lucy', 'James', 'Emily']);
+      case 'landmark':
+        return this.getRandomItem(['river', 'mountain', 'old tree', 'temple', 'bridge', 'castle', 'lake', 'waterfall', 'market', 'library', 'garden', 'tower']);
+      case 'dialogue':
+      case '台词':
+        return this.getRandomItem(['Follow me!', 'I have a secret to tell you.', "Don't be afraid.", 'You are the chosen one.', 'Help me, please!', 'This is amazing!', "I've been waiting for you.", 'Can you believe it?']);
+      case 'emotion':
+      case '感情':
+        return this.getRandomItem(['happy', 'surprised', 'scared', 'excited', 'confused', 'hopeful', 'worried', 'amazed', 'delighted', 'nervous']);
+      case 'message':
+        return this.getRandomItem(['Meet me at midnight.', 'The treasure is hidden under the old oak.', 'You have been chosen.', "Don't trust the stranger.", 'Follow the north star.', 'Your journey begins now.']);
+      case 'quality':
+        return this.getRandomItem(['courage', 'wisdom', 'kindness', 'patience', 'determination', 'curiosity', 'honesty', 'creativity']);
+      case 'question':
+        return this.getRandomItem([
+          'What is your favorite way to learn?',
+          'How do you practice speaking?',
+          'What language are you learning now?',
+          'Do you prefer reading or listening?',
+          'What motivates you to learn a new language?',
+          'Have you ever had a funny language mix-up?',
+        ]);
+      case 'adjective2':
+        return this.getRandomItem(['strange', 'wonderful', 'terrible', 'amazing', 'mysterious', 'unexpected', 'magical', 'unforgettable', 'shocking', 'incredible']);
+      case 'adjective3':
+        return this.getRandomItem(['extraordinary', 'unbelievable', 'bizarre', 'miraculous', 'peculiar', 'remarkable', 'astonishing', 'surreal']);
+      case 'action2':
+        return this.getRandomItem(['sing a song', 'tell a story', 'dance together', 'share their secret', 'write a book', 'build a bridge', 'plant a garden', 'create a map']);
+      case '質問':
+        return this.getRandomItem(['どこに行きますか', 'これは何ですか', '誰ですか', 'どうしてですか', 'いつ来ますか']);
+      case '질문':
+        return this.getRandomItem(['어디에 가세요?', '이게 뭐예요?', '누구세요?', '왜 그래요?', '언제 와요?']);
       default:
+        // Final fallback: return variable name as-is
         return variableName;
     }
   }
@@ -228,6 +285,10 @@ class ContentGenerator {
             'Complete the sentence: I have been ___ English for two years.',
             'Rewrite in passive: They built this building in 2020.',
           ],
+          story_en: [
+            'Once upon a time, in a small village nestled between green mountains, there lived a young student named Li Wei. Every morning, she would practice writing characters by the river. One day, an old sage appeared and said, "You have the gift of words. Use them wisely, and they will open doors you never imagined."',
+            'The ancient library had stood for 300 years. Nobody had entered its deepest chamber for decades. When Emma accidentally pushed the wrong bookshelf, it slid aside to reveal a hidden room filled with glowing manuscripts in languages she had never seen before.',
+          ],
         };
 
         const key = `${type}_${language}`;
@@ -245,6 +306,8 @@ class ContentGenerator {
         return radioTemplates.filter(t => t.language === language);
       case 'grammar':
         return grammarTemplates.filter(t => t.language === language);
+      case 'story':
+        return storyTemplates.filter(t => t.language === language);
       default:
         return [];
     }
@@ -264,8 +327,24 @@ class ContentGenerator {
   private async saveToDatabase(content: GeneratedContent): Promise<void> {
     if (!content.isAI) return;
     
+    // Also save to localStorage for offline resilience
     try {
-      const { error } = await supabase.from('contents').insert([{
+      const localCache = JSON.parse(localStorage.getItem('ai_generated_cache') || '{}');
+      const key = `${content.type}_${content.language}`;
+      if (!localCache[key]) localCache[key] = [];
+      localCache[key].push({
+        id: content.id, type: content.type, language: content.language,
+        title: content.title, content: content.content,
+        translation: content.translation, level: content.level,
+        source: 'ai_generated', created_at: new Date().toISOString(),
+      });
+      // Keep only last 50 per type+language
+      if (localCache[key].length > 50) localCache[key] = localCache[key].slice(-50);
+      localStorage.setItem('ai_generated_cache', JSON.stringify(localCache));
+    } catch { /* ignore localStorage errors */ }
+
+    try {
+      await dp().insert('contents', [{
         id: content.id,
         type: content.type,
         language: content.language,
@@ -276,14 +355,9 @@ class ContentGenerator {
         source: 'ai_generated',
         usage_count: 1,
       }]);
-      
-      if (error) {
-        console.warn('Failed to save AI-generated content to database:', error);
-      } else {
-        console.log('AI-generated content saved to database:', content.id);
-      }
+      console.log('AI-generated content saved to database:', content.id);
     } catch (e) {
-      console.warn('Error saving to database:', e);
+      console.warn('Error saving to database (offline mode, cached locally):', e);
     }
   }
 
@@ -298,27 +372,24 @@ class ContentGenerator {
     }
 
     try {
-      const { data, error } = await supabase
-        .from('contents')
-        .select('*')
-        .eq('type', type)
-        .eq('language', language)
-        .eq('source', 'ai_generated')
-        .limit(20);
+      const data = await dp().select('contents', {
+        eq: { type, language, source: 'ai_generated' },
+        limit: 20,
+      });
 
-      if (!error && data && data.length > 0) {
-        const dbContent = data.map(item => ({
-          id: item.id,
+      if (data && data.length > 0) {
+        const dbContent = data.map((item: Record<string, unknown>) => ({
+          id: item.id as string,
           type: item.type as GeneratedContent['type'],
-          language: item.language,
-          content: item.content,
-          title: item.title,
-          translation: item.translation,
-          level: item.level,
+          language: item.language as string,
+          content: item.content as string,
+          title: item.title as string | undefined,
+          translation: item.translation as string | undefined,
+          level: item.level as string | undefined,
           templateId: 'ai_generated',
           variablesUsed: {},
           isAI: true,
-          timestamp: item.created_at ? new Date(item.created_at).getTime() : Date.now(),
+          timestamp: item.created_at ? new Date(item.created_at as string).getTime() : Date.now(),
         }));
         
         this.aiGeneratedCache.set(cacheKey, dbContent);

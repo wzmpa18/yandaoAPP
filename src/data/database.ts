@@ -26,6 +26,10 @@ export const supportedLanguages: LanguageConfig[] = [
   { code: 'fr', name: 'French', nativeName: 'Français', flag: '🇫🇷' },
   { code: 'es', name: 'Spanish', nativeName: 'Español', flag: '🇪🇸' },
   { code: 'de', name: 'German', nativeName: 'Deutsch', flag: '🇩🇪' },
+  { code: 'it', name: 'Italian', nativeName: 'Italiano', flag: '🇮🇹' },
+  { code: 'pt', name: 'Portuguese', nativeName: 'Português', flag: '🇵🇹' },
+  { code: 'ar', name: 'Arabic', nativeName: 'العربية', flag: '🇸🇦' },
+  { code: 'zh', name: 'Chinese', nativeName: '中文', flag: '🇨🇳' },
 ];
 
 export const generateMockData = (): ContentItem[] => {
@@ -86,6 +90,63 @@ export const generateMockData = (): ContentItem[] => {
     { content: "Twinkle, twinkle, little star, How I wonder what you are! Up above the world so high, Like a diamond in the sky.", translation: "一闪一闪小星星，我想知道你是什么！高高挂在世界上，像天空中的钻石。", age_group: 'kids' },
     { content: "Row, row, row your boat, Gently down the stream. Merrily, merrily, merrily, merrily, Life is but a dream.", translation: "划呀划，划小船，轻轻顺流而下。快乐呀快乐，生活只是一场梦。", age_group: 'kids' },
     { content: "Mary had a little lamb, Its fleece was white as snow. And everywhere that Mary went, The lamb was sure to go.", translation: "玛丽有一只小羊羔，羊毛白如雪。玛丽走到哪里，小羊羔就跟到哪里。", age_group: 'kids' },
+  ];
+
+  const frenchJokes = [
+    { content: "Pourquoi les plongeurs plongent-ils toujours en arrière? Parce que sinon ils tombent dans le bateau!", translation: "为什么潜水员总是往后跳水？因为否则他们会掉进船里！" },
+    { content: "Quel est le comble pour un électricien? De ne pas être au courant!", translation: "电工最尴尬的事是什么？不知道/不通电！" },
+    { content: "Pourquoi le café est-il déprimé? Parce qu'il a été moulu toute la journée!", translation: "为什么咖啡很沮丧？因为它整天被研磨！" },
+  ];
+
+  const spanishJokes = [
+    { content: "¿Qué le dice un semáforo a otro? ¡No me mires que me estoy cambiando!", translation: "一个红绿灯对另一个说什么？别看我在换衣服！" },
+    { content: "¿Por qué los pájaros no usan Facebook? ¡Porque ya tienen Twitter!", translation: "为什么鸟不用Facebook？因为它们已经有Twitter了！" },
+    { content: "¿Cuál es el colmo de un libro? ¡Perder las hojas en otoño!", translation: "一本书最倒霉的事是什么？秋天掉页（叶子）！" },
+  ];
+
+  const germanJokes = [
+    { content: "Was ist gelb und kann nicht schießen? Eine Banane — sie ist krumm!", translation: "什么是黄色的但不能射击？香蕉——它弯了！" },
+    { content: "Warum gehen Ameisen nicht in die Kirche? Weil sie in Sekten sind!", translation: "为什么蚂蚁不去教堂？因为它们在教派里！" },
+  ];
+
+  const italianJokes = [
+    { content: "Perché il libro di matematica è triste? Perché ha troppi problemi!", translation: "为什么数学书很伤心？因为它有太多问题！" },
+    { content: "Cosa dice un pomodoro all'altro? Ci vediamo in insalata!", translation: "一个番茄对另一个说什么？沙拉里见！" },
+  ];
+
+  const portugueseJokes = [
+    { content: "Por que o livro de matemática está triste? Porque tem muitos problemas!", translation: "为什么数学书很伤心？因为它有太多问题！" },
+    { content: "O que o zero disse para o oito? Que cinto bonito!", translation: "0对8说了什么？好漂亮的腰带！" },
+  ];
+
+  const arabicJokes = [
+    { content: "لماذا كتاب الرياضيات حزين؟ لأن لديه مشاكل كثيرة!", translation: "为什么数学书很伤心？因为它有太多问题！" },
+    { content: "ماذا قال الصفر للثمانية؟ حزام جميل!", translation: "0对8说了什么？漂亮的腰带！" },
+  ];
+
+  const chineseJokes = [
+    { content: "为什么数学书总是忧伤？因为它有太多解决不了的问题！", translation: "Why is the math book always sad? Because it has too many unsolvable problems!" },
+    { content: "0对8说了什么？兄弟，你这腰带不错啊！", translation: "What did 0 say to 8? Nice belt, bro!" },
+    { content: "筷子为什么找不到对象？因为它总是单身（双根）！", translation: "Why can't chopsticks find a partner? Because they're always single (double)!" },
+  ];
+
+  const multiLangStories = [
+    { language: 'ja', content: "むかしむかし、あるところに、おじいさんとおばあさんが住んでいました。おばあさんが川で洗濯をしていると、大きな桃が流れてきました。", translation: "很久很久以前，老爷爷和老奶奶住在一起。老奶奶在河边洗衣服时，漂来一个大桃子。", level: 'A1', age_group: 'kids' },
+    { language: 'fr', content: "Il était une fois un petit prince qui vivait sur une toute petite planète. Un jour, une rose magnifique est apparue sur sa planète.", translation: "从前有一个小王子，住在一颗很小的星球上。有一天，他的星球上出现了一朵美丽的玫瑰。", level: 'A1', age_group: 'kids' },
+    { language: 'es', content: "En un pequeño pueblo de España, vivía un joven llamado Miguel que soñaba con viajar por el mundo. Cada día ahorraba un poco de dinero.", translation: "在西班牙的一个小镇上，住着一个叫米格尔的年轻人，他梦想环游世界。他每天都存一点钱。", level: 'A2', age_group: 'teenagers' },
+    { language: 'de', content: "Es war einmal ein kleiner Hase, der im Wald lebte. Er war sehr neugierig und wollte immer neue Dinge entdecken.", translation: "从前有一只小兔子住在森林里。他非常好奇，总想发现新事物。", level: 'A1', age_group: 'kids' },
+    { language: 'it', content: "C'era una volta un burattino di legno che sognava di diventare un bambino vero. Il suo nome era Pinocchio.", translation: "从前有一个木偶，他梦想成为一个真正的男孩。他的名字叫匹诺曹。", level: 'A1', age_group: 'kids' },
+    { language: 'pt', content: "Era uma vez uma menina chamada Ana que adorava explorar a floresta perto de sua casa. Um dia, ela encontrou um mapa antigo.", translation: "从前有一个叫安娜的女孩，她喜欢探索家附近的森林。有一天，她发现了一张古老的地图。", level: 'A2', age_group: 'teenagers' },
+    { language: 'ar', content: "كان ياما كان، في قديم الزمان، كان هناك تاجر اسمه سندباد. كان يحب السفر والمغامرة.", translation: "很久很久以前，有一个商人叫辛巴达。他热爱旅行和冒险。", level: 'A2', age_group: 'teenagers' },
+    { language: 'zh', content: "从前有一个小男孩，他每天都去河边放牛。有一天，他觉得很无聊，就对着山下大喊：「狼来了！狼来了！」", translation: "Once there was a boy who herded cattle by the river every day. One day, feeling bored, he shouted: 'Wolf! Wolf!'", level: 'A1', age_group: 'kids' },
+  ];
+
+  const multiLangNurseryRhymes = [
+    { language: 'ja', content: "ぞうさん、ぞうさん、お鼻が長いのね。そうよ、かあさんも長いのよ。", translation: "大象大象，你的鼻子真长呀。是啊，妈妈也长呢。", age_group: 'kids' },
+    { language: 'ko', content: "곰 세 마리가 한 집에 있어, 아빠 곰, 엄마 곰, 애기 곰. 아빠 곰은 뚱뚱해.", translation: "三只熊住在一间房子里，熊爸爸，熊妈妈，熊宝宝。熊爸爸胖胖的。", age_group: 'kids' },
+    { language: 'fr', content: "Frère Jacques, Frère Jacques, dormez-vous? Dormez-vous? Sonnez les matines, sonnez les matines. Ding ding dong!", translation: "雅克兄弟，雅克兄弟，你在睡觉吗？你在睡觉吗？敲响晨钟，敲响晨钟。叮叮咚！", age_group: 'kids' },
+    { language: 'es', content: "Los pollitos dicen pío, pío, pío, cuando tienen hambre, cuando tienen frío.", translation: "小鸡们叫叽叽叽，当它们饿了，当它们冷了。", age_group: 'kids' },
+    { language: 'zh', content: "两只老虎，两只老虎，跑得快，跑得快。一只没有耳朵，一只没有尾巴，真奇怪，真奇怪！", translation: "Two tigers, two tigers, running fast. One has no ears, one has no tail. How strange!", age_group: 'kids' },
   ];
 
   englishJokes.forEach((joke, index) => {
@@ -180,6 +241,53 @@ export const generateMockData = (): ContentItem[] => {
       source: 'manual',
       created_at: now - index * 9000000,
       usage_count: Math.floor(Math.random() * 500),
+    });
+  });
+
+  // Multi-language jokes
+  [{ lang: 'fr', data: frenchJokes }, { lang: 'es', data: spanishJokes }, { lang: 'de', data: germanJokes }, { lang: 'it', data: italianJokes }, { lang: 'pt', data: portugueseJokes }, { lang: 'ar', data: arabicJokes }, { lang: 'zh', data: chineseJokes }].forEach(({ lang, data }) => {
+    data.forEach((joke, index) => {
+      items.push({
+        id: `joke_${lang}_${index + 1}`,
+        type: 'joke',
+        language: lang,
+        content: joke.content,
+        translation: joke.translation,
+        source: 'manual',
+        created_at: now - index * 3600000,
+        usage_count: Math.floor(Math.random() * 30),
+      });
+    });
+  });
+
+  // Multi-language stories
+  multiLangStories.forEach((story, index) => {
+    items.push({
+      id: `story_${story.language}_${index + 1}`,
+      type: 'story',
+      language: story.language,
+      content: story.content,
+      translation: story.translation,
+      level: story.level,
+      age_group: story.age_group,
+      source: 'manual',
+      created_at: now - index * 10800000,
+      usage_count: Math.floor(Math.random() * 60),
+    });
+  });
+
+  // Multi-language nursery rhymes
+  multiLangNurseryRhymes.forEach((rhyme, index) => {
+    items.push({
+      id: `nursery_${rhyme.language}_${index + 1}`,
+      type: 'nursery_rhyme',
+      language: rhyme.language,
+      content: rhyme.content,
+      translation: rhyme.translation,
+      age_group: rhyme.age_group,
+      source: 'manual',
+      created_at: now - index * 9000000,
+      usage_count: Math.floor(Math.random() * 400),
     });
   });
 

@@ -4,7 +4,7 @@
     <text class="page-subtitle">选择你的专属学习伙伴</text>
   </view>
 
-  <view class="characters-section">
+  <view class="characters-section" wx:if="{{!selectedCharacter}}">
     <view class="character-card" wx:for="{{characters}}" wx:key="id" bindtap="selectCharacter" data-character="{{item}}">
       <view class="character-avatar">{{item.avatar}}</view>
       <text class="character-name">{{item.name}}</text>
@@ -17,32 +17,63 @@
 
   <view class="chat-section" wx:if="{{selectedCharacter}}">
     <view class="chat-header">
-      <view class="chat-avatar">{{selectedCharacter.avatar}}</view>
-      <view class="chat-info">
-        <text class="chat-name">{{selectedCharacter.name}}</text>
-        <text class="chat-status">在线</text>
+      <view class="chat-back" bindtap="changeCharacter">← 换角色</view>
+      <view class="chat-info-center">
+        <text class="chat-avatar-small">{{selectedCharacter.avatar}}</text>
+        <view class="chat-info">
+          <text class="chat-name">{{selectedCharacter.name}}</text>
+          <text class="chat-status">{{aiEnabled ? '🤖 AI在线' : '📱 离线模式'}}</text>
+        </view>
       </view>
+      <view class="chat-session">对话 {{sessionCount}} 次</view>
     </view>
 
-    <scroll-view scroll-y class="chat-messages" scroll-top="{{scrollTop}}">
-      <view class="message-item ai-message" wx:for="{{messages}}" wx:key="id">
-        <view class="message-avatar">{{item.isAI ? selectedCharacter.avatar : '👤'}}</view>
-        <view class="message-content" style="background: {{item.isAI ? '#f0fdf4' : '#22c55e'}}; color: {{item.isAI ? '#1e293b' : '#ffffff'}}">
-          {{item.content}}
+    <scroll-view scroll-y class="chat-messages" scroll-top="{{scrollTop}}" scroll-with-animation>
+      <view wx:if="{{messages.length === 0}}" class="chat-empty">
+        <text class="empty-icon">💬</text>
+        <text class="empty-text">开始你的第一次对话吧！</text>
+      </view>
+      <view class="message-wrapper" wx:for="{{messages}}" wx:key="id">
+        <view class="message-item {{item.isAI ? 'ai' : 'user'}}">
+          <view class="message-avatar">{{item.isAI ? selectedCharacter.avatar : '👤'}}</view>
+          <view class="message-bubble {{item.isAI ? 'ai-bubble' : 'user-bubble'}}">
+            {{item.content}}
+          </view>
+        </view>
+      </view>
+      <view wx:if="{{loading}}" class="message-item ai">
+        <view class="message-avatar">{{selectedCharacter.avatar}}</view>
+        <view class="message-bubble ai-bubble typing">
+          <text>思考中</text>
+          <view class="typing-dots">
+            <view class="dot"></view>
+            <view class="dot"></view>
+            <view class="dot"></view>
+          </view>
         </view>
       </view>
     </scroll-view>
 
-    <view class="chat-input">
-      <input class="input-field" placeholder="输入你想说的..." bindinput="onInput" value="{{inputText}}" />
-      <view class="send-btn" bindtap="sendMessage">发送</view>
+    <view class="chat-input-bar">
+      <input 
+        class="chat-input" 
+        placeholder="输入你想说的..." 
+        bindinput="onInput" 
+        value="{{inputText}}"
+        confirm-type="send"
+        bindconfirm="sendMessage"
+        disabled="{{loading}}"
+      />
+      <view class="send-btn {{inputText ? 'active' : ''}}" bindtap="sendMessage">
+        {{loading ? '...' : '发送'}}
+      </view>
     </view>
   </view>
 
   <view class="tips-section" wx:if="{{!selectedCharacter}}">
     <view class="tips-card">
       <text class="tips-title">💡 选择一个角色开始对话</text>
-      <text class="tips-content">每个角色都有独特的性格和教学风格，选择最适合你的学习伙伴吧！</text>
+      <text class="tips-content">每个角色都有独特的性格和教学风格，选择最适合你的学习伙伴吧！AI会记住你们的对话上下文，提供个性化的学习体验。</text>
     </view>
   </view>
 </view>

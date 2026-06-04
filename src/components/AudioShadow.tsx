@@ -1,21 +1,31 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { speakWithPreset } from '../lib/voiceProfile';
 
 interface AudioShadowProps {
   phrase: string;
   pronunciation: string;
   onResult?: (score: number) => void;
+  langCode?: string;
 }
 
 type ShadowState = 'idle' | 'listening' | 'processing' | 'success' | 'retry';
 
-export const AudioShadow: React.FC<AudioShadowProps> = ({ phrase, pronunciation, onResult }) => {
+export const AudioShadow: React.FC<AudioShadowProps> = ({ phrase, pronunciation, onResult, langCode }) => {
   const [state, setState] = useState<ShadowState>('idle');
   const [audioLevel, setAudioLevel] = useState(0);
   const [waveformData, setWaveformData] = useState<number[]>(Array(32).fill(0));
+  const [speaking, setSpeaking] = useState(false);
   const animFrameRef = useRef<number>(0);
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
+
+  const playStandard = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (speaking) return;
+    setSpeaking(true);
+    speakWithPreset(phrase, langCode || 'en').finally(() => setSpeaking(false));
+  };
 
   const cleanup = useCallback(() => {
     if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
@@ -110,6 +120,13 @@ export const AudioShadow: React.FC<AudioShadowProps> = ({ phrase, pronunciation,
       <div className="audio-shadow-phrase">
         <p className="audio-shadow-target">{phrase}</p>
         <p className="audio-shadow-pron">{pronunciation}</p>
+        <button
+          className={`as-play-btn ${speaking ? 'speaking' : ''}`}
+          onClick={playStandard}
+          title="听标准发音"
+        >
+          {speaking ? '🔊 播放中…' : '🔈 标准发音'}
+        </button>
       </div>
 
       {/* Waveform visualization */}

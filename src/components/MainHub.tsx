@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase } from '../data/supabase';
 import { TaijiCompass } from './TaijiCompass';
 import { LanguageSelector, Language, getLangZh } from './LanguageSelector';
 import { HomePage } from './HomePage';
@@ -155,20 +155,54 @@ export const MainHub: React.FC<MainHubProps> = ({ initialProfile, onReset }) => 
 
   const isSubView = view !== 'path';
 
+  // 返回按钮：非首页时显示，回到上一个视图（path 或 profile）
+  const [viewStack, setViewStack] = useState<HubView[]>(['path']);
+
+  function pushView(target: HubView) {
+    setViewStack((s) => [...s, target]);
+    setView(target);
+  }
+
+  function popView() {
+    setViewStack((s) => {
+      if (s.length <= 1) return ['path'];
+      const next = [...s];
+      next.pop();
+      const prev = next[next.length - 1];
+      setView(prev);
+      return next;
+    });
+  }
+
+  // 当底部导航直接跳转时，重置栈
+  function navigateToWithStack(target: HubView) {
+    setViewStack([target]);
+    navigateTo(target);
+  }
+
   return (
     <div className="hub-shell">
       {/* ── Global Top Bar ── */}
       <header className="hub-topbar">
-        <div className="hub-brand">
-          <TaijiCompass size={26} />
-          <span className="hub-brand-name">言道</span>
-        </div>
+        {/* 一键返回按钮：非首页时固定显示在最左侧 */}
+        {isSubView && (
+          <button className="hub-back-btn" onClick={popView} title="返回上一页">
+            <span className="hub-back-icon">←</span>
+            <span className="hub-back-text">返回</span>
+          </button>
+        )}
+        {!isSubView && (
+          <div className="hub-brand">
+            <TaijiCompass size={26} />
+            <span className="hub-brand-name">言道</span>
+          </div>
+        )}
 
         {languages.length > 0 && (
           <LanguageSelector
             languages={languages}
             selected={lang}
-            onSelect={(code) => { setLang(code); setView('path'); }}
+            onSelect={(code) => { setLang(code); setView('path'); setViewStack(['path']); }}
           />
         )}
 
@@ -182,7 +216,14 @@ export const MainHub: React.FC<MainHubProps> = ({ initialProfile, onReset }) => 
           </div>
           <button
             className="hub-avatar-btn"
-            onClick={() => setView(view === 'profile' ? 'path' : 'profile')}
+            onClick={() => {
+              if (view === 'profile') {
+                setView('path');
+                setViewStack(['path']);
+              } else {
+                pushView('profile');
+              }
+            }}
             title="用户中心"
           >
             <span className="hub-avatar-icon">{view === 'profile' ? '✕' : '👤'}</span>
@@ -202,23 +243,23 @@ export const MainHub: React.FC<MainHubProps> = ({ initialProfile, onReset }) => 
             />
             {/* Quick action bar */}
             <div className="hub-quick-bar">
-              <button className="hub-quick-tile" onClick={() => setView('leaderboard')}>
+              <button className="hub-quick-tile" onClick={() => pushView('leaderboard')}>
                 <span className="hqt-icon">🏆</span>
                 <span className="hqt-label">{s.nav_leaderboard ?? '排行榜'}</span>
               </button>
-              <button className="hub-quick-tile" onClick={() => setView('daily_tasks')}>
+              <button className="hub-quick-tile" onClick={() => pushView('daily_tasks')}>
                 <span className="hqt-icon">📋</span>
                 <span className="hqt-label">{s.nav_daily_tasks ?? '每日任务'}</span>
               </button>
-              <button className="hub-quick-tile" onClick={() => setView('friends')}>
+              <button className="hub-quick-tile" onClick={() => pushView('friends')}>
                 <span className="hqt-icon">👫</span>
                 <span className="hqt-label">{s.nav_friends ?? '好友'}</span>
               </button>
-              <button className="hub-quick-tile" onClick={() => setView('achievements')}>
+              <button className="hub-quick-tile" onClick={() => pushView('achievements')}>
                 <span className="hqt-icon">🎖️</span>
                 <span className="hqt-label">{s.nav_achievements ?? '成就'}</span>
               </button>
-              <button className="hub-quick-tile" onClick={() => setView('new_features')}>
+              <button className="hub-quick-tile" onClick={() => pushView('new_features')}>
                 <span className="hqt-icon">✨</span>
                 <span className="hqt-label">新功能</span>
               </button>
@@ -371,7 +412,7 @@ export const MainHub: React.FC<MainHubProps> = ({ initialProfile, onReset }) => 
           <button
             key={item.key}
             className={`hub-nav-item ${view === item.key ? 'active' : ''}`}
-            onClick={() => navigateTo(item.key as HubView)}
+            onClick={() => navigateToWithStack(item.key as HubView)}
           >
             <span className="hub-nav-icon">{item.icon}</span>
             <span className="hub-nav-label">{item.label}</span>
@@ -379,7 +420,14 @@ export const MainHub: React.FC<MainHubProps> = ({ initialProfile, onReset }) => 
         ))}
         <button
           className={`hub-nav-item ${view === 'profile' ? 'active' : ''}`}
-          onClick={() => setView(view === 'profile' ? 'path' : 'profile')}
+          onClick={() => {
+            if (view === 'profile') {
+              setView('path');
+              setViewStack(['path']);
+            } else {
+              pushView('profile');
+            }
+          }}
         >
           <span className="hub-nav-icon">👤</span>
           <span className="hub-nav-label">{s.nav_profile}</span>
@@ -389,27 +437,27 @@ export const MainHub: React.FC<MainHubProps> = ({ initialProfile, onReset }) => 
       {/* ── Feature strip (path view only) ── */}
       {view === 'path' && (
         <div className="hub-feature-strip">
-          <button className="hub-feature-card game-card" onClick={() => setView('game')}>
+          <button className="hub-feature-card game-card" onClick={() => pushView('game')}>
             <span className="hfc-icon">🎮</span>
             <span className="hfc-title">{s.feature_game}</span>
             <span className="hfc-sub">{s.feature_game_sub}</span>
           </button>
-          <button className="hub-feature-card grammar-card" onClick={() => setView('grammar')}>
+          <button className="hub-feature-card grammar-card" onClick={() => pushView('grammar')}>
             <span className="hfc-icon">📐</span>
             <span className="hfc-title">{s.feature_grammar}</span>
             <span className="hfc-sub">{s.feature_grammar_sub}</span>
           </button>
-          <button className="hub-feature-card radio-card" onClick={() => setView('radio')}>
+          <button className="hub-feature-card radio-card" onClick={() => pushView('radio')}>
             <span className="hfc-icon">🎙️</span>
             <span className="hfc-title">{s.feature_radio}</span>
             <span className="hfc-sub">{s.feature_radio_sub}</span>
           </button>
-          <button className="hub-feature-card partner-card" onClick={() => setView('partner')}>
+          <button className="hub-feature-card partner-card" onClick={() => pushView('partner')}>
             <span className="hfc-icon">🤝</span>
             <span className="hfc-title">{s.feature_partner}</span>
             <span className="hfc-sub">{s.feature_partner_sub}</span>
           </button>
-          <button className="hub-feature-card member-card" onClick={() => setView('member')}>
+          <button className="hub-feature-card member-card" onClick={() => pushView('member')}>
             <span className="hfc-icon">💎</span>
             <span className="hfc-title">{s.feature_member}</span>
             <span className="hfc-sub">{s.feature_member_sub}</span>

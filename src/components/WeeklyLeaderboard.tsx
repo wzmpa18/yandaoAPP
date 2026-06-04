@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { FloatingBack } from './FloatingBack';
-import { supabase } from '../lib/supabase';
+import { supabase } from '../data/supabase';
 import { useUI } from '../lib/UILanguageContext';
+import { getWeeklyRanking, isOfflineMode, OfflineRankEntry } from '../lib/offlineData';
 
 const SESSION_KEY_STORE = 'yandao_session_v5';
 function getSessionKey() { return localStorage.getItem(SESSION_KEY_STORE) ?? 'anon'; }
@@ -74,6 +75,21 @@ export const WeeklyLeaderboard: React.FC<WeeklyLeaderboardProps> = ({
 
   const loadLeaderboard = useCallback(async () => {
     setLoading(true);
+
+    if (isOfflineMode()) {
+      // Use offline ranking data
+      const offline = getWeeklyRanking();
+      const me = offline.find(r => r.session_key === sessionKey) ?? {
+        session_key: sessionKey,
+        xp_earned: currentWeekXP || 120,
+        rank_tier: getTier(currentWeekXP || 120).key,
+      };
+      setEntries(offline as RankEntry[]);
+      setMyEntry(me as RankEntry);
+      setLoading(false);
+      return;
+    }
+
     await upsertMyXP();
     const { data } = await supabase
       .from('weekly_xp')
@@ -83,13 +99,25 @@ export const WeeklyLeaderboard: React.FC<WeeklyLeaderboardProps> = ({
       .limit(50);
 
     const rows = (data ?? []) as RankEntry[];
-    setEntries(rows);
-    const me = rows.find((r) => r.session_key === sessionKey) ?? {
-      session_key: sessionKey,
-      xp_earned: currentWeekXP,
-      rank_tier: getTier(currentWeekXP).key,
-    };
-    setMyEntry(me);
+    if (rows.length === 0) {
+      // Fallback to offline if Supabase empty
+      const offline = getWeeklyRanking();
+      setEntries(offline as RankEntry[]);
+      const me = offline.find(r => r.session_key === sessionKey) ?? {
+        session_key: sessionKey,
+        xp_earned: currentWeekXP || 120,
+        rank_tier: getTier(currentWeekXP || 120).key,
+      };
+      setMyEntry(me as RankEntry);
+    } else {
+      setEntries(rows);
+      const me = rows.find((r) => r.session_key === sessionKey) ?? {
+        session_key: sessionKey,
+        xp_earned: currentWeekXP,
+        rank_tier: getTier(currentWeekXP).key,
+      };
+      setMyEntry(me);
+    }
     setLoading(false);
   }, [sessionKey, weekStart, currentWeekXP, upsertMyXP]);
 

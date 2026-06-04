@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase } from '../data/supabase';
 import { TaijiCompass } from './TaijiCompass';
 import { UILang, UI_LANG_OPTIONS, setStoredUILang } from '../lib/i18n';
 
@@ -246,9 +246,17 @@ export const Onboarding: React.FC<OnboardingProps> = ({ sessionKey, onComplete }
       interest_tags: [],
       profession: goal === 'professional' ? 'tech' : '',
     };
-    const { data } = await supabase.from('user_profiles').insert(profile).select().maybeSingle();
-    setSaving(false);
-    onComplete({ ...profile, id: data?.id });
+
+    // Try Supabase first, but always save to localStorage as fallback
+    try {
+      const { data } = await supabase.from('user_profiles').insert(profile).select().maybeSingle();
+      setSaving(false);
+      onComplete({ ...profile, id: data?.id ?? undefined });
+    } catch {
+      // Offline mode: save directly to localStorage
+      setSaving(false);
+      onComplete(profile);
+    }
   }
 
   /* ══════════════════════════════════════════════════════

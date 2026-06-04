@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { FloatingBack } from './FloatingBack';
+import { speakWithPreset } from '../lib/voiceProfile';
 
 interface Phoneme {
   symbol: string;
@@ -83,8 +84,15 @@ export const PhonemeCoach: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [analysis, setAnalysis] = useState<WordAnalysis | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [score, setScore] = useState<number | null>(null);
+  const [speaking, setSpeaking] = useState(false);
   
   const recognitionRef = useRef<SpeechRecognition | null>(null);
+
+  const playStandardPronunciation = () => {
+    if (speaking) return;
+    setSpeaking(true);
+    speakWithPreset(selectedWord.word, 'en').finally(() => setSpeaking(false));
+  };
 
   const startRecording = useCallback(() => {
     const SRClass = (window as Window & { SpeechRecognition?: typeof SpeechRecognition; webkitSpeechRecognition?: typeof SpeechRecognition }).SpeechRecognition
@@ -176,6 +184,13 @@ export const PhonemeCoach: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         <div className="word-display">
           <span className="word-text">{selectedWord.word}</span>
           <span className="word-ipa">{selectedWord.ipa}</span>
+          <button
+            className={`ph-speak-btn ${speaking ? 'speaking' : ''}`}
+            onClick={playStandardPronunciation}
+            title="听标准发音"
+          >
+            {speaking ? '🔊' : '🔈'}
+          </button>
         </div>
         <p className="word-meaning">{selectedWord.meaning}</p>
 

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase } from '../data/supabase';
 import { FloatingBack } from './FloatingBack';
 
 interface LangPackAdminProps {

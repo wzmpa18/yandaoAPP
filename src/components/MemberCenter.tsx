@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase } from '../data/supabase';
 import { FloatingBack } from './FloatingBack';
 import { CheckoutModal } from './CheckoutModal';
 import { UpsellPlan } from '../lib/featureGate';
@@ -13,9 +13,11 @@ interface ExchangeRateData {
 
 async function fetchExchangeRates(currency: string): Promise<ExchangeRateData | null> {
   try {
-    const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/exchange-rates?currency=${currency}`;
+    const baseUrl = import.meta.env.VITE_SUPABASE_URL || import.meta.env.VITE_API_BASE_URL || '';
+    if (!baseUrl) return null;
+    const url = `${baseUrl}/functions/v1/exchange-rates?currency=${currency}`;
     const res = await fetch(url, {
-      headers: { Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}` },
+      headers: { Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.VITE_API_KEY || ''}` },
     });
     if (!res.ok) return null;
     return await res.json() as ExchangeRateData;

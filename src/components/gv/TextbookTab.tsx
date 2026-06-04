@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { supabase } from '../../lib/supabase';
+import { supabase } from '../../data/supabase';
 
 interface TextbookTabProps {
   sessionKey: string;
@@ -35,6 +35,7 @@ interface UnitContent {
 }
 
 const UNIT_DATA: Record<string, UnitContent[]> = {
+  // Japanese
   minna_ja: [
     {
       unit: 1, title: 'はじめまして',
@@ -54,85 +55,106 @@ const UNIT_DATA: Record<string, UnitContent[]> = {
     {
       unit: 2, title: 'これはなんですか',
       vocab: [
-        { word: 'これ', meaning: '这个' },
-        { word: 'それ', meaning: '那个' },
-        { word: 'あれ', meaning: '那个（远）' },
-        { word: '本', reading: 'ほん', meaning: '书' },
-        { word: '辞書', reading: 'じしょ', meaning: '词典' },
+        { word: 'これ', meaning: '这个' }, { word: 'それ', meaning: '那个' }, { word: 'あれ', meaning: '那个（远）' },
+        { word: '本', reading: 'ほん', meaning: '书' }, { word: '辞書', reading: 'じしょ', meaning: '词典' },
       ],
       grammar: [
         { pattern: 'これ/それ/あれは〜です', meaning: '这/那是…', example: 'これは本です' },
         { pattern: '〜の〜', meaning: '…的…', example: '私の本' },
       ],
     },
-    {
-      unit: 3, title: 'ここはどこですか',
-      vocab: [
-        { word: 'ここ', meaning: '这里' },
-        { word: 'そこ', meaning: '那里' },
-        { word: 'あそこ', meaning: '那里（远）' },
-        { word: 'デパート', meaning: '百货公司' },
-        { word: '銀行', reading: 'ぎんこう', meaning: '银行' },
-      ],
-      grammar: [
-        { pattern: '〜はどこですか', meaning: '…在哪里？', example: 'トイレはどこですか' },
-        { pattern: '〜の〜に〜があります', meaning: '在…的…有…', example: '駅の前に銀行があります' },
-      ],
-    },
+    { unit: 3, title: 'ここはどこですか', vocab: [{ word: 'ここ', meaning: '这里' },{ word: 'そこ', meaning: '那里' },{ word: 'デパート', meaning: '百货公司' },{ word: '銀行', reading: 'ぎんこう', meaning: '银行' },{ word: '駅', reading: 'えき', meaning: '车站' }], grammar: [{ pattern: '〜はどこですか', meaning: '…在哪里？', example: 'トイレはどこですか' },{ pattern: '〜に〜があります', meaning: '在…有…', example: '駅の前に銀行があります' }] },
   ],
   genki_ja: [
-    {
-      unit: 1, title: 'New Friends',
-      vocab: [
-        { word: '大学', reading: 'だいがく', meaning: '大学' },
-        { word: '一年生', reading: 'いちねんせい', meaning: '大一' },
-        { word: '専攻', reading: 'せんこう', meaning: '专业' },
-        { word: '出身', reading: 'しゅっしん', meaning: '出身/来自' },
-        { word: '趣味', reading: 'しゅみ', meaning: '爱好' },
-      ],
-      grammar: [
-        { pattern: 'X は Y です', meaning: 'X是Y', example: '私はメアリーです' },
-        { pattern: 'X の Y', meaning: 'X的Y', example: 'メアリーさんの専攻' },
-      ],
-      dialogue: 'メアリー：すみません、留学生ですか。\nたけし：はい、そうです。アメリカから来ました。',
-    },
-    {
-      unit: 2, title: 'Shopping',
-      vocab: [
-        { word: 'いくら', meaning: '多少钱' },
-        { word: '円', reading: 'えん', meaning: '日元' },
-        { word: '安い', reading: 'やすい', meaning: '便宜' },
-        { word: '高い', reading: 'たかい', meaning: '贵/高' },
-        { word: '買う', reading: 'かう', meaning: '买' },
-      ],
-      grammar: [
-        { pattern: '〜をください', meaning: '请给我…', example: 'これをください' },
-        { pattern: 'いくらですか', meaning: '多少钱？', example: 'このシャツはいくらですか' },
-      ],
-    },
+    { unit: 1, title: 'New Friends', vocab: [{ word: '大学', reading: 'だいがく', meaning: '大学' },{ word: '専攻', reading: 'せんこう', meaning: '专业' },{ word: '出身', reading: 'しゅっしん', meaning: '出身' },{ word: '趣味', reading: 'しゅみ', meaning: '爱好' },{ word: '留学生', reading: 'りゅうがくせい', meaning: '留学生' }], grammar: [{ pattern: 'X は Y です', meaning: 'X是Y', example: '私はメアリーです' },{ pattern: 'X の Y', meaning: 'X的Y', example: 'メアリーさんの専攻' }], dialogue: 'メアリー：すみません、留学生ですか。\nたけし：はい、アメリカから来ました。' },
+    { unit: 2, title: 'Shopping', vocab: [{ word: 'いくら', meaning: '多少钱' },{ word: '安い', reading: 'やすい', meaning: '便宜' },{ word: '高い', reading: 'たかい', meaning: '贵' },{ word: '買う', reading: 'かう', meaning: '买' },{ word: '店', reading: 'みせ', meaning: '商店' }], grammar: [{ pattern: '〜をください', meaning: '请给我…', example: 'これをください' },{ pattern: 'いくらですか', meaning: '多少钱？', example: 'このシャツはいくらですか' }] },
   ],
+  // Korean
   topik_ko: [
-    {
-      unit: 1, title: '인사 - 问候',
-      vocab: [
-        { word: '안녕하세요', meaning: '你好' },
-        { word: '감사합니다', meaning: '谢谢' },
-        { word: '이름', meaning: '名字' },
-        { word: '학생', meaning: '学生' },
-        { word: '선생님', meaning: '老师' },
-      ],
-      grammar: [
-        { pattern: '저는 〜입니다', meaning: '我是…', example: '저는 학생입니다' },
-        { pattern: '〜이/가 있어요', meaning: '有…', example: '책이 있어요' },
-      ],
-    },
+    { unit: 1, title: '인사', vocab: [{ word: '안녕하세요', meaning: '你好' },{ word: '감사합니다', meaning: '谢谢' },{ word: '이름', meaning: '名字' },{ word: '학생', meaning: '学生' },{ word: '선생님', meaning: '老师' }], grammar: [{ pattern: '저는 〜입니다', meaning: '我是…', example: '저는 학생입니다' },{ pattern: '〜이/가 있어요', meaning: '有…', example: '책이 있어요' }] },
+    { unit: 2, title: '가족', vocab: [{ word: '가족', meaning: '家庭' },{ word: '아버지', meaning: '爸爸' },{ word: '어머니', meaning: '妈妈' },{ word: '형', meaning: '哥哥' },{ word: '언니', meaning: '姐姐' }], grammar: [{ pattern: '〜이/가 몇 명이에요?', meaning: '有几口人？', example: '가족이 몇 명이에요?' },{ pattern: '〜하고', meaning: '和…', example: '아버지하고 어머니' }] },
+  ],
+  sejong_ko: [
+    { unit: 1, title: '한국어 공부', vocab: [{ word: '한국어', meaning: '韩语' },{ word: '공부', meaning: '学习' },{ word: '책', meaning: '书' },{ word: '연필', meaning: '铅笔' },{ word: '공책', meaning: '笔记本' }], grammar: [{ pattern: '〜을/를 공부해요', meaning: '学习…', example: '한국어를 공부해요' }] },
+  ],
+  // English
+  interchange_en: [
+    { unit: 1, title: 'Nice to meet you!', vocab: [{ word: 'name', meaning: '名字' },{ word: 'teacher', meaning: '老师' },{ word: 'student', meaning: '学生' },{ word: 'friend', meaning: '朋友' },{ word: 'city', meaning: '城市' }], grammar: [{ pattern: 'I am / You are', meaning: '我是/你是', example: 'I am a student' },{ pattern: 'What is your name?', meaning: '你叫什么名字？', example: 'My name is John' }], dialogue: 'A: Hi, I\'m Sarah. What\'s your name?\nB: My name is Ken. Nice to meet you!' },
+    { unit: 2, title: 'Where are you from?', vocab: [{ word: 'country', meaning: '国家' },{ word: 'language', meaning: '语言' },{ word: 'from', meaning: '来自' },{ word: 'live', meaning: '居住' },{ word: 'speak', meaning: '说' }], grammar: [{ pattern: 'Where are you from?', meaning: '你从哪里来？', example: 'I\'m from Canada' },{ pattern: 'Do you speak…?', meaning: '你说…吗？', example: 'Do you speak English?' }] },
+  ],
+  headway_en: [
+    { unit: 1, title: 'Hello!', vocab: [{ word: 'hello', meaning: '你好' },{ word: 'goodbye', meaning: '再见' },{ word: 'please', meaning: '请' },{ word: 'thank you', meaning: '谢谢' },{ word: 'sorry', meaning: '对不起' }], grammar: [{ pattern: 'be + adjective', meaning: '描述', example: 'I am happy' },{ pattern: 'Present Simple', meaning: '一般现在时', example: 'I work in London' }] },
+  ],
+  // French
+  alter_fr: [
+    { unit: 1, title: 'Bonjour!', vocab: [{ word: 'bonjour', meaning: '你好' },{ word: 'merci', meaning: '谢谢' },{ word: 's\'il vous plaît', meaning: '请' },{ word: 'au revoir', meaning: '再见' },{ word: 'pardon', meaning: '对不起' }], grammar: [{ pattern: 'Je suis / Tu es', meaning: '我是/你是', example: 'Je suis français' },{ pattern: 'Comment tu t\'appelles?', meaning: '你叫什么？', example: 'Je m\'appelle Marie' }], dialogue: 'A: Bonjour! Comment ça va?\nB: Ça va bien, merci! Et toi?' },
+    { unit: 2, title: 'Au café', vocab: [{ word: 'café', meaning: '咖啡' },{ word: 'croissant', meaning: '牛角包' },{ word: 'lait', meaning: '牛奶' },{ word: 'sucre', meaning: '糖' },{ word: 'pain', meaning: '面包' }], grammar: [{ pattern: 'Je voudrais…', meaning: '我想要…', example: 'Je voudrais un café' },{ pattern: 'Combien ça coûte?', meaning: '多少钱？', example: 'Ça coûte 2 euros' }] },
+  ],
+  edito_fr: [
+    { unit: 1, title: 'Présentations', vocab: [{ word: 'nom', meaning: '姓' },{ word: 'prénom', meaning: '名' },{ word: 'nationalité', meaning: '国籍' },{ word: 'profession', meaning: '职业' },{ word: 'âge', meaning: '年龄' }], grammar: [{ pattern: 'Avoir + âge', meaning: '表达年龄', example: 'J\'ai 25 ans' },{ pattern: 'Être + nationalité', meaning: '表达国籍', example: 'Je suis chinois' }] },
+  ],
+  // Spanish
+  aula_es: [
+    { unit: 1, title: '¡Hola!', vocab: [{ word: 'hola', meaning: '你好' },{ word: 'gracias', meaning: '谢谢' },{ word: 'por favor', meaning: '请' },{ word: 'adiós', meaning: '再见' },{ word: 'perdón', meaning: '对不起' }], grammar: [{ pattern: 'Ser + nombre', meaning: '自我介绍', example: 'Soy Carlos' },{ pattern: '¿Cómo te llamas?', meaning: '你叫什么？', example: 'Me llamo Ana' }], dialogue: 'A: ¡Hola! ¿Cómo estás?\nB: Muy bien, ¿y tú?\nA: Bien, gracias.' },
+    { unit: 2, title: 'En la cafetería', vocab: [{ word: 'café', meaning: '咖啡' },{ word: 'leche', meaning: '牛奶' },{ word: 'azúcar', meaning: '糖' },{ word: 'pan', meaning: '面包' },{ word: 'agua', meaning: '水' }], grammar: [{ pattern: 'Quiero…', meaning: '我要…', example: 'Quiero un café' },{ pattern: '¿Cuánto cuesta?', meaning: '多少钱？', example: 'Cuesta 2 euros' }] },
+  ],
+  prisma_es: [
+    { unit: 1, title: 'Presentaciones', vocab: [{ word: 'nombre', meaning: '名字' },{ word: 'apellido', meaning: '姓' },{ word: 'país', meaning: '国家' },{ word: 'idioma', meaning: '语言' },{ word: 'edad', meaning: '年龄' }], grammar: [{ pattern: 'Tener + edad', meaning: '表达年龄', example: 'Tengo 20 años' },{ pattern: 'Hablar + idioma', meaning: '说语言', example: 'Hablo español' }] },
+  ],
+  // German
+  menschen_de: [
+    { unit: 1, title: 'Hallo!', vocab: [{ word: 'hallo', meaning: '你好' },{ word: 'danke', meaning: '谢谢' },{ word: 'bitte', meaning: '请' },{ word: 'tschüss', meaning: '再见' },{ word: 'Entschuldigung', meaning: '对不起' }], grammar: [{ pattern: 'Ich heiße…', meaning: '我叫…', example: 'Ich heiße Anna' },{ pattern: 'Wie heißt du?', meaning: '你叫什么？', example: 'Ich heiße Max' }], dialogue: 'A: Hallo! Wie geht\'s?\nB: Gut, danke! Und dir?\nA: Auch gut!' },
+    { unit: 2, title: 'Im Café', vocab: [{ word: 'Kaffee', meaning: '咖啡' },{ word: 'Milch', meaning: '牛奶' },{ word: 'Zucker', meaning: '糖' },{ word: 'Brot', meaning: '面包' },{ word: 'Wasser', meaning: '水' }], grammar: [{ pattern: 'Ich möchte…', meaning: '我想要…', example: 'Ich möchte einen Kaffee' },{ pattern: 'Was kostet das?', meaning: '多少钱？', example: 'Das kostet 2 Euro' }] },
+  ],
+  schritte_de: [
+    { unit: 1, title: 'Guten Tag', vocab: [{ word: 'Name', meaning: '名字' },{ word: 'Land', meaning: '国家' },{ word: 'Sprache', meaning: '语言' },{ word: 'Beruf', meaning: '职业' },{ word: 'Alter', meaning: '年龄' }], grammar: [{ pattern: 'Sein + Beruf', meaning: '表达职业', example: 'Ich bin Lehrer' },{ pattern: 'Kommen aus…', meaning: '来自…', example: 'Ich komme aus China' }] },
+  ],
+  // Italian
+  nuovo_it: [
+    { unit: 1, title: 'Ciao!', vocab: [{ word: 'ciao', meaning: '你好' },{ word: 'grazie', meaning: '谢谢' },{ word: 'per favore', meaning: '请' },{ word: 'arrivederci', meaning: '再见' },{ word: 'scusa', meaning: '对不起' }], grammar: [{ pattern: 'Io sono…', meaning: '我是…', example: 'Io sono Marco' },{ pattern: 'Come ti chiami?', meaning: '你叫什么？', example: 'Mi chiamo Laura' }], dialogue: 'A: Ciao! Come stai?\nB: Bene, grazie! E tu?\nA: Bene, grazie!' },
+    { unit: 2, title: 'Al bar', vocab: [{ word: 'caffè', meaning: '咖啡' },{ word: 'latte', meaning: '牛奶' },{ word: 'zucchero', meaning: '糖' },{ word: 'pane', meaning: '面包' },{ word: 'acqua', meaning: '水' }], grammar: [{ pattern: 'Vorrei…', meaning: '我想要…', example: 'Vorrei un caffè' },{ pattern: 'Quanto costa?', meaning: '多少钱？', example: 'Costa 2 euro' }] },
+  ],
+  progetto_it: [
+    { unit: 1, title: 'Presentazioni', vocab: [{ word: 'nome', meaning: '名字' },{ word: 'cognome', meaning: '姓' },{ word: 'nazionalità', meaning: '国籍' },{ word: 'professione', meaning: '职业' },{ word: 'età', meaning: '年龄' }], grammar: [{ pattern: 'Avere + età', meaning: '表达年龄', example: 'Ho 30 anni' },{ pattern: 'Parlare + lingua', meaning: '说语言', example: 'Parlo italiano' }] },
+  ],
+  // Portuguese
+  bom_pt: [
+    { unit: 1, title: 'Olá!', vocab: [{ word: 'olá', meaning: '你好' },{ word: 'obrigado', meaning: '谢谢' },{ word: 'por favor', meaning: '请' },{ word: 'tchau', meaning: '再见' },{ word: 'desculpe', meaning: '对不起' }], grammar: [{ pattern: 'Eu sou…', meaning: '我是…', example: 'Eu sou João' },{ pattern: 'Como você se chama?', meaning: '你叫什么？', example: 'Me chamo Ana' }], dialogue: 'A: Olá! Tudo bem?\nB: Tudo bem, e você?\nA: Tudo ótimo!' },
+    { unit: 2, title: 'No café', vocab: [{ word: 'café', meaning: '咖啡' },{ word: 'leite', meaning: '牛奶' },{ word: 'açúcar', meaning: '糖' },{ word: 'pão', meaning: '面包' },{ word: 'água', meaning: '水' }], grammar: [{ pattern: 'Quero…', meaning: '我要…', example: 'Quero um café' },{ pattern: 'Quanto custa?', meaning: '多少钱？', example: 'Custa 2 reais' }] },
+  ],
+  novo_pt: [
+    { unit: 1, title: 'Apresentações', vocab: [{ word: 'nome', meaning: '名字' },{ word: 'sobrenome', meaning: '姓' },{ word: 'país', meaning: '国家' },{ word: 'língua', meaning: '语言' },{ word: 'idade', meaning: '年龄' }], grammar: [{ pattern: 'Ter + idade', meaning: '表达年龄', example: 'Tenho 25 anos' },{ pattern: 'Falar + língua', meaning: '说语言', example: 'Falo português' }] },
+  ],
+  // Arabic
+  kitab_ar: [
+    { unit: 1, title: 'مرحباً', vocab: [{ word: 'مرحباً', meaning: '你好' },{ word: 'شكراً', meaning: '谢谢' },{ word: 'من فضلك', meaning: '请' },{ word: 'مع السلامة', meaning: '再见' },{ word: 'آسف', meaning: '对不起' }], grammar: [{ pattern: 'أنا…', meaning: '我是…', example: 'أنا طالب' },{ pattern: 'ما اسمك؟', meaning: '你叫什么？', example: 'اسمي أحمد' }], dialogue: 'أ: السلام عليكم! كيف حالك؟\nب: الحمد لله، بخير. وأنت؟\nأ: بخير، شكراً!' },
+    { unit: 2, title: 'في المقهى', vocab: [{ word: 'قهوة', meaning: '咖啡' },{ word: 'حليب', meaning: '牛奶' },{ word: 'سكر', meaning: '糖' },{ word: 'خبز', meaning: '面包' },{ word: 'ماء', meaning: '水' }], grammar: [{ pattern: 'أريد…', meaning: '我要…', example: 'أريد قهوة' },{ pattern: 'كم السعر؟', meaning: '多少钱？', example: 'بكم هذا؟' }] },
+  ],
+  arabiyya_ar: [
+    { unit: 1, title: 'التعارف', vocab: [{ word: 'اسم', meaning: '名字' },{ word: 'بلد', meaning: '国家' },{ word: 'لغة', meaning: '语言' },{ word: 'عمل', meaning: '工作' },{ word: 'عمر', meaning: '年龄' }], grammar: [{ pattern: 'عندي…', meaning: '我有…', example: 'عندي ٢٥ سنة' },{ pattern: 'أتحدث…', meaning: '我说…', example: 'أتحدث العربية' }] },
+  ],
+  // Chinese
+  hsk_zh: [
+    { unit: 1, title: '你好', vocab: [{ word: '你好', meaning: 'Hello' },{ word: '谢谢', meaning: 'Thanks' },{ word: '对不起', meaning: 'Sorry' },{ word: '再见', meaning: 'Goodbye' },{ word: '请', meaning: 'Please' }], grammar: [{ pattern: '是…的', meaning: 'Emphasis structure', example: '我是昨天来的' },{ pattern: '了 (completion)', meaning: 'Completed action', example: '我吃了饭' }], dialogue: 'A: 你好！你叫什么名字？\nB: 我叫小明，你呢？\nA: 我叫小红。' },
+    { unit: 2, title: '买东西', vocab: [{ word: '这个', meaning: 'This' },{ word: '那个', meaning: 'That' },{ word: '多少', meaning: 'How much' },{ word: '钱', meaning: 'Money' },{ word: '贵', meaning: 'Expensive' }], grammar: [{ pattern: '多少钱？', meaning: 'How much?', example: '这个多少钱？' },{ pattern: '太…了', meaning: 'Too…', example: '太贵了！' }] },
+  ],
+  road_zh: [
+    { unit: 1, title: '自我介绍', vocab: [{ word: '名字', meaning: 'Name' },{ word: '国家', meaning: 'Country' },{ word: '语言', meaning: 'Language' },{ word: '工作', meaning: 'Job' },{ word: '爱好', meaning: 'Hobby' }], grammar: [{ pattern: '我叫…', meaning: 'My name is…', example: '我叫大卫' },{ pattern: '我是…人', meaning: 'I am from…', example: '我是美国人' }] },
   ],
 };
 
 function getUnits(textbookId: string): UnitContent[] {
-  if (textbookId.includes('minna')) return UNIT_DATA['minna_ja'] ?? [];
-  if (textbookId.includes('genki')) return UNIT_DATA['genki_ja'] ?? [];
-  if (textbookId.includes('topik')) return UNIT_DATA['topik_ko'] ?? [];
+  // Check all keys for partial match
+  for (const key of Object.keys(UNIT_DATA)) {
+    if (textbookId.includes(key.replace(/_.*/, '')) || textbookId === key) {
+      return UNIT_DATA[key] ?? [];
+    }
+  }
+  // Fallback: first unit of first textbook in matching language
+  const langPrefix = textbookId.split('_')[1] || '';
+  for (const key of Object.keys(UNIT_DATA)) {
+    if (key.endsWith('_' + langPrefix)) return UNIT_DATA[key] ?? [];
+  }
   return UNIT_DATA['minna_ja'] ?? [];
 }
 

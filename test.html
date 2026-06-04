@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"/><title>言道 - MainHub诊断</title>
+<script type="module">import RefreshRuntime from "/@react-refresh";RefreshRuntime.injectIntoGlobalHook(window);window.$RefreshReg$=()=>{};window.$RefreshSig$=()=>(t)=>t;window.__vite_plugin_react_preamble_installed__=true</script>
+<script type="module" src="/@vite/client"></script>
+<style>body{margin:0;padding:12px;font-family:monospace;background:#111;color:#eee;font-size:13px}.e{color:#f44;padding:4px 8px;margin:2px 0;border-radius:3px;background:rgba(255,0,0,0.1);}.o{color:#4a4;padding:2px 8px;margin:2px 0;}#root{margin-top:10px;padding:10px;background:#fff;color:#000;border-radius:6px;min-height:200px;}</style></head>
+<body>
+<h3>言道 - MainHub 直接渲染</h3>
+<div id="log"></div>
+<div id="root">loading...</div>
+<script type="module">
+var l=document.getElementById('log');
+function p(m,c){var d=document.createElement('div');d.className=c||'';d.textContent=m;l.appendChild(d);}
+var errs=[];
+window.onerror=function(m,u,ln){errs.push(m);p('ERR:'+m+'@'+ln,'e');return false;};
+window.addEventListener('unhandledrejection',function(e){errs.push(e.reason&&e.reason.message||e.reason);p('PROMISE:'+(e.reason&&e.reason.message||e.reason),'e');e.preventDefault();});
+
+(async function(){
+try{
+var React=await import('react');
+var rdom=await import('react-dom/client');
+await import('/src/index.css');
+await import('/src/lib/theme');
+p('Base OK','o');
+
+// Import UILanguageContext (MainHub needs it)
+p('Importing UILanguageContext...');
+var {UILanguageProvider}=await import('/src/lib/UILanguageContext.tsx');
+p('OK','o');
+
+// Import MainHub
+p('Importing MainHub...');
+var {MainHub}=await import('/src/components/MainHub.tsx');
+p('OK','o');
+
+// Create a demo profile like App would after onboarding
+var profile={
+  session_key:'test_demo_001',
+  language_code:'ja',
+  ui_language:'zh',
+  goal:'daily',
+  level:'beginner',
+  placement_score:0,
+  completed_onboarding:true,
+  age_group:'professional',
+  interest_tags:['anime','travel'],
+  profession:'tech'
+};
+
+p('Rendering MainHub with demo profile...');
+var el=document.getElementById('root');
+el.innerHTML='';
+try{
+  var root=rdom.createRoot(el);
+  root.render(
+    React.createElement(UILanguageProvider,{initial:'zh'},
+      React.createElement(MainHub,{initialProfile:profile,onReset:function(){p('reset called','o');}})
+    )
+  );
+  p('MainHub render() OK!','o');
+}catch(e){
+  p('MAINHUB CRASH: '+e.message,'e');
+  if(e.stack)e.stack.split('\n').slice(0,5).forEach(function(s){p('  '+s.trim(),'e');});
+}
+
+setTimeout(function(){
+  var h=el.innerHTML;
+  p('After 3s: DOM='+h.length+' chars, errors='+errs.length,h.length>50?'o':'e');
+},3000);
+
+}catch(e){
+  p('FATAL: '+e.message,'e');
+}
+})();
+</script>
+</body>
+</html>

@@ -1,11 +1,14 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { FloatingBack } from './FloatingBack';
 import { CameraAI } from './CameraAI';
-import { supabase } from '../lib/supabase';
+import { getProviderSync } from '../providers';
 import { useUI } from '../lib/UILanguageContext';
 import { logAICall, isOverBudget } from './AICostDashboard';
 import { callAI, friendlyAIError, type AIMessage } from '../lib/aiClient';
 import { loadVoicePreset, speakWithPreset } from '../lib/voiceProfile';
+
+// 延迟获取 data provider，避免模块初始化时序问题
+function dp() { try { return getProviderSync().data; } catch { throw new Error('[AIAssistant] Provider not available'); } }
 
 interface AIAssistantProps {
   languageCode: string;
@@ -18,6 +21,63 @@ type AIMode = 'home' | 'camera' | 'voice' | 'text' | 'chat';
 type ChatRoleKey = 'panda' | 'tsundere' | 'funny' | 'sweet';
 type VoiceState = 'idle' | 'listening' | 'recognized' | 'thinking' | 'speaking';
 type SpeechSpeed = 0.8 | 1 | 1.2;
+
+// 用户偏好设置
+interface UserPrefs {
+  level: 'beginner' | 'elementary' | 'intermediate' | 'upper_intermediate' | 'advanced';
+  goal: 'daily' | 'travel' | 'exam' | 'business' | 'hobby';
+  examType: 'JLPT_N5' | 'JLPT_N4' | 'JLPT_N3' | 'JLPT_N2' | 'JLPT_N1' | 'TOEFL' | 'IELTS' | 'HSK' | 'TOPIK' | 'DELF' | 'DELE' | 'none';
+  aiStyle: 'serious' | 'funny' | 'encouraging' | 'strict';
+  aiGender: 'female' | 'male';
+  focusArea: 'speaking' | 'listening' | 'reading' | 'writing' | 'grammar' | 'vocabulary';
+}
+
+const LEVEL_OPTIONS: { key: UserPrefs['level']; label: string; desc: string }[] = [
+  { key: 'beginner', label: '零基础', desc: '完全不会，从零开始' },
+  { key: 'elementary', label: '初级', desc: '会简单的问候和单词' },
+  { key: 'intermediate', label: '中级', desc: '能进行日常对话' },
+  { key: 'upper_intermediate', label: '中高级', desc: '能阅读文章和看剧' },
+  { key: 'advanced', label: '高级', desc: '接近母语水平' },
+];
+
+const GOAL_OPTIONS: { key: UserPrefs['goal']; label: string; icon: string; desc: string }[] = [
+  { key: 'daily', label: '日常交流', icon: '💬', desc: '出国旅游、日常对话无障碍' },
+  { key: 'travel', label: '旅行用语', icon: '✈️', desc: '短期出行必备口语' },
+  { key: 'exam', label: '能力考试', icon: '📝', desc: 'JLPT/TOEFL/HSK等备考' },
+  { key: 'business', label: '商务职场', icon: '💼', desc: '邮件、会议、商务谈判' },
+  { key: 'hobby', label: '兴趣学习', icon: '🎯', desc: '追剧、看番、读原著' },
+];
+
+const EXAM_OPTIONS: { key: UserPrefs['examType']; label: string; desc: string }[] = [
+  { key: 'JLPT_N5', label: 'JLPT N5', desc: '日语能力考入门级' },
+  { key: 'JLPT_N4', label: 'JLPT N4', desc: '日语能力考基础级' },
+  { key: 'JLPT_N3', label: 'JLPT N3', desc: '日语能力考中级' },
+  { key: 'JLPT_N2', label: 'JLPT N2', desc: '日语能力考上级' },
+  { key: 'JLPT_N1', label: 'JLPT N1', desc: '日语能力考最高级' },
+  { key: 'TOEFL', label: 'TOEFL', desc: '托福英语考试' },
+  { key: 'IELTS', label: 'IELTS', desc: '雅思英语考试' },
+  { key: 'HSK', label: 'HSK', desc: '汉语水平考试' },
+  { key: 'TOPIK', label: 'TOPIK', desc: '韩语能力考试' },
+  { key: 'DELF', label: 'DELF', desc: '法语水平考试' },
+  { key: 'DELE', label: 'DELE', desc: '西班牙语水平考试' },
+  { key: 'none', label: '暂不备考', desc: '以日常学习为主' },
+];
+
+const AI_STYLE_OPTIONS: { key: UserPrefs['aiStyle']; label: string; icon: string; desc: string }[] = [
+  { key: 'serious', label: '严肃专业', icon: '👨‍🏫', desc: '像老师一样严谨教学' },
+  { key: 'funny', label: '幽默风趣', icon: '😄', desc: '轻松搞笑，用段子教学' },
+  { key: 'encouraging', label: '温柔鼓励', icon: '🌸', desc: '耐心鼓励，像朋友一样' },
+  { key: 'strict', label: '严格鞭策', icon: '💪', desc: '毒舌纠正，刺激进步' },
+];
+
+const FOCUS_OPTIONS: { key: UserPrefs['focusArea']; label: string; icon: string }[] = [
+  { key: 'speaking', label: '口语', icon: '🗣️' },
+  { key: 'listening', label: '听力', icon: '🎧' },
+  { key: 'reading', label: '阅读', icon: '📖' },
+  { key: 'writing', label: '写作', icon: '✍️' },
+  { key: 'grammar', label: '语法', icon: '📐' },
+  { key: 'vocabulary', label: '词汇', icon: '📝' },
+];
 
 interface Message {
   id: string;
@@ -109,16 +169,56 @@ function simulateAIResponse(
   const lang = langName[langCode] ?? langCode;
 
   const VOCAB_TIPS: Record<string, string[][]> = {
-    ja: [['苹果','りんご'],['猫','ねこ'],['学校','がっこう'],['水','みず']],
-    ko: [['苹果','사과'],['猫','고양이'],['学校','학교'],['水','물']],
-    fr: [['苹果','pomme'],['猫','chat'],['学校','école'],['水','eau']],
-    es: [['苹果','manzana'],['猫','gato'],['学校','escuela'],['水','agua']],
-    de: [['苹果','Apfel'],['猫','Katze'],['学校','Schule'],['水','Wasser']],
-    it: [['苹果','mela'],['猫','gatto'],['学校','scuola'],['水','acqua']],
-    pt: [['苹果','maçã'],['猫','gato'],['学校','escola'],['水','água']],
-    en: [['苹果','apple'],['猫','cat'],['学校','school'],['水','water']],
-    zh: [['Hello','你好'],['Cat','猫'],['School','学校'],['Water','水']],
-    ar: [['苹果','تفاحة'],['猫','قطة'],['学校','مدرسة'],['水','ماء']],
+    ja: [
+      ['苹果','りんご'],['猫','ねこ'],['学校','がっこう'],['水','みず'],
+      ['本','ほん'],['友達','ともだち'],['食べる','たべる'],['行く','いく'],
+      ['今日','きょう'],['天気','てんき'],['駅','えき'],['美味しい','おいしい'],
+    ],
+    ko: [
+      ['苹果','사과'],['猫','고양이'],['学校','학교'],['水','물'],
+      ['本','책'],['友達','친구'],['食べる','먹다'],['行く','가다'],
+      ['今日','오늘'],['天気','날씨'],['駅','역'],['美味しい','맛있다'],
+    ],
+    fr: [
+      ['苹果','pomme'],['猫','chat'],['学校','école'],['水','eau'],
+      ['本','livre'],['友達','ami'],['食べる','manger'],['行く','aller'],
+      ['今日',"aujourd'hui"],['天気','temps'],['駅','gare'],['美味しい','délicieux'],
+    ],
+    es: [
+      ['苹果','manzana'],['猫','gato'],['学校','escuela'],['水','agua'],
+      ['本','libro'],['友達','amigo'],['食べる','comer'],['行く','ir'],
+      ['今日','hoy'],['天気','tiempo'],['駅','estación'],['美味しい','delicioso'],
+    ],
+    de: [
+      ['苹果','Apfel'],['猫','Katze'],['学校','Schule'],['水','Wasser'],
+      ['本','Buch'],['友達','Freund'],['食べる','essen'],['行く','gehen'],
+      ['今日','heute'],['天気','Wetter'],['駅','Bahnhof'],['美味しい','lecker'],
+    ],
+    it: [
+      ['苹果','mela'],['猫','gatto'],['学校','scuola'],['水','acqua'],
+      ['本','libro'],['友達','amico'],['食べる','mangiare'],['行く','andare'],
+      ['今日','oggi'],['天気','tempo'],['駅','stazione'],['美味しい','delizioso'],
+    ],
+    pt: [
+      ['苹果','maçã'],['猫','gato'],['学校','escola'],['水','água'],
+      ['本','livro'],['友達','amigo'],['食べる','comer'],['行く','ir'],
+      ['今日','hoje'],['天気','tempo'],['駅','estação'],['美味しい','delicioso'],
+    ],
+    en: [
+      ['苹果','apple'],['猫','cat'],['学校','school'],['水','water'],
+      ['本','book'],['友達','friend'],['食べる','eat'],['行く','go'],
+      ['今日','today'],['天気','weather'],['駅','station'],['美味しい','delicious'],
+    ],
+    zh: [
+      ['Hello','你好'],['Cat','猫'],['School','学校'],['Water','水'],
+      ['Book','书'],['Friend','朋友'],['Eat','吃'],['Go','去'],
+      ['Today','今天'],['Weather','天气'],['Station','车站'],['Delicious','好吃'],
+    ],
+    ar: [
+      ['苹果','تفاحة'],['猫','قطة'],['学校','مدرسة'],['水','ماء'],
+      ['本','كتاب'],['友達','صديق'],['食べる','يأكل'],['行く','يذهب'],
+      ['今日','اليوم'],['天気','طقس'],['駅','محطة'],['美味しい','لذيذ'],
+    ],
   };
 
   if (mode === 'grammar') return `【语法分析】「${input}」\n\n结构拆解：主语 + 谓语 + 宾语\n时态：一般现在时\n关键词「${input.slice(0,4)}」属于${lang}核心词汇\n\n建议：尝试加入形容词让表达更丰富。`;
@@ -127,7 +227,8 @@ function simulateAIResponse(
   if (mode === 'correct') return `【纠错建议】\n\n你的句子：「${input}」\n\n改进点：词序可以调整，更符合${lang}语感；动词形式建议使用礼貌体。\n\n修正后：「${input}（已优化）」\n\n继续加油！`;
 
   if (mode === 'chat') {
-    const vocab = (VOCAB_TIPS[langCode] ?? VOCAB_TIPS.en)[Math.floor(Math.random() * 4)];
+    const pool = VOCAB_TIPS[langCode] ?? VOCAB_TIPS.en;
+    const vocab = pool[Math.floor(Math.random() * pool.length)];
     const prevContext = history && history.length > 2
       ? history[history.length - 2].text.slice(0, 30)
       : null;
@@ -215,27 +316,58 @@ async function callRealAI(params: {
   }
 }
 
-// Memory helpers
+// Memory helpers — through provider abstraction
 async function loadMemory(sessionKey: string): Promise<Record<string, string>> {
-  const { data } = await supabase
-    .from('ai_conversation_memory')
-    .select('memory_key, memory_value')
-    .eq('session_key', sessionKey);
-  if (!data) return {};
-  return Object.fromEntries(data.map((r: { memory_key: string; memory_value: string }) => [r.memory_key, r.memory_value]));
+  try {
+    const data = await dp.select('ai_conversation_memory', {
+      filters: [{ field: 'session_key', op: 'eq', value: sessionKey }],
+    });
+    if (!data || !Array.isArray(data)) return {};
+    return Object.fromEntries(
+      (data as Array<{ memory_key: string; memory_value: string }>).map((r) => [r.memory_key, r.memory_value]),
+    );
+  } catch {
+    // Fallback to localStorage
+    const raw = localStorage.getItem(`mem_${sessionKey}`);
+    if (!raw) return {};
+    try { return JSON.parse(raw); } catch { return {}; }
+  }
 }
 
 async function saveMemory(sessionKey: string, key: string, value: string) {
-  await supabase.from('ai_conversation_memory').upsert(
-    { session_key: sessionKey, memory_key: key, memory_value: value, updated_at: new Date().toISOString() },
-    { onConflict: 'session_key,memory_key' },
-  );
+  // localStorage fallback always works
+  const mem = loadMemorySync(sessionKey);
+  mem[key] = value;
+  localStorage.setItem(`mem_${sessionKey}`, JSON.stringify(mem));
+  // Try server
+  try {
+    await dp().upsert('ai_conversation_memory', {
+      session_key: sessionKey, memory_key: key, memory_value: value, updated_at: new Date().toISOString(),
+    });
+  } catch { /* silent — localStorage is already saved */ }
+}
+
+function loadMemorySync(sessionKey: string): Record<string, string> {
+  const raw = localStorage.getItem(`mem_${sessionKey}`);
+  if (!raw) return {};
+  try { return JSON.parse(raw); } catch { return {}; }
 }
 
 async function saveConversationMsg(sessionKey: string, role: ChatRoleKey, sender: 'user' | 'ai', content: string, langCode: string, sessionId: string) {
-  await supabase.from('ai_conversations').insert({
-    session_key: sessionKey, role, sender, content, lang_code: langCode, session_id: sessionId,
-  });
+  try {
+    await dp().insert('ai_conversations', {
+      session_key: sessionKey, role, sender, content, lang_code: langCode, session_id: sessionId,
+    });
+  } catch {
+    // localStorage fallback
+    const key = `conv_${sessionKey}`;
+    const raw = localStorage.getItem(key);
+    const list = raw ? JSON.parse(raw) : [];
+    list.push({ role, sender, content, langCode, sessionId, ts: Date.now() });
+    // Keep last 200
+    if (list.length > 200) list.splice(0, list.length - 200);
+    localStorage.setItem(key, JSON.stringify(list));
+  }
 }
 
 export const AIAssistant: React.FC<AIAssistantProps> = ({ languageCode, languageName, sessionKey = 'guest', onBack }) => {
@@ -246,6 +378,39 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ languageCode, language
   const [inputText, setInputText] = useState('');
   const [queryType, setQueryType] = useState('grammar');
   const [thinking, setThinking] = useState(false);
+
+  // 用户偏好调查
+  const [prefs, setPrefs] = useState<UserPrefs>(() => {
+    try {
+      const saved = localStorage.getItem('yandao_ai_prefs');
+      return saved ? JSON.parse(saved) : {
+        level: 'beginner' as UserPrefs['level'],
+        goal: 'daily' as UserPrefs['goal'],
+        examType: 'none' as UserPrefs['examType'],
+        aiStyle: 'encouraging' as UserPrefs['aiStyle'],
+        aiGender: 'female' as UserPrefs['aiGender'],
+        focusArea: 'speaking' as UserPrefs['focusArea'],
+      };
+    } catch {
+      return {
+        level: 'beginner' as UserPrefs['level'], goal: 'daily' as UserPrefs['goal'],
+        examType: 'none' as UserPrefs['examType'], aiStyle: 'encouraging' as UserPrefs['aiStyle'],
+        aiGender: 'female' as UserPrefs['aiGender'], focusArea: 'speaking' as UserPrefs['focusArea'],
+      };
+    }
+  });
+  const [showSurvey, setShowSurvey] = useState(() => localStorage.getItem('yandao_ai_survey_done') !== 'true');
+  const [surveyStep, setSurveyStep] = useState(0);
+
+  function savePrefs(p: UserPrefs) {
+    setPrefs(p);
+    localStorage.setItem('yandao_ai_prefs', JSON.stringify(p));
+  }
+
+  function finishSurvey() {
+    localStorage.setItem('yandao_ai_survey_done', 'true');
+    setShowSurvey(false);
+  }
 
   // Voice chat state
   const [voiceState, setVoiceState] = useState<VoiceState>('idle');
@@ -273,7 +438,7 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ languageCode, language
 
   // Load memory on mount
   useEffect(() => {
-    loadMemory(sessionKey).then(setMemory);
+    loadMemory(sessionKey).then(setMemory).catch(() => {});
   }, [sessionKey]);
 
   // Reset all conversation state when target language changes
@@ -617,36 +782,189 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ languageCode, language
       {/* ── HOME ── */}
       {mode === 'home' && (
         <>
-          <div className="ai-home-header">
-            <div className="ai-home-orb">🤖</div>
-            <h2 className="ai-home-title">{s.ai_title}</h2>
-            <p className="ai-home-sub">{languageName} · 智能问答 · 全天候陪伴</p>
-          </div>
-          <div className="ai-mode-grid">
-            <button className="ai-mode-card camera" onClick={() => setMode('camera')}>
-              <span className="ai-mode-icon">📷</span>
-              <span className="ai-mode-label">{s.ai_camera}</span>
-              <span className="ai-mode-desc">拍下题目或单词，AI即时解析</span>
-            </button>
-            <button className="ai-mode-card voice" onClick={() => setMode('voice')}>
-              <span className="ai-mode-icon">🎙️</span>
-              <span className="ai-mode-label">{s.ai_voice}</span>
-              <span className="ai-mode-desc">开口说，AI帮你解答语言问题</span>
-            </button>
-            <button className="ai-mode-card text" onClick={() => setMode('text')}>
-              <span className="ai-mode-icon">💬</span>
-              <span className="ai-mode-label">{s.ai_text}</span>
-              <span className="ai-mode-desc">语法解析 · 词汇查询 · 翻译纠错</span>
-            </button>
-            <button className="ai-mode-card chat" onClick={() => setMode('chat')}>
-              <span className="ai-mode-icon">🫂</span>
-              <span className="ai-mode-label">{s.ai_chat}</span>
-              <span className="ai-mode-desc">语音对话 · 4种AI角色 · 主动引导</span>
-            </button>
-          </div>
-          <div className="ai-home-notice">
-            支持豆包 / Claude / OpenAI · 在创始人后台「AI配置」中填写密钥即可启用真实回复
-          </div>
+          {/* 用户水平调查问卷 */}
+          {showSurvey && (
+            <div className="ai-survey-wrap">
+              <div className="ai-survey-header">
+                <div className="ai-survey-orb">🎯</div>
+                <h2 className="ai-survey-title">AI 智能评估</h2>
+                <p className="ai-survey-sub">回答几个问题，AI 为你定制专属学习方案</p>
+                <div className="ai-survey-progress">
+                  {[0, 1, 2, 3, 4].map((i) => (
+                    <div key={i} className={`ai-survey-dot ${i === surveyStep ? 'active' : ''} ${i < surveyStep ? 'done' : ''}`} />
+                  ))}
+                </div>
+              </div>
+
+              <div className="ai-survey-card">
+                {/* Step 0: 语言水平 */}
+                {surveyStep === 0 && (
+                  <>
+                    <h3 className="ai-survey-q">你的{languageName}水平是？</h3>
+                    <div className="ai-survey-options">
+                      {LEVEL_OPTIONS.map((opt) => (
+                        <button
+                          key={opt.key}
+                          className={`ai-survey-option ${prefs.level === opt.key ? 'selected' : ''}`}
+                          onClick={() => { savePrefs({ ...prefs, level: opt.key }); setSurveyStep(1); }}
+                        >
+                          <span className="ai-so-label">{opt.label}</span>
+                          <span className="ai-so-desc">{opt.desc}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+
+                {/* Step 1: 学习目标 */}
+                {surveyStep === 1 && (
+                  <>
+                    <h3 className="ai-survey-q">你的学习目标是什么？</h3>
+                    <div className="ai-survey-options">
+                      {GOAL_OPTIONS.map((opt) => (
+                        <button
+                          key={opt.key}
+                          className={`ai-survey-option ${prefs.goal === opt.key ? 'selected' : ''}`}
+                          onClick={() => { savePrefs({ ...prefs, goal: opt.key }); setSurveyStep(2); }}
+                        >
+                          <span className="ai-so-icon">{opt.icon}</span>
+                          <span className="ai-so-label">{opt.label}</span>
+                          <span className="ai-so-desc">{opt.desc}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+
+                {/* Step 2: 考试类型（仅目标为考试时显示更多选项） */}
+                {surveyStep === 2 && (
+                  <>
+                    <h3 className="ai-survey-q">{prefs.goal === 'exam' ? '你准备参加哪个考试？' : '你希望重点提升什么？'}</h3>
+                    {prefs.goal === 'exam' ? (
+                      <div className="ai-survey-options ai-exam-grid">
+                        {EXAM_OPTIONS.map((opt) => (
+                          <button
+                            key={opt.key}
+                            className={`ai-survey-option compact ${prefs.examType === opt.key ? 'selected' : ''}`}
+                            onClick={() => { savePrefs({ ...prefs, examType: opt.key }); setSurveyStep(3); }}
+                          >
+                            <span className="ai-so-label">{opt.label}</span>
+                            <span className="ai-so-desc">{opt.desc}</span>
+                          </button>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="ai-survey-options">
+                        {FOCUS_OPTIONS.map((opt) => (
+                          <button
+                            key={opt.key}
+                            className={`ai-survey-option ${prefs.focusArea === opt.key ? 'selected' : ''}`}
+                            onClick={() => { savePrefs({ ...prefs, focusArea: opt.key }); setSurveyStep(3); }}
+                          >
+                            <span className="ai-so-icon">{opt.icon}</span>
+                            <span className="ai-so-label">{opt.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {/* Step 3: AI风格 */}
+                {surveyStep === 3 && (
+                  <>
+                    <h3 className="ai-survey-q">你希望 AI 以什么风格教学？</h3>
+                    <div className="ai-survey-options">
+                      {AI_STYLE_OPTIONS.map((opt) => (
+                        <button
+                          key={opt.key}
+                          className={`ai-survey-option ${prefs.aiStyle === opt.key ? 'selected' : ''}`}
+                          onClick={() => { savePrefs({ ...prefs, aiStyle: opt.key }); setSurveyStep(4); }}
+                        >
+                          <span className="ai-so-icon">{opt.icon}</span>
+                          <span className="ai-so-label">{opt.label}</span>
+                          <span className="ai-so-desc">{opt.desc}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+
+                {/* Step 4: AI声音性别 */}
+                {surveyStep === 4 && (
+                  <>
+                    <h3 className="ai-survey-q">你希望 AI 用什么样的声音？</h3>
+                    <div className="ai-survey-options ai-gender-row">
+                      <button
+                        className={`ai-survey-option large ${prefs.aiGender === 'female' ? 'selected' : ''}`}
+                        onClick={() => { savePrefs({ ...prefs, aiGender: 'female' }); finishSurvey(); }}
+                      >
+                        <span className="ai-so-icon" style={{ fontSize: '36px' }}>👩</span>
+                        <span className="ai-so-label">温柔女声</span>
+                        <span className="ai-so-desc">柔和亲切，娓娓道来</span>
+                      </button>
+                      <button
+                        className={`ai-survey-option large ${prefs.aiGender === 'male' ? 'selected' : ''}`}
+                        onClick={() => { savePrefs({ ...prefs, aiGender: 'male' }); finishSurvey(); }}
+                      >
+                        <span className="ai-so-icon" style={{ fontSize: '36px' }}>👨</span>
+                        <span className="ai-so-label">沉稳男声</span>
+                        <span className="ai-so-desc">稳重清晰，专业感强</span>
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* 跳过按钮 */}
+              <div className="ai-survey-skip">
+                <button onClick={finishSurvey}>跳过调查，直接使用 AI →</button>
+              </div>
+            </div>
+          )}
+
+          {/* 非调查模式：功能主页 */}
+          {!showSurvey && (
+            <>
+              <div className="ai-home-header">
+                <div className="ai-home-orb">🤖</div>
+                <h2 className="ai-home-title">{s.ai_title}</h2>
+                <p className="ai-home-sub">
+                  {languageName} · {LEVEL_OPTIONS.find(l => l.key === prefs.level)?.label} · 
+                  {GOAL_OPTIONS.find(g => g.key === prefs.goal)?.icon} {GOAL_OPTIONS.find(g => g.key === prefs.goal)?.label} · 
+                  {AI_STYLE_OPTIONS.find(s => s.key === prefs.aiStyle)?.icon} {AI_STYLE_OPTIONS.find(s => s.key === prefs.aiStyle)?.label}
+                </p>
+                <button className="ai-re-survey-btn" onClick={() => { localStorage.removeItem('yandao_ai_survey_done'); setShowSurvey(true); setSurveyStep(0); }}>
+                  重新评估 →
+                </button>
+              </div>
+              <div className="ai-mode-grid">
+                <button className="ai-mode-card camera" onClick={() => setMode('camera')}>
+                  <span className="ai-mode-icon">📷</span>
+                  <span className="ai-mode-label">{s.ai_camera}</span>
+                  <span className="ai-mode-desc">拍下题目或单词，AI即时解析</span>
+                </button>
+                <button className="ai-mode-card voice" onClick={() => setMode('voice')}>
+                  <span className="ai-mode-icon">🎙️</span>
+                  <span className="ai-mode-label">{s.ai_voice}</span>
+                  <span className="ai-mode-desc">开口说，AI帮你解答语言问题</span>
+                </button>
+                <button className="ai-mode-card text" onClick={() => setMode('text')}>
+                  <span className="ai-mode-icon">💬</span>
+                  <span className="ai-mode-label">{s.ai_text}</span>
+                  <span className="ai-mode-desc">语法解析 · 词汇查询 · 翻译纠错</span>
+                </button>
+                <button className="ai-mode-card chat" onClick={() => setMode('chat')}>
+                  <span className="ai-mode-icon">🫂</span>
+                  <span className="ai-mode-label">{s.ai_chat}</span>
+                  <span className="ai-mode-desc">语音对话 · 4种AI角色 · 主动引导</span>
+                </button>
+              </div>
+              <div className="ai-home-notice">
+                支持豆包 / Claude / OpenAI · 在创始人后台「AI配置」中填写密钥即可启用真实回复
+              </div>
+            </>
+          )}
         </>
       )}
 
@@ -666,7 +984,9 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ languageCode, language
             <div className="ai-voice-tips">
               <p>提问示例：</p>
               <p>· "「食べる」和「食べます」有什么区别？"</p>
-              <p>· "帮我翻译这句话"</p>
+              <p>· "帮我翻译这句话到{languageName}"</p>
+              <p>· "用{languageName}怎么说'谢谢'？"</p>
+              <p>· "这句语法对吗？请帮我纠错"</p>
             </div>
           )}
         </div>

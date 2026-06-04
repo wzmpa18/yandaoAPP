@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { FloatingBack } from './FloatingBack';
-import { supabase } from '../lib/supabase';
+import { supabase } from '../data/supabase';
 import { Confetti } from './Confetti';
 import { useUI } from '../lib/UILanguageContext';
+import { getDailyTasks, getMonthlyCheckinCount, getMonthlyBadges, isOfflineMode } from '../lib/offlineData';
 
 const SESSION_KEY_STORE = 'yandao_session_v5';
 function getSessionKey() { return localStorage.getItem(SESSION_KEY_STORE) ?? 'anon'; }
@@ -70,18 +71,10 @@ export const DailyTasks: React.FC<DailyTasksProps> = ({
       .eq('session_key', sessionKey)
       .eq('task_date', today);
 
-    if (!existing || existing.length === 0) {
-      // Generate today's tasks
-      const inserts = TASK_TEMPLATES.map((t) => ({
-        session_key: sessionKey,
-        task_date: today,
-        ...t,
-        current_value: 0,
-        completed: false,
-        reward_claimed: false,
-      }));
-      const { data: inserted } = await supabase.from('daily_tasks').insert(inserts).select();
-      setTasks((inserted ?? []) as DailyTask[]);
+    if (!existing || existing.length === 0 || isOfflineMode()) {
+      // Use offline data
+      const offline = getDailyTasks(sessionKey);
+      setTasks(offline as DailyTask[]);
     } else {
       setTasks(existing as DailyTask[]);
     }
@@ -93,7 +86,8 @@ export const DailyTasks: React.FC<DailyTasksProps> = ({
       .eq('session_key', sessionKey)
       .gte('checkin_date', `${yearMonth}-01`)
       .lte('checkin_date', `${yearMonth}-31`);
-    setCheckinDays(count ?? 0);
+    const checkinCount = count ?? (isOfflineMode() ? getMonthlyCheckinCount(sessionKey, yearMonth) : 0);
+    setCheckinDays(checkinCount);
 
     // Load monthly badges
     const { data: badges } = await supabase
@@ -101,7 +95,11 @@ export const DailyTasks: React.FC<DailyTasksProps> = ({
       .select('badge_key, badge_name, checkin_days')
       .eq('session_key', sessionKey)
       .eq('year_month', yearMonth);
-    setMonthBadges((badges ?? []) as typeof monthBadges);
+    if (badges && badges.length > 0) {
+      setMonthBadges(badges as typeof monthBadges);
+    } else if (isOfflineMode()) {
+      setMonthBadges(getMonthlyBadges());
+    }
 
     setLoading(false);
   }, [sessionKey, today, yearMonth]);

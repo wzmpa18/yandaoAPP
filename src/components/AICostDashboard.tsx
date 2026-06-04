@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase } from '../data/supabase';
 
 interface CostConfig {
   price_per_1m_input_usd: number;

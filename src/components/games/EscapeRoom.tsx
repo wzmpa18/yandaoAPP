@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { supabase } from '../../lib/supabase';
+import { supabase } from '../../data/supabase';
 import { InfiniteGameGenerator, GameContent } from '../../lib/InfiniteGameGenerator';
 import { useAudio } from '../../lib/useAudio';
 
@@ -32,14 +32,29 @@ const SCENE_ICONS: Record<string, string> = {
   default: '🏠',
 };
 
-function buildPuzzle(c: GameContent): Puzzle {
-  const d = c.data as { clue?: string; answer?: string; hint?: string; scene?: string };
+// 多语言干扰项，根据语言代码返回合适的假选项
+const DISTRACTORS_BY_LANG: Record<string, string[]> = {
+  ja: ['すみません', 'わかりません', 'ちょっと待って'],
+  ko: ['죄송합니다', '모르겠어요', '잠시만요'],
+  fr: ['Excusez-moi', 'Je ne sais pas', 'Attendez'],
+  es: ['Lo siento', 'No sé', 'Espere'],
+  de: ['Entschuldigung', 'Ich weiß nicht', 'Warten Sie'],
+  it: ['Mi scusi', 'Non lo so', 'Aspetti'],
+  pt: ['Desculpe', 'Não sei', 'Espere'],
+  ar: ['آسف', 'لا أعرف', 'انتظر'],
+  zh: ['不好意思', '我不知道', '等一下'],
+  en: ['Sorry', "I don't know", 'Wait a moment'],
+};
+
+function buildPuzzle(c: GameContent, langCode: string): Puzzle {
+  const d = c.data as { clue?: string; answer?: string; hint?: string; scene?: string; type?: string };
   const clue = String(d.clue ?? '请回答以下问题');
   const answer = String(d.answer ?? '');
   const hint = String(d.hint ?? '');
-  const distractors = ['不好意思', '我不知道', '对不起打扰了'];
+  const pType = (d.type as Puzzle['type']) || 'choice';
+  const distractors = DISTRACTORS_BY_LANG[langCode] ?? DISTRACTORS_BY_LANG.en;
   const options = [answer, ...distractors].sort(() => Math.random() - 0.5);
-  return { type: 'choice', question: clue, answer, hint, options };
+  return { type: pType, question: clue, answer, hint, options };
 }
 
 export const EscapeRoom: React.FC<EscapeRoomProps> = ({ langCode, onXP, onHeartLost, onBack }) => {
@@ -75,7 +90,7 @@ export const EscapeRoom: React.FC<EscapeRoomProps> = ({ langCode, onXP, onHeartL
         return {
           name: String(s.title_zh ?? s.title ?? '场景'),
           icon: SCENE_ICONS[String(s.title ?? '')] ?? SCENE_ICONS.default,
-          puzzles: puzzleContent.map(buildPuzzle),
+          puzzles: puzzleContent.map(c => buildPuzzle(c, langCode)),
           keys: 0,
         };
       });
@@ -87,7 +102,7 @@ export const EscapeRoom: React.FC<EscapeRoomProps> = ({ langCode, onXP, onHeartL
       const newScenes: Scene[] = sceneNames.map((name, si) => ({
         name,
         icon: SCENE_ICONS[name] ?? SCENE_ICONS.default,
-        puzzles: contents.slice(si * 3, si * 3 + 3).map(buildPuzzle),
+        puzzles: contents.slice(si * 3, si * 3 + 3).map(c => buildPuzzle(c, langCode)),
         keys: 0,
       }));
       setScenes(newScenes);
@@ -108,7 +123,12 @@ export const EscapeRoom: React.FC<EscapeRoomProps> = ({ langCode, onXP, onHeartL
     const puzzle = scene.puzzles[puzzleIdx];
     if (!puzzle) return;
 
-    const correct = userAnswer.trim().toLowerCase().includes(puzzle.answer.toLowerCase().slice(0, 4));
+    const ua = userAnswer.trim().toLowerCase();
+    const pa = puzzle.answer.toLowerCase().trim();
+    // 更严格的匹配：完全匹配，或答案包含用户输入（至少4字符），或用户输入包含答案（至少3字符）
+    const correct = ua === pa 
+      || (ua.length >= 4 && pa.includes(ua))
+      || (pa.length >= 3 && ua.includes(pa));
 
     if (correct) {
       playSuccess();
@@ -145,15 +165,22 @@ export const EscapeRoom: React.FC<EscapeRoomProps> = ({ langCode, onXP, onHeartL
     }
   }
 
+  const SR_LANG_MAP: Record<string, string> = {
+    ja: 'ja-JP', ko: 'ko-KR', zh: 'zh-CN', fr: 'fr-FR',
+    es: 'es-ES', de: 'de-DE', it: 'it-IT', pt: 'pt-BR',
+    ar: 'ar-SA', en: 'en-US',
+  };
+
   function startSpeechRecognition() {
     if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-      setSpeechInput(scenes[sceneIdx]?.puzzles[puzzleIdx]?.answer ?? '');
+      // 降级：直接用文本输入替代语音
+      setSpeechInput('请使用文本输入框');
       return;
     }
     const SRClass = (window as Window & { webkitSpeechRecognition?: new() => SpeechRecognition; SpeechRecognition?: new() => SpeechRecognition }).webkitSpeechRecognition ?? (window as Window & { SpeechRecognition?: new() => SpeechRecognition }).SpeechRecognition;
     if (!SRClass) return;
     const sr = new SRClass();
-    sr.lang = langCode === 'ja' ? 'ja-JP' : langCode === 'ko' ? 'ko-KR' : langCode === 'zh' ? 'zh-CN' : 'en-US';
+    sr.lang = SR_LANG_MAP[langCode] || 'en-US';
     sr.onresult = (e: SpeechRecognitionEvent) => {
       const transcript = e.results[0][0].transcript;
       setSpeechInput(transcript);

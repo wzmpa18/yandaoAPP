@@ -1,4 +1,7 @@
-import { supabase } from './supabase';
+import { getProviderSync } from '../providers';
+
+// 延迟获取 data provider，避免模块初始化时序问题
+function dp() { try { return getProviderSync().data; } catch { throw new Error('[aiClient] Provider not available'); } }
 
 export type AIModel = 'doubao' | 'claude' | 'openai';
 
@@ -25,9 +28,10 @@ export interface AIMessage {
 
 const DEFAULT_CFG: AIModelConfig = {
   default_model: 'doubao',
-  doubao_api_key: 'ark-d751d0e3-08af-4d58-80b9-1e51b6830dd7-0fd5d',
-  doubao_endpoint: 'https://ark.cn-beijing.volces.com/api/v3/chat/completions',
-  doubao_model: 'ep-20250529145638-8v7r6',
+  // 优先从 .env 环境变量读取，fallback 到硬编码值
+  doubao_api_key: (import.meta.env as Record<string, string>).VITE_DOUBAO_API_KEY || 'ark-d751d0e3-08af-4d58-80b9-1e51b6830dd7-0fd5d',
+  doubao_endpoint: (import.meta.env as Record<string, string>).VITE_DOUBAO_ENDPOINT || 'https://ark.cn-beijing.volces.com/api/v3/chat/completions',
+  doubao_model: (import.meta.env as Record<string, string>).VITE_DOUBAO_MODEL || 'ep-20250529145638-8v7r6',
   claude_api_key: '',
   claude_model: 'claude-3-5-sonnet-20241022',
   claude_endpoint: 'https://api.anthropic.com/v1/messages',
@@ -36,7 +40,7 @@ const DEFAULT_CFG: AIModelConfig = {
   openai_endpoint: 'https://api.openai.com/v1/chat/completions',
   max_tokens: 800,
   temperature: 0.8,
-  system_prompt_prefix: '你是一个专业的语言学习助手，请用简洁清晰的方式回答用户的问题。',
+  system_prompt_prefix: '你是一个专业的语言学习助手（言道Gendou），请用简洁清晰的方式回答用户的问题。根据用户选择的风格（严肃/幽默/温柔/严格）调整回复语气。',
 };
 
 let configCache: AIModelConfig | null = null;
@@ -45,7 +49,7 @@ const CACHE_TTL = 30_000; // 30s
 
 export async function getAIConfig(): Promise<AIModelConfig> {
   if (configCache && Date.now() - configCacheTs < CACHE_TTL) return configCache;
-  const { data } = await supabase.from('ai_model_config').select('*').eq('id', 1).maybeSingle();
+  const data = await dp().selectOne('ai_model_config', { eq: { id: 1 } });
   configCache = data ? { ...DEFAULT_CFG, ...data } : DEFAULT_CFG;
   configCacheTs = Date.now();
   return configCache;

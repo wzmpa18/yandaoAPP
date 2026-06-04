@@ -120,6 +120,21 @@ export const GrammarCube: React.FC<GrammarCubeProps> = ({ langCode, onXP, onHear
         }}
         onMouseUp={() => setDragging(false)}
         onMouseLeave={() => setDragging(false)}
+        onTouchStart={(e) => {
+          const t = e.touches[0];
+          setDragging(true); setDragStart({ x: t.clientX, y: t.clientY });
+        }}
+        onTouchMove={(e) => {
+          if (!dragging) return;
+          const t = e.touches[0];
+          setRotation((r) => ({
+            x: r.x - (t.clientY - dragStart.y) * 0.3,
+            y: r.y + (t.clientX - dragStart.x) * 0.3,
+          }));
+          setDragStart({ x: t.clientX, y: t.clientY });
+        }}
+        onTouchEnd={() => setDragging(false)}
+        style={{ touchAction: 'none' }}
       >
         <div
           className="gc-cube"

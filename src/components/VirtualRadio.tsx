@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase } from '../data/supabase';
 import { FloatingBack } from './FloatingBack';
 
 interface VirtualRadioProps {
@@ -46,19 +46,40 @@ const DIFF_COLOR: Record<string, string> = {
   advanced: 'var(--terra)',
 };
 
+/* 难度筛选选项 */
+const DIFFICULTY_FILTERS = [
+  { key: 'all', label: '全部', icon: '📻' },
+  { key: 'beginner', label: '初级', icon: '🌱' },
+  { key: 'intermediate', label: '中级', icon: '🌿' },
+  { key: 'advanced', label: '高级', icon: '🌳' },
+] as const;
+
 // Offline fallback content when DB has nothing
-const FALLBACK: Record<string, RadioContent> = {
+const FALLBACK: Record<string, Record<string, RadioContent>> = {
   news: {
-    id: 'fb-news', lang_code: 'en', radio_type: 'news', profession: null,
-    title: '今日新闻（示例）',
-    content_text: '欢迎收听虚拟广播电台新闻频道。这是一段示例新闻播报内容，用于演示电台功能。实际内容将从数据库动态加载，支持多语言、多类型广播内容。请连接数据库以获取完整内容。',
-    duration: 30, difficulty: 'beginner', order_index: 0,
+    ja: { id: 'fb-news-ja', lang_code: 'ja', radio_type: 'news', profession: null, title: 'NHK 速報：新技術が言語学習を変える', content_text: 'こんにちは。今日のニュースです。最新のAI技術により、言語学習の方法が大きく変わろうとしています。専門家によると、今後5年間で、より多くの人が複数の言語を話せるようになると予測されています。特に注目されているのは、音声認識とAI対話を組み合わせた新しい学習方法です。これにより、学習者はより自然な会話練習が可能になります。', duration: 45, difficulty: 'intermediate', order_index: 0 },
+    en: { id: 'fb-news-en', lang_code: 'en', radio_type: 'news', profession: null, title: 'Daily News: Language Learning Revolution', content_text: 'Good morning. In today\'s news, AI technology is transforming how we learn languages. Researchers report that students using AI-powered tools learn 40% faster than traditional methods. The key innovation is personalized feedback that adapts to each learner\'s pace and style. More schools are now adopting these technologies worldwide.', duration: 40, difficulty: 'intermediate', order_index: 0 },
+    ko: { id: 'fb-news-ko', lang_code: 'ko', radio_type: 'news', profession: null, title: '뉴스: 언어 학습의 새로운 시대', content_text: '안녕하세요. 오늘의 뉴스입니다. AI 기술이 언어 학습 방식을 혁신적으로 바꾸고 있습니다. 연구에 따르면 AI 도구를 사용하는 학습자들이 전통적인 방법보다 40% 더 빠르게 학습한다고 합니다. 핵심은 각 학습자의 속도와 스타일에 맞춘 개인화된 피드백입니다.', duration: 40, difficulty: 'intermediate', order_index: 0 },
+    default: { id: 'fb-news-d', lang_code: 'en', radio_type: 'news', profession: null, title: 'Language Learning News', content_text: 'Welcome to Virtual Radio News. AI technology is revolutionizing language learning. Students using AI tools learn 40% faster. The key is personalized feedback that adapts to each learner.', duration: 25, difficulty: 'beginner', order_index: 0 },
+  },
+  music: {
+    ja: { id: 'fb-music-ja', lang_code: 'ja', radio_type: 'music', profession: null, title: 'J-POP 音楽特集：言葉で感じる日本', content_text: '今日は日本の音楽を通して言語を学びましょう。J-POPの歌詞には、日常会話でよく使われる表現がたくさん含まれています。例えば、「君」や「僕」といった人称代名詞、「好き」「楽しい」などの感情表現。歌を聴きながら歌詞を読むことで、自然な日本語のリズムと発音が身につきます。', duration: 50, difficulty: 'beginner', order_index: 0 },
+    en: { id: 'fb-music-en', lang_code: 'en', radio_type: 'music', profession: null, title: 'Music & Language: Learning Through Songs', content_text: 'Let\'s explore how music helps language learning. Song lyrics contain everyday expressions, idioms, and natural rhythms. Try listening to English songs while reading lyrics — you\'ll pick up pronunciation and vocabulary naturally. Today\'s feature: pop songs that teach common phrases.', duration: 45, difficulty: 'beginner', order_index: 0 },
+    default: { id: 'fb-music-d', lang_code: 'en', radio_type: 'music', profession: null, title: 'Learning Through Music', content_text: 'Music is a powerful tool for language learning. Songs contain natural expressions and help with pronunciation. Listen to songs in your target language and try singing along!', duration: 20, difficulty: 'beginner', order_index: 0 },
   },
   story: {
-    id: 'fb-story', lang_code: 'en', radio_type: 'story', profession: null,
-    title: '短篇故事（示例）',
-    content_text: '从前，在一座宁静的小镇上，有一个热爱语言的年轻人。他每天通过收听广播来练习外语，久而久之，他的语言水平突飞猛进。这个故事告诉我们：坚持是成功的关键。',
-    duration: 30, difficulty: 'beginner', order_index: 0,
+    ja: { id: 'fb-story-ja', lang_code: 'ja', radio_type: 'story', profession: null, title: '日本昔話：桃太郎', content_text: 'むかしむかし、あるところに、おじいさんとおばあさんが住んでいました。ある日、おばあさんが川で洗濯をしていると、大きな桃が流れてきました。桃を割ってみると、中から元気な男の子が生まれました。その子は桃太郎と名付けられ、すくすくと育ちました。桃太郎は大きくなると、鬼ヶ島へ鬼退治に行くことを決意します。', duration: 55, difficulty: 'intermediate', order_index: 0 },
+    en: { id: 'fb-story-en', lang_code: 'en', radio_type: 'story', profession: null, title: 'Classic Tale: The Language Learner', content_text: 'Once upon a time, in a quiet town, there lived a young person who dreamed of speaking many languages. Every morning, they would practice for 30 minutes. They made mistakes, laughed at themselves, and kept going. After one year, they could hold conversations in three languages. The secret? Consistency and not being afraid to make mistakes.', duration: 40, difficulty: 'intermediate', order_index: 0 },
+    default: { id: 'fb-story-d', lang_code: 'en', radio_type: 'story', profession: null, title: 'A Short Story', content_text: 'There was once a dedicated language learner who practiced every day. Through consistency and courage to make mistakes, they achieved fluency. This story reminds us that persistence is key.', duration: 20, difficulty: 'beginner', order_index: 0 },
+  },
+  business: {
+    ja: { id: 'fb-biz-ja', lang_code: 'ja', radio_type: 'business', profession: null, title: 'ビジネス日本語：敬語の基本', content_text: '日本のビジネスシーンでは、敬語の使い方が非常に重要です。尊敬語、謙譲語、丁寧語の3種類があります。例えば、「言う」の尊敬語は「おっしゃる」、謙譲語は「申す」、丁寧語は「言います」です。正しい敬語を使うことで、相手に敬意を示し、円滑なビジネスコミュニケーションが可能になります。', duration: 50, difficulty: 'advanced', order_index: 0 },
+    en: { id: 'fb-biz-en', lang_code: 'en', radio_type: 'business', profession: null, title: 'Business English: Meeting Phrases', content_text: 'In today\'s business English session, we\'ll cover essential meeting phrases. "Could you elaborate on that?" asks for more details. "I\'d like to circle back to..." returns to a previous topic. "Let\'s table this for now" means postponing discussion. Master these phrases to sound more professional in meetings.', duration: 45, difficulty: 'advanced', order_index: 0 },
+    default: { id: 'fb-biz-d', lang_code: 'en', radio_type: 'business', profession: null, title: 'Business Communication', content_text: 'Today we cover essential business communication skills. Learn key phrases for meetings, emails, and professional conversations in your target language.', duration: 25, difficulty: 'intermediate', order_index: 0 },
+  },
+  academic: {
+    en: { id: 'fb-acad-en', lang_code: 'en', radio_type: 'academic', profession: null, title: 'Academic Lecture: Second Language Acquisition', content_text: 'Today\'s academic lecture explores second language acquisition theory. Research by Stephen Krashen suggests that comprehensible input is the key driver of language acquisition. Learners need exposure to language that is slightly above their current level — what he calls "i+1". This means you should challenge yourself, but not overwhelm yourself.', duration: 55, difficulty: 'advanced', order_index: 0 },
+    default: { id: 'fb-acad-d', lang_code: 'en', radio_type: 'academic', profession: null, title: 'Academic: Language Learning Science', content_text: 'This academic lecture covers the science of language learning. Key concepts include comprehensible input, spaced repetition, and the importance of active recall in vocabulary acquisition.', duration: 30, difficulty: 'advanced', order_index: 0 },
   },
 };
 
@@ -98,6 +119,7 @@ export const VirtualRadio: React.FC<VirtualRadioProps> = ({
   languageCode, languageName, profession, onBack,
 }) => {
   const [activeType, setActiveType] = useState<RadioType>('news');
+  const [difficultyFilter, setDifficultyFilter] = useState<string>('all');
   const [contents, setContents] = useState<RadioContent[]>([]);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -157,12 +179,20 @@ export const VirtualRadio: React.FC<VirtualRadioProps> = ({
     query.then(({ data }) => {
       const rows = (data ?? []) as RadioContent[];
       if (rows.length === 0) {
-        // Use fallback
-        const fb = FALLBACK[activeType] ?? FALLBACK['news'];
+        // Use language-specific fallback content
+        const typeFallbacks = FALLBACK[activeType] ?? FALLBACK['news'];
+        const fb = typeFallbacks[languageCode] ?? typeFallbacks['default'] ?? Object.values(typeFallbacks)[0];
         setContents([{ ...fb, lang_code: languageCode }]);
       } else {
         setContents(rows);
       }
+      setCurrentIdx(0);
+      setLoading(false);
+    }).catch(() => {
+      // Network error — use fallback
+      const typeFallbacks = FALLBACK[activeType] ?? FALLBACK['news'];
+      const fb = typeFallbacks[languageCode] ?? typeFallbacks['default'] ?? Object.values(typeFallbacks)[0];
+      setContents([{ ...fb, lang_code: languageCode }]);
       setCurrentIdx(0);
       setLoading(false);
     });
@@ -345,6 +375,22 @@ export const VirtualRadio: React.FC<VirtualRadioProps> = ({
         ))}
       </div>
 
+      {/* Difficulty filter */}
+      <div className="radio-difficulty-strip">
+        <span className="radio-difficulty-label">难度筛选：</span>
+        {DIFFICULTY_FILTERS.map(d => (
+          <button
+            key={d.key}
+            className={`radio-difficulty-btn ${difficultyFilter === d.key ? 'active' : ''}`}
+            onClick={() => setDifficultyFilter(d.key)}
+            style={difficultyFilter === d.key ? { borderColor: DIFF_COLOR[d.key] ?? 'var(--stone)', color: DIFF_COLOR[d.key] ?? 'var(--stone)' } : {}}
+          >
+            <span className="radio-difficulty-icon">{d.icon}</span>
+            <span className="radio-difficulty-label">{d.label}</span>
+          </button>
+        ))}
+      </div>
+
       {loading ? (
         <div className="radio-loading">
           <div className="radio-loading-wave">
@@ -452,22 +498,42 @@ export const VirtualRadio: React.FC<VirtualRadioProps> = ({
               </div>
             </div>
 
-            {/* Track list */}
-            {contents.length > 1 && (
-              <div className="radio-tracklist">
-                {contents.map((c, i) => (
-                  <button
-                    key={c.id}
-                    className={`radio-track-item ${i === currentIdx ? 'active' : ''}`}
-                    onClick={() => { cancel(); setPlaying(false); setElapsed(0); setCurrentIdx(i); setShadowScore(null); }}
-                  >
-                    <span className="radio-track-num">{i + 1}</span>
-                    <span className="radio-track-name">{c.title}</span>
-                    <span className="radio-track-len">{c.duration}s</span>
-                  </button>
-                ))}
-              </div>
-            )}
+            {/* Track list with difficulty filter */}
+            {contents.length > 0 && (() => {
+              const filtered = difficultyFilter === 'all'
+                ? contents
+                : contents.filter(c => c.difficulty === difficultyFilter);
+              return filtered.length > 0 ? (
+                <div className="radio-tracklist">
+                  {filtered.map((c) => {
+                    const idx = contents.indexOf(c);
+                    return (
+                      <button
+                        key={c.id}
+                        className={`radio-track-item ${idx === currentIdx ? 'active' : ''}`}
+                        onClick={() => { cancel(); setPlaying(false); setElapsed(0); setCurrentIdx(idx); setShadowScore(null); }}
+                      >
+                        <span className="radio-track-num">{idx + 1}</span>
+                        <span className="radio-track-name">{c.title}</span>
+                        <span
+                          className="radio-track-diff"
+                          style={{ color: DIFF_COLOR[c.difficulty] ?? 'var(--stone)' }}
+                        >
+                          {c.difficulty === 'beginner' ? '初级' : c.difficulty === 'intermediate' ? '中级' : '高级'}
+                        </span>
+                        <span className="radio-track-len">{c.duration}s</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="radio-tracklist">
+                  <span className="radio-track-empty">
+                    该难度暂无内容，请切换难度筛选
+                  </span>
+                </div>
+              );
+            })()}
 
             {/* Shadow mode button */}
             {!shadowMode && (

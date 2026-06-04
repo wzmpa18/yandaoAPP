@@ -1,4 +1,7 @@
-import { supabase } from '../data/supabase';
+import { getProviderSync } from '../providers';
+
+// 延迟获取 data provider，避免模块初始化时序问题
+function dp() { try { return getProviderSync().data; } catch { throw new Error('[QuestionGenerator] Provider not available'); } }
 
 export type QuestionType = 'single_choice' | 'fill_blank' | 'reading';
 export type QuestionDifficulty = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
@@ -149,6 +152,62 @@ class QuestionGenerator {
         difficulty: 2,
       },
     ],
+    it: [
+      {
+        template: 'Scegli la forma corretta: Io ___ studente. (sono/sei/è)',
+        difficulty: 1,
+      },
+      {
+        template: 'Scegli il verbo corretto: Lei ___ a scuola. (andare/va/vanno)',
+        difficulty: 2,
+      },
+      {
+        template: 'Scegli l\'articolo corretto: ___ libro è interessante. (Il/Lo/La)',
+        difficulty: 2,
+      },
+    ],
+    pt: [
+      {
+        template: 'Escolha a forma correta: Eu ___ estudante. (sou/é/estou)',
+        difficulty: 1,
+      },
+      {
+        template: 'Escolha o verbo correto: Ela ___ para a escola. (ir/vai/vamos)',
+        difficulty: 2,
+      },
+      {
+        template: 'Escolha o artigo correto: ___ livro é interessante. (O/A/Os)',
+        difficulty: 2,
+      },
+    ],
+    ar: [
+      {
+        template: 'اختر الصيغة الصحيحة: أنا ___ طالب. (أكون/يكون/تكون)',
+        difficulty: 1,
+      },
+      {
+        template: 'اختر الفعل الصحيح: هو ___ إلى المدرسة. (يذهب/تذهب/أذهب)',
+        difficulty: 2,
+      },
+      {
+        template: 'اختر حرف الجر الصحيح: ذهبت ___ المدرسة. (إلى/على/في)',
+        difficulty: 2,
+      },
+    ],
+    zh: [
+      {
+        template: '选择正确的量词：一___书。(本/个/只/张)',
+        difficulty: 1,
+      },
+      {
+        template: '选择正确的"的/地/得"：他跑___很快。(的/地/得)',
+        difficulty: 3,
+      },
+      {
+        template: '选择正确的词语：这个苹果很___。(好吃/好吃吗/好吃吧)',
+        difficulty: 1,
+      },
+    ],
   };
 
   private topicKeywords: Record<string, string[]> = {
@@ -158,6 +217,10 @@ class QuestionGenerator {
     fr: ['verbes', 'articles', 'adjectifs', 'prépositions', 'passé composé', 'imparfait'],
     es: ['verbos', 'artículos', 'adjetivos', 'preposiciones', 'pretérito', 'imperfecto'],
     de: ['Verben', 'Artikel', 'Adjektive', 'Präpositionen', 'Präteritum', 'Perfekt'],
+    it: ['verbi', 'articoli', 'aggettivi', 'preposizioni', 'passato prossimo', 'imperfetto'],
+    pt: ['verbos', 'artigos', 'adjetivos', 'preposições', 'pretérito perfeito', 'imperfeito'],
+    ar: ['أفعال', 'حروف جر', 'صفات', 'أسماء', 'مذكر ومؤنث', 'جمع'],
+    zh: ['量词', '动词', '形容词', '副词', '连词', '语气词', '的得地'],
   };
 
   private async initialize(): Promise<void> {
@@ -168,24 +231,235 @@ class QuestionGenerator {
   }
 
   private async loadVocabFromDB(): Promise<void> {
-    const languages = ['en', 'ja', 'ko', 'fr', 'es', 'de'];
+    const languages = ['en', 'ja', 'ko', 'fr', 'es', 'de', 'it', 'pt', 'ar', 'zh'];
     
     for (const lang of languages) {
-      const { data, error } = await supabase
-        .from('contents')
-        .select('content, translation')
-        .eq('type', 'vocab')
-        .eq('language', lang)
-        .limit(100);
+      try {
+        const { data, error } = await supabase
+          .from('contents')
+          .select('content, translation')
+          .eq('type', 'vocab')
+          .eq('language', lang)
+          .limit(100);
 
-      if (!error && data) {
-        this.vocabCache[lang] = data.map(item => ({
-          word: item.content,
-          translation: item.translation || '',
-          partOfSpeech: '',
-          example: '',
-        }));
+        if (!error && data && data.length > 0) {
+          this.vocabCache[lang] = data.map(item => ({
+            word: item.content,
+            translation: item.translation || '',
+            partOfSpeech: '',
+            example: '',
+          }));
+        }
+      } catch {
+        // Offline: try localStorage fallback
+        this.loadVocabFromLocalStorage(lang);
       }
+    }
+    
+    // If any language still has no vocab, try offline data
+    for (const lang of languages) {
+      if (!this.vocabCache[lang] || this.vocabCache[lang].length === 0) {
+        this.loadVocabFromLocalStorage(lang);
+      }
+    }
+  }
+
+  private loadVocabFromLocalStorage(lang: string): void {
+    try {
+      const cache = JSON.parse(localStorage.getItem('ai_question_vocab_cache') || '{}');
+      if (cache[lang] && cache[lang].length > 0) {
+        this.vocabCache[lang] = cache[lang];
+        return;
+      }
+    } catch { /* ignore */ }
+    
+    // Fallback to built-in vocab
+    const fallbackVocab: Record<string, VocabItem[]> = {
+      en: [
+        { word: 'beautiful', translation: '美丽的', partOfSpeech: 'adjective', example: 'The sunset is beautiful.' },
+        { word: 'important', translation: '重要的', partOfSpeech: 'adjective', example: 'This is very important.' },
+        { word: 'different', translation: '不同的', partOfSpeech: 'adjective', example: 'They are different.' },
+        { word: 'together', translation: '一起', partOfSpeech: 'adverb', example: 'Let\'s go together.' },
+        { word: 'remember', translation: '记得', partOfSpeech: 'verb', example: 'Remember to call me.' },
+        { word: 'problem', translation: '问题', partOfSpeech: 'noun', example: 'No problem at all.' },
+        { word: 'understand', translation: '理解', partOfSpeech: 'verb', example: 'I understand now.' },
+        { word: 'experience', translation: '经验', partOfSpeech: 'noun', example: 'Good experience.' },
+        { word: 'decision', translation: '决定', partOfSpeech: 'noun', example: 'Make a decision.' },
+        { word: 'opportunity', translation: '机会', partOfSpeech: 'noun', example: 'Great opportunity.' },
+      ],
+      ja: [
+        { word: '美しい', translation: '美丽的', partOfSpeech: 'adjective', example: '美しい花ですね。' },
+        { word: '大切', translation: '重要的', partOfSpeech: 'adjective', example: 'これは大切です。' },
+        { word: '違う', translation: '不同的', partOfSpeech: 'verb', example: '意見が違います。' },
+        { word: '一緒に', translation: '一起', partOfSpeech: 'adverb', example: '一緒に行きましょう。' },
+        { word: '覚える', translation: '记住', partOfSpeech: 'verb', example: '単語を覚える。' },
+        { word: '問題', translation: '问题', partOfSpeech: 'noun', example: '問題を解く。' },
+        { word: '経験', translation: '经验', partOfSpeech: 'noun', example: 'いい経験です。' },
+        { word: '決める', translation: '决定', partOfSpeech: 'verb', example: '自分で決める。' },
+        { word: '機会', translation: '机会', partOfSpeech: 'noun', example: 'いい機会です。' },
+        { word: '頑張る', translation: '努力', partOfSpeech: 'verb', example: '一緒に頑張ろう！' },
+      ],
+      ko: [
+        { word: '아름답다', translation: '美丽的', partOfSpeech: 'adjective', example: '꽃이 아름답습니다.' },
+        { word: '중요하다', translation: '重要的', partOfSpeech: 'adjective', example: '이것은 중요합니다.' },
+        { word: '다르다', translation: '不同的', partOfSpeech: 'adjective', example: '의견이 다릅니다.' },
+        { word: '함께', translation: '一起', partOfSpeech: 'adverb', example: '함께 갑시다.' },
+        { word: '기억하다', translation: '记住', partOfSpeech: 'verb', example: '단어를 기억하세요.' },
+        { word: '문제', translation: '问题', partOfSpeech: 'noun', example: '문제를 풀어요.' },
+        { word: '경험', translation: '经验', partOfSpeech: 'noun', example: '좋은 경험입니다.' },
+        { word: '결정하다', translation: '决定', partOfSpeech: 'verb', example: '빨리 결정하세요.' },
+        { word: '기회', translation: '机会', partOfSpeech: 'noun', example: '좋은 기회입니다.' },
+        { word: '노력하다', translation: '努力', partOfSpeech: 'verb', example: '열심히 노력하세요.' },
+      ],
+      fr: [
+        { word: 'important', translation: '重要的', partOfSpeech: 'adjective', example: 'C\'est très important.' },
+        { word: 'ensemble', translation: '一起', partOfSpeech: 'adverb', example: 'Allons-y ensemble.' },
+        { word: 'différent', translation: '不同的', partOfSpeech: 'adjective', example: 'Ils sont différents.' },
+        { word: 'comprendre', translation: '理解', partOfSpeech: 'verb', example: 'Je comprends maintenant.' },
+        { word: 'expérience', translation: '经验', partOfSpeech: 'noun', example: 'Bonne expérience.' },
+        { word: 'décision', translation: '决定', partOfSpeech: 'noun', example: 'Prends une décision.' },
+        { word: 'opportunité', translation: '机会', partOfSpeech: 'noun', example: 'Belle opportunité.' },
+        { word: 'problème', translation: '问题', partOfSpeech: 'noun', example: 'Pas de problème.' },
+        { word: 'souvenir', translation: '记住', partOfSpeech: 'verb', example: 'Je me souviens.' },
+        { word: 'beau', translation: '美丽的', partOfSpeech: 'adjective', example: 'C\'est très beau.' },
+      ],
+      es: [
+        { word: 'importante', translation: '重要的', partOfSpeech: 'adjective', example: 'Esto es muy importante.' },
+        { word: 'juntos', translation: '一起', partOfSpeech: 'adverb', example: 'Vamos juntos.' },
+        { word: 'diferente', translation: '不同的', partOfSpeech: 'adjective', example: 'Son diferentes.' },
+        { word: 'entender', translation: '理解', partOfSpeech: 'verb', example: 'Ahora entiendo.' },
+        { word: 'experiencia', translation: '经验', partOfSpeech: 'noun', example: 'Buena experiencia.' },
+        { word: 'decisión', translation: '决定', partOfSpeech: 'noun', example: 'Toma una decisión.' },
+        { word: 'oportunidad', translation: '机会', partOfSpeech: 'noun', example: 'Gran oportunidad.' },
+        { word: 'problema', translation: '问题', partOfSpeech: 'noun', example: 'No hay problema.' },
+        { word: 'recordar', translation: '记住', partOfSpeech: 'verb', example: 'Recuerda llamarme.' },
+        { word: 'hermoso', translation: '美丽的', partOfSpeech: 'adjective', example: 'Es muy hermoso.' },
+      ],
+      de: [
+        { word: 'wichtig', translation: '重要的', partOfSpeech: 'adjective', example: 'Das ist sehr wichtig.' },
+        { word: 'zusammen', translation: '一起', partOfSpeech: 'adverb', example: 'Lass uns zusammen gehen.' },
+        { word: 'verschieden', translation: '不同的', partOfSpeech: 'adjective', example: 'Sie sind verschieden.' },
+        { word: 'verstehen', translation: '理解', partOfSpeech: 'verb', example: 'Ich verstehe jetzt.' },
+        { word: 'Erfahrung', translation: '经验', partOfSpeech: 'noun', example: 'Gute Erfahrung.' },
+        { word: 'Entscheidung', translation: '决定', partOfSpeech: 'noun', example: 'Triff eine Entscheidung.' },
+        { word: 'Gelegenheit', translation: '机会', partOfSpeech: 'noun', example: 'Große Gelegenheit.' },
+        { word: 'Problem', translation: '问题', partOfSpeech: 'noun', example: 'Kein Problem.' },
+        { word: 'erinnern', translation: '记住', partOfSpeech: 'verb', example: 'Erinnere dich daran.' },
+        { word: 'schön', translation: '美丽的', partOfSpeech: 'adjective', example: 'Das ist sehr schön.' },
+      ],
+      it: [
+        { word: 'importante', translation: '重要的', partOfSpeech: 'adjective', example: 'È molto importante.' },
+        { word: 'insieme', translation: '一起', partOfSpeech: 'adverb', example: 'Andiamo insieme.' },
+        { word: 'diverso', translation: '不同的', partOfSpeech: 'adjective', example: 'Sono diversi.' },
+        { word: 'capire', translation: '理解', partOfSpeech: 'verb', example: 'Ora capisco.' },
+        { word: 'esperienza', translation: '经验', partOfSpeech: 'noun', example: 'Buona esperienza.' },
+        { word: 'decisione', translation: '决定', partOfSpeech: 'noun', example: 'Prendi una decisione.' },
+        { word: 'opportunità', translation: '机会', partOfSpeech: 'noun', example: 'Grande opportunità.' },
+        { word: 'problema', translation: '问题', partOfSpeech: 'noun', example: 'Nessun problema.' },
+        { word: 'ricordare', translation: '记住', partOfSpeech: 'verb', example: 'Ricorda di chiamarmi.' },
+        { word: 'bello', translation: '美丽的', partOfSpeech: 'adjective', example: 'È molto bello.' },
+      ],
+      pt: [
+        { word: 'importante', translation: '重要的', partOfSpeech: 'adjective', example: 'É muito importante.' },
+        { word: 'juntos', translation: '一起', partOfSpeech: 'adverb', example: 'Vamos juntos.' },
+        { word: 'diferente', translation: '不同的', partOfSpeech: 'adjective', example: 'São diferentes.' },
+        { word: 'entender', translation: '理解', partOfSpeech: 'verb', example: 'Agora entendo.' },
+        { word: 'experiência', translation: '经验', partOfSpeech: 'noun', example: 'Boa experiência.' },
+        { word: 'decisão', translation: '决定', partOfSpeech: 'noun', example: 'Tome uma decisão.' },
+        { word: 'oportunidade', translation: '机会', partOfSpeech: 'noun', example: 'Grande oportunidade.' },
+        { word: 'problema', translation: '问题', partOfSpeech: 'noun', example: 'Sem problema.' },
+        { word: 'lembrar', translation: '记住', partOfSpeech: 'verb', example: 'Lembre de me ligar.' },
+        { word: 'bonito', translation: '美丽的', partOfSpeech: 'adjective', example: 'É muito bonito.' },
+      ],
+      ar: [
+        { word: 'مهم', translation: '重要的', partOfSpeech: 'adjective', example: 'هذا مهم جداً.' },
+        { word: 'معاً', translation: '一起', partOfSpeech: 'adverb', example: 'لنذهب معاً.' },
+        { word: 'مختلف', translation: '不同的', partOfSpeech: 'adjective', example: 'هم مختلفون.' },
+        { word: 'يفهم', translation: '理解', partOfSpeech: 'verb', example: 'أفهم الآن.' },
+        { word: 'خبرة', translation: '经验', partOfSpeech: 'noun', example: 'خبرة جيدة.' },
+        { word: 'قرار', translation: '决定', partOfSpeech: 'noun', example: 'اتخذ قراراً.' },
+        { word: 'فرصة', translation: '机会', partOfSpeech: 'noun', example: 'فرصة عظيمة.' },
+        { word: 'مشكلة', translation: '问题', partOfSpeech: 'noun', example: 'لا مشكلة.' },
+        { word: 'يتذكر', translation: '记住', partOfSpeech: 'verb', example: 'تذكر أن تتصل بي.' },
+        { word: 'جميل', translation: '美丽的', partOfSpeech: 'adjective', example: 'هذا جميل جداً.' },
+      ],
+      zh: [
+        { word: '重要', translation: 'important', partOfSpeech: 'adjective', example: '这件事很重要。' },
+        { word: '一起', translation: 'together', partOfSpeech: 'adverb', example: '我们一起走吧。' },
+        { word: '不同', translation: 'different', partOfSpeech: 'adjective', example: '他们完全不同。' },
+        { word: '理解', translation: 'understand', partOfSpeech: 'verb', example: '我现在理解了。' },
+        { word: '经验', translation: 'experience', partOfSpeech: 'noun', example: '很好的经验。' },
+        { word: '决定', translation: 'decision', partOfSpeech: 'noun', example: '请做出决定。' },
+        { word: '机会', translation: 'opportunity', partOfSpeech: 'noun', example: '这是个好机会。' },
+        { word: '问题', translation: 'problem', partOfSpeech: 'noun', example: '没问题。' },
+        { word: '记得', translation: 'remember', partOfSpeech: 'verb', example: '记得给我打电话。' },
+        { word: '美丽', translation: 'beautiful', partOfSpeech: 'adjective', example: '这里很美丽。' },
+      ],
+    };
+    
+    if (fallbackVocab[lang]) {
+      this.vocabCache[lang] = fallbackVocab[lang];
+    }
+  }
+
+  private async saveQuestionToDatabase(question: Question): Promise<void> {
+    // Save to localStorage for offline resilience
+    try {
+      const localCache = JSON.parse(localStorage.getItem('ai_question_cache') || '{}');
+      const key = `${question.language}_${question.type}`;
+      if (!localCache[key]) localCache[key] = [];
+      localCache[key].push({
+        id: question.id, type: question.type, language: question.language,
+        difficulty: question.difficulty, topic: question.topic,
+        question: question.question, options: question.options,
+        correctAnswer: question.correctAnswer, explanation: question.explanation,
+        source: 'ai_generated', created_at: new Date().toISOString(),
+      });
+      if (localCache[key].length > 50) localCache[key] = localCache[key].slice(-50);
+      localStorage.setItem('ai_question_cache', JSON.stringify(localCache));
+      
+      // Also cache vocab for offline usage
+      if (question.topic === 'vocabulary') {
+        const vocabCache = JSON.parse(localStorage.getItem('ai_question_vocab_cache') || '{}');
+        if (!vocabCache[question.language]) vocabCache[question.language] = [];
+        const exists = vocabCache[question.language].some((v: VocabItem) => 
+          v.word === question.correctAnswer || v.translation === question.correctAnswer
+        );
+        if (!exists) {
+          vocabCache[question.language].push({
+            word: question.correctAnswer,
+            translation: question.correctAnswer,
+            partOfSpeech: '',
+            example: '',
+          });
+        }
+        if (vocabCache[question.language].length > 100) {
+          vocabCache[question.language] = vocabCache[question.language].slice(-100);
+        }
+        localStorage.setItem('ai_question_vocab_cache', JSON.stringify(vocabCache));
+      }
+    } catch { /* ignore localStorage errors */ }
+
+    // Try to save to database via provider
+    try {
+      await dp().insert('questions', [{
+        id: question.id,
+        type: question.type,
+        language: question.language,
+        difficulty: question.difficulty,
+        topic: question.topic,
+        question: question.question,
+        options: question.options ? JSON.stringify(question.options) : null,
+        correct_answer: question.correctAnswer,
+        explanation: question.explanation,
+        source: 'ai_generated',
+      }]);
+
+      if (error) {
+        console.warn('Failed to save question to database:', error);
+      }
+    } catch (e) {
+      console.warn('Error saving question to database (offline, cached locally):', e);
     }
   }
 
@@ -264,6 +538,22 @@ class QuestionGenerator {
         `Was bedeutet "${randomVocab.word}"? ____`,
         `Übersetzen: ${randomVocab.word} -> ____`,
       ],
+      it: [
+        `Cosa significa "${randomVocab.word}"? ____`,
+        `Traduci: ${randomVocab.word} -> ____`,
+      ],
+      pt: [
+        `O que significa "${randomVocab.word}"? ____`,
+        `Traduza: ${randomVocab.word} -> ____`,
+      ],
+      ar: [
+        `ما معنى "${randomVocab.word}"؟ ____`,
+        `ترجم: ${randomVocab.word} -> ____`,
+      ],
+      zh: [
+        `"${randomVocab.word}" 的英文意思是什么？ ____`,
+        `翻译："${randomVocab.word}" -> ____`,
+      ],
     };
     
     const sentenceList = sentences[language] || sentences.en;
@@ -301,6 +591,70 @@ class QuestionGenerator {
           ],
         },
       ],
+      ko: [
+        {
+          text: '인터넷은 우리의 소통 방식을 바꾸었습니다. 오늘날 사람들은 전 세계 어디에서나 메시지를 보내고 사진을 공유하며 가족 및 친구와 영상 통화를 할 수 있습니다.',
+          questions: [
+            { question: '우리의 소통 방식을 바꾼 것은 무엇인가요?', answer: '인터넷' },
+          ],
+        },
+      ],
+      fr: [
+        {
+          text: 'Internet a changé notre façon de communiquer. Aujourd\'hui, les gens peuvent envoyer des messages, partager des photos et faire des appels vidéo avec leur famille et leurs amis partout dans le monde.',
+          questions: [
+            { question: 'Qu\'est-ce qui a changé notre façon de communiquer?', answer: 'Internet' },
+          ],
+        },
+      ],
+      es: [
+        {
+          text: 'Internet ha cambiado nuestra forma de comunicarnos. Hoy en día, las personas pueden enviar mensajes, compartir fotos y hacer videollamadas con familiares y amigos en cualquier parte del mundo.',
+          questions: [
+            { question: '¿Qué ha cambiado nuestra forma de comunicarnos?', answer: 'Internet' },
+          ],
+        },
+      ],
+      de: [
+        {
+          text: 'Das Internet hat unsere Art zu kommunizieren verändert. Heute können Menschen Nachrichten senden, Fotos teilen und Videoanrufe mit Familie und Freunden überall auf der Welt führen.',
+          questions: [
+            { question: 'Was hat unsere Art zu kommunizieren verändert?', answer: 'Das Internet' },
+          ],
+        },
+      ],
+      it: [
+        {
+          text: 'Internet ha cambiato il nostro modo di comunicare. Oggi le persone possono inviare messaggi, condividere foto e fare videochiamate con familiari e amici in tutto il mondo.',
+          questions: [
+            { question: 'Cosa ha cambiato il nostro modo di comunicare?', answer: 'Internet' },
+          ],
+        },
+      ],
+      pt: [
+        {
+          text: 'A Internet mudou a nossa forma de comunicar. Hoje, as pessoas podem enviar mensagens, partilhar fotos e fazer videochamadas com familiares e amigos em qualquer parte do mundo.',
+          questions: [
+            { question: 'O que mudou a nossa forma de comunicar?', answer: 'A Internet' },
+          ],
+        },
+      ],
+      ar: [
+        {
+          text: 'غير الإنترنت طريقة تواصلنا. اليوم، يمكن للناس إرسال الرسائل ومشاركة الصور وإجراء مكالمات الفيديو مع العائلة والأصدقاء في أي مكان في العالم.',
+          questions: [
+            { question: 'ما الذي غير طريقة تواصلنا؟', answer: 'الإنترنت' },
+          ],
+        },
+      ],
+      zh: [
+        {
+          text: '互联网改变了我们的沟通方式。如今，人们可以在世界任何地方发送信息、分享照片、与家人朋友视频通话。社交媒体让我们随时随地保持联系。',
+          questions: [
+            { question: '什么改变了我们的沟通方式？', answer: '互联网' },
+          ],
+        },
+      ],
     };
     
     const passageList = passages[language] || passages.en;
@@ -331,16 +685,26 @@ class QuestionGenerator {
     const topics = this.topicKeywords[language] || this.topicKeywords.en;
     const selectedTopic = topic || topics[Math.floor(Math.random() * topics.length)];
 
+    let question: Question;
     switch (type) {
       case 'single_choice':
-        return this.generateSingleChoice(language, difficulty, selectedTopic);
+        question = this.generateSingleChoice(language, difficulty, selectedTopic);
+        break;
       case 'fill_blank':
-        return this.generateFillBlank(language, difficulty, selectedTopic);
+        question = this.generateFillBlank(language, difficulty, selectedTopic);
+        break;
       case 'reading':
-        return this.generateReading(language, difficulty, selectedTopic);
+        question = this.generateReading(language, difficulty, selectedTopic);
+        break;
       default:
-        return this.generateSingleChoice(language, difficulty, selectedTopic);
+        question = this.generateSingleChoice(language, difficulty, selectedTopic);
+        break;
     }
+
+    // Auto-save AI-generated questions to database + localStorage
+    this.saveQuestionToDatabase(question).catch(() => {});
+
+    return question;
   }
 
   public async generateBatch(
@@ -356,6 +720,9 @@ class QuestionGenerator {
       const q = await this.generate(language, type, difficulty, topic);
       questions.push(q);
     }
+    
+    // Batch save all questions
+    Promise.all(questions.map(q => this.saveQuestionToDatabase(q).catch(() => {}))).catch(() => {});
     
     return questions;
   }

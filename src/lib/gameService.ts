@@ -1,5 +1,8 @@
-import { supabase } from '../data/supabase';
+import { getProviderSync } from '../providers';
 import { contentGenerator, type GeneratedContent } from '../content-generator/ContentGenerator';
+
+// 延迟获取 data provider，避免模块初始化时序问题
+function dp() { try { return getProviderSync().data; } catch { throw new Error('[gameService] Provider not available'); } }
 
 export type GameMode = 'infinite' | 'repeat';
 
@@ -41,24 +44,19 @@ class GameService {
   private userQuestionSets: Map<string, string[]> = new Map();
 
   private async generateWordHunterQuestion(language: string): Promise<Question> {
-    const vocabResult = await supabase
-      .from('contents')
-      .select('*')
-      .eq('type', 'vocab')
-      .eq('language', language)
-      .limit(1)
-      .single();
+    const vocab = await dp().selectOne('contents', {
+      eq: { type: 'vocab', language },
+    });
 
-    if (vocabResult.data) {
-      const vocab = vocabResult.data;
-      const distractors = await this.getDistractors(language, vocab.content);
+    if (vocab) {
+      const distractors = await this.getDistractors(language, vocab.content as string);
       
       return {
         id: `qh_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         gameType: 'word_hunter',
         question: `Find the correct translation for: ${vocab.content}`,
-        options: this.shuffleArray([vocab.translation || '???', ...distractors]),
-        correctAnswer: vocab.translation || '',
+        options: this.shuffleArray([(vocab.translation as string) || '???', ...distractors]),
+        correctAnswer: (vocab.translation as string) || '',
         explanation: `This word means "${vocab.translation}"`,
       };
     }
@@ -90,14 +88,12 @@ class GameService {
   }
 
   private async generateSentenceBuilderQuestion(language: string): Promise<Question> {
-    const vocabResult = await supabase
-      .from('contents')
-      .select('*')
-      .eq('type', 'vocab')
-      .eq('language', language)
-      .limit(5);
+    const vocabResults = await dp().select('contents', {
+      eq: { type: 'vocab', language },
+      limit: 5,
+    });
 
-    const words = vocabResult.data?.map(v => v.content) || ['I', 'love', 'learning', 'language'];
+    const words = vocabResults?.map((v: Record<string, unknown>) => v.content) || ['I', 'love', 'learning', 'language'];
     const shuffled = this.shuffleArray([...words]);
     
     return {
@@ -110,24 +106,19 @@ class GameService {
   }
 
   private async generateVocabQuizQuestion(language: string): Promise<Question> {
-    const vocabResult = await supabase
-      .from('contents')
-      .select('*')
-      .eq('type', 'vocab')
-      .eq('language', language)
-      .limit(1)
-      .single();
+    const vocab = await dp().selectOne('contents', {
+      eq: { type: 'vocab', language },
+    });
 
-    if (vocabResult.data) {
-      const vocab = vocabResult.data;
-      const distractors = await this.getDistractors(language, vocab.content);
+    if (vocab) {
+      const distractors = await this.getDistractors(language, vocab.content as string);
       
       return {
         id: `qv_${Date.now()}`,
         gameType: 'vocab_quiz',
         question: `What is "${vocab.content}"?`,
-        options: this.shuffleArray([vocab.translation || '???', ...distractors]),
-        correctAnswer: vocab.translation || '',
+        options: this.shuffleArray([(vocab.translation as string) || '???', ...distractors]),
+        correctAnswer: (vocab.translation as string) || '',
         explanation: `Definition: ${vocab.translation}`,
       };
     }
@@ -143,14 +134,13 @@ class GameService {
   }
 
   private async getDistractors(language: string, exclude: string): Promise<string[]> {
-    const result = await supabase
-      .from('contents')
-      .select('translation')
-      .eq('language', language)
-      .neq('content', exclude)
-      .limit(3);
+    const results = await dp().select('contents', {
+      eq: { language },
+      neq: { content: exclude },
+      limit: 3,
+    });
 
-    return result.data?.map(r => r.translation || '') || ['distractor1', 'distractor2', 'distractor3'];
+    return results?.map((r: Record<string, unknown>) => r.translation || '') || ['distractor1', 'distractor2', 'distractor3'];
   }
 
   private generateGrammarOptions(question: string): string[] {
@@ -216,7 +206,7 @@ class GameService {
     }
     this.userQuestionSets.get(userId)!.push(questionSet.id);
 
-    await supabase.from('game_records').insert([{
+    await dp().insert('game_records', [{
       id: questionSet.id,
       user_id: userId,
       game_type: gameType,
@@ -239,20 +229,16 @@ class GameService {
   }
 
   public async saveGameRecord(userId: string, questionSetId: string, score: number, totalQuestions: number, completed: boolean): Promise<void> {
-    const existing = await supabase
-      .from('game_records')
-      .select('*')
-      .eq('id', questionSetId)
-      .single();
+    const existing = await dp().selectOne('game_records', { eq: { id: questionSetId } });
 
-    if (existing.data) {
-      await supabase.from('game_records').update({
+    if (existing) {
+      await dp().update('game_records', {
         score,
         completed,
         updated_at: new Date().toISOString(),
-      }).eq('id', questionSetId);
+      }, { eq: { id: questionSetId } });
     } else {
-      await supabase.from('game_records').insert([{
+      await dp().insert('game_records', [{
         id: questionSetId,
         user_id: userId,
         game_type: '',
@@ -267,24 +253,21 @@ class GameService {
   }
 
   public async getGameRecords(userId: string): Promise<GameRecord[]> {
-    const { data, error } = await supabase
-      .from('game_records')
-      .select('*')
-      .eq('user_id', userId);
+    const data = await dp().select('game_records', { eq: { user_id: userId } });
 
-    if (error || !data) return [];
+    if (!data || data.length === 0) return [];
 
-    return data.map(record => ({
-      id: record.id,
-      userId: record.user_id,
+    return data.map((record: Record<string, unknown>) => ({
+      id: record.id as string,
+      userId: record.user_id as string,
       gameType: record.game_type as GameType,
-      questionSetId: record.id,
+      questionSetId: record.id as string,
       mode: record.mode as GameMode,
-      score: record.score,
+      score: record.score as number,
       totalQuestions: 10,
-      completed: record.completed,
-      createdAt: record.created_at ? new Date(record.created_at).getTime() : Date.now(),
-      updatedAt: record.updated_at ? new Date(record.updated_at).getTime() : Date.now(),
+      completed: record.completed as boolean,
+      createdAt: record.created_at ? new Date(record.created_at as string).getTime() : Date.now(),
+      updatedAt: record.updated_at ? new Date(record.updated_at as string).getTime() : Date.now(),
     }));
   }
 

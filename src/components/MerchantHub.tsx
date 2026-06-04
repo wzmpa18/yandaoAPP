@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { FloatingBack } from './FloatingBack';
-import { supabase } from '../lib/supabase';
+import { supabase } from '../data/supabase';
 
 const SESSION_KEY_STORE = 'yandao_session_v5';
 function getSessionKey(): string { return localStorage.getItem(SESSION_KEY_STORE) ?? 'anon'; }

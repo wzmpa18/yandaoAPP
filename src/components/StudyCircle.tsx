@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase } from '../data/supabase';
 import { FloatingBack } from './FloatingBack';
 import { GroupShop } from './GroupShop';
 import { userAllowsMerchantPush } from './PrivacySettings';
 import { mockUserProfiles, interestTags, locationTags } from '../data/mockData';
+import { getStudyGroups, isOfflineMode } from '../lib/offlineData';
+import { PageLoading } from './Skeleton';
 
 interface FilterOptions {
   locations: string[];
@@ -115,8 +117,15 @@ export const StudyCircle: React.FC<StudyCircleProps> = ({ sessionKey, onBack }) 
   const [banReason, setBanReason] = useState('');
   const [banning, setBanning] = useState(false);
   const [banDone, setBanDone] = useState(false);
-  const isAdmin = sessionKey === (localStorage.getItem('yandao_admin_session') ?? '__never__')
-    || (localStorage.getItem('yandao_admin_v1') !== null && JSON.parse(localStorage.getItem('yandao_admin_v1') ?? '{}').adFreq !== undefined);
+  const isAdmin = (() => {
+    try {
+      const v1 = JSON.parse(localStorage.getItem('yandao_admin_v1') ?? '{}');
+      return sessionKey === (localStorage.getItem('yandao_admin_session') ?? '__never__')
+        || (localStorage.getItem('yandao_admin_v1') !== null && v1.adFreq !== undefined);
+    } catch {
+      return sessionKey === (localStorage.getItem('yandao_admin_session') ?? '__never__');
+    }
+  })();
 
   // Merchant recommendation cards
   const [merchantCards, setMerchantCards] = useState<MerchantCard[]>([]);
@@ -160,7 +169,12 @@ export const StudyCircle: React.FC<StudyCircleProps> = ({ sessionKey, onBack }) 
 
   const loadAllGroups = useCallback(async () => {
     const { data } = await supabase.from('study_groups').select('*').eq('is_active', true).eq('status', 'active').order('created_at', { ascending: false });
-    setAllGroups((data ?? []) as StudyGroup[]);
+    if (data && data.length > 0 && !isOfflineMode()) {
+      setAllGroups(data as StudyGroup[]);
+    } else {
+      // Use offline study groups
+      setAllGroups(getStudyGroups() as unknown as StudyGroup[]);
+    }
   }, []);
 
   const loadMyGroups = useCallback(async () => {
@@ -439,7 +453,7 @@ export const StudyCircle: React.FC<StudyCircleProps> = ({ sessionKey, onBack }) 
     return (
       <div className="sc-wrap">
         <FloatingBack onClick={onBack} />
-        <div className="sc-loading">加载学习圈…</div>
+        <PageLoading message="加载学习圈…" />
       </div>
     );
   }
@@ -815,9 +829,9 @@ export const StudyCircle: React.FC<StudyCircleProps> = ({ sessionKey, onBack }) 
                               <div className="sc-user-info">
                                 <span className="sc-user-name">{user.nickname}</span>
                                 <span className="sc-user-meta">
-                                  {user.privacy.showLocation && user.location} · Lv.{user.level}
+                                  {(user.privacy?.showLocation ?? false) && (user.location ?? '')} · Lv.{user.level ?? 0}
                                 </span>
-                                {user.privacy.showInterests && user.interests.slice(0, 2).map((i, idx) => (
+                                {(user.privacy?.showInterests ?? false) && (user.interests || []).slice(0, 2).map((i, idx) => (
                                   <span key={idx} className="sc-user-tag">{i}</span>
                                 ))}
                               </div>

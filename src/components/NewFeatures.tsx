@@ -8,6 +8,16 @@ import { FamilyDashboard } from './FamilyDashboard';
 
 type FeatureView = 'home' | 'writing' | 'reading' | 'phoneme' | 'dashboard' | 'creator' | 'family';
 
+/* 学习模式分类 */
+type StudyMode = 'daily' | 'exam' | 'interest';
+
+const STUDY_MODES: { key: StudyMode; label: string; icon: string; desc: string }[] = [
+  { key: 'daily', label: '日常交流', icon: '💬', desc: '旅行、购物、餐厅等日常场景' },
+  { key: 'exam', label: '能力考试', icon: '📝', desc: 'JLPT/TOEFL/HSK 备考强化' },
+  { key: 'interest', label: '兴趣学习', icon: '🎯', desc: '动漫、音乐、文化等兴趣驱动' },
+];
+
+/* 新功能卡片 */
 const FEATURES = [
   { key: 'writing', icon: '✍️', title: 'AI作文教练', desc: '智能语法批改 · 句式优化建议' },
   { key: 'reading', icon: '📚', title: 'AI选词阅读', desc: '智能分级读物推荐' },
@@ -19,6 +29,14 @@ const FEATURES = [
 
 export const NewFeatures: React.FC = () => {
   const [view, setView] = useState<FeatureView>('home');
+  const [studyMode, setStudyMode] = useState<StudyMode>('daily');
+  const [toastMsg, setToastMsg] = useState('');
+
+  /* 显示 toast 提示 */
+  const showToast = (msg: string) => {
+    setToastMsg(msg);
+    setTimeout(() => setToastMsg(''), 2500);
+  };
 
   if (view !== 'home') {
     const back = () => setView('home');
@@ -43,11 +61,42 @@ export const NewFeatures: React.FC = () => {
 
   return (
     <div className="new-features">
+      {/* Toast 提示 */}
+      {toastMsg && (
+        <div className="ai-toast">
+          <span>{toastMsg}</span>
+        </div>
+      )}
+
       <div className="features-header">
         <h1 className="features-title">✨ 新功能体验</h1>
         <p className="features-sub">探索言道的强大学习功能</p>
       </div>
 
+      {/* 学习模式切换 */}
+      <div className="study-mode-section">
+        <h2 className="intro-title">🎯 选择你的学习模式</h2>
+        <div className="study-mode-selector">
+          {STUDY_MODES.map(mode => (
+            <button
+              key={mode.key}
+              className={`study-mode-btn ${studyMode === mode.key ? 'active' : ''}`}
+              onClick={() => {
+                setStudyMode(mode.key);
+                showToast(`已切换到「${mode.label}」模式 — AI 将据此调整推荐内容`);
+              }}
+            >
+              <span className="study-mode-icon">{mode.icon}</span>
+              <div className="study-mode-info">
+                <span className="study-mode-label">{mode.label}</span>
+                <span className="study-mode-desc">{mode.desc}</span>
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* 新功能卡片网格 */}
       <div className="features-grid">
         {FEATURES.map(feature => (
           <button
@@ -60,6 +109,46 @@ export const NewFeatures: React.FC = () => {
             <p className="feature-desc">{feature.desc}</p>
           </button>
         ))}
+      </div>
+
+      {/* AI 补充内容占位按钮 */}
+      <div className="ai-supplement-section">
+        <h2 className="intro-title">🤖 AI 智能辅助</h2>
+        <div className="ai-supplement-grid">
+          <button
+            className="ai-supplement-btn"
+            onClick={() => showToast('AI 功能即将开放 — 我们将根据你的水平生成更多练习题')}
+          >
+            <span className="ai-supplement-icon">📝</span>
+            <div className="ai-supplement-info">
+              <span className="ai-supplement-label">AI 帮我生成更多练习题</span>
+              <span className="ai-supplement-desc">根据当前进度智能出题</span>
+            </div>
+            <span className="ai-supplement-badge">即将开放</span>
+          </button>
+          <button
+            className="ai-supplement-btn"
+            onClick={() => showToast('AI 功能即将开放 — 将根据你的水平智能推荐内容')}
+          >
+            <span className="ai-supplement-icon">🎯</span>
+            <div className="ai-supplement-info">
+              <span className="ai-supplement-label">AI 根据我的水平推荐内容</span>
+              <span className="ai-supplement-desc">个性化难度匹配</span>
+            </div>
+            <span className="ai-supplement-badge">即将开放</span>
+          </button>
+          <button
+            className="ai-supplement-btn"
+            onClick={() => showToast('AI 功能即将开放 — 将为你补充更多场景对话')}
+          >
+            <span className="ai-supplement-icon">💬</span>
+            <div className="ai-supplement-info">
+              <span className="ai-supplement-label">AI 补充这个场景的更多对话</span>
+              <span className="ai-supplement-desc">扩展真实语境表达</span>
+            </div>
+            <span className="ai-supplement-badge">即将开放</span>
+          </button>
+        </div>
       </div>
 
       <div className="features-intro">

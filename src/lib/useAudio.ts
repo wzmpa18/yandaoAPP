@@ -6,21 +6,38 @@ function pickIndex(): number {
   return Math.floor(Math.random() * MAX_FILES) + 1;
 }
 
+// Shared AudioContext — reuse to avoid Chrome's autoplay limits
+let sharedCtx: AudioContext | null = null;
+function getAudioContext(): AudioContext | null {
+  if (sharedCtx && sharedCtx.state !== 'closed') return sharedCtx;
+  try {
+    sharedCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    // Resume if suspended (autoplay policy)
+    if (sharedCtx.state === 'suspended') {
+      sharedCtx.resume().catch(() => {});
+    }
+    return sharedCtx;
+  } catch {
+    return null;
+  }
+}
+
 export function useAudio(volume = 0.8) {
   const currentRef = useRef<HTMLAudioElement | null>(null);
   const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
-    const initAudio = async () => {
-      await new Promise(resolve => setTimeout(resolve, 100));
+    // Pre-warm AudioContext on first user interaction (handled by component mount)
+    const warmUp = () => {
+      getAudioContext();
       setInitialized(true);
     };
-    initAudio();
+    // Small delay to ensure DOM is ready
+    const t = setTimeout(warmUp, 100);
+    return () => clearTimeout(t);
   }, []);
 
   const play = useCallback((dir: 'success' | 'failure') => {
-    if (!initialized) return;
-    
     if (currentRef.current) {
       currentRef.current.pause();
       currentRef.current.currentTime = 0;
@@ -28,12 +45,12 @@ export function useAudio(volume = 0.8) {
     
     const audio = new Audio(`/audio/${dir}/${pickIndex()}.mp3`);
     audio.volume = volume;
-    audio.play().catch(err => {
-      console.warn('Audio play failed, using Web Audio API fallback:', err);
+    audio.play().catch(() => {
+      // MP3 file not found or autoplay blocked — fall back to tone
       playTone(dir === 'success');
     });
     currentRef.current = audio;
-  }, [volume, initialized]);
+  }, [volume]);
 
   const playSuccess = useCallback(() => play('success'), [play]);
   const playFailure = useCallback(() => play('failure'), [play]);
@@ -41,24 +58,50 @@ export function useAudio(volume = 0.8) {
   return { playSuccess, playFailure, play };
 }
 
+/**
+ * Generate a pleasant tone using Web Audio API.
+ * Used as fallback when MP3 files are unavailable.
+ * Creates a more musical sound: rising two-note for success, low buzz for failure.
+ */
 function playTone(isSuccess: boolean) {
+  const ctx = getAudioContext();
+  if (!ctx) return;
+  
   try {
-    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
+    // Resume if suspended
+    if (ctx.state === 'suspended') ctx.resume();
     
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
+    const now = ctx.currentTime;
     
-    oscillator.frequency.value = isSuccess ? 800 : 200;
-    oscillator.type = 'sine';
-    
-    gainNode.gain.setValueAtTime(isSuccess ? 0.3 : 0.2, audioContext.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
-    
-    oscillator.start(audioContext.currentTime);
-    oscillator.stop(audioContext.currentTime + 0.3);
+    if (isSuccess) {
+      // Rising two-tone "ding-ding!" success sound
+      [523.25, 659.25].forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        const t = now + i * 0.12;
+        gain.gain.setValueAtTime(0.25, t);
+        gain.gain.exponentialRampToValueAtTime(0.01, t + 0.25);
+        osc.start(t);
+        osc.stop(t + 0.25);
+      });
+    } else {
+      // Low buzz for failure
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'triangle';
+      osc.frequency.value = 180;
+      gain.gain.setValueAtTime(0.15, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+      osc.start(now);
+      osc.stop(now + 0.35);
+    }
   } catch {
-    console.warn('Web Audio API not available');
+    // Silently fail — audio is non-critical
   }
 }

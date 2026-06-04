@@ -8,9 +8,10 @@ import { AICostDashboard } from './AICostDashboard';
 import { AIModelConfigPanel } from './AIModelConfig';
 import { VoicePicker } from './VoicePicker';
 import { VoicePreset, loadVoicePreset } from '../lib/voiceProfile';
-import { supabase } from '../lib/supabase';
+import { supabase } from '../data/supabase';
 import { useUI } from '../lib/UILanguageContext';
 import { UILang, UI_LANG_OPTIONS } from '../lib/i18n';
+import { Skeleton } from './Skeleton';
 
 interface ProfilePanelProps {
   profile: UserProfile;
@@ -473,7 +474,13 @@ export const ProfilePanel: React.FC<ProfilePanelProps> = ({
 
             {showGroupPanel && (
               <div className="admin-group-list">
-                {adminGroupsLoading && <p className="admin-group-loading">加载中…</p>}
+                {adminGroupsLoading && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '8px 0' }}>
+                    <Skeleton height={40} />
+                    <Skeleton height={40} />
+                    <Skeleton height={40} />
+                  </div>
+                )}
                 {!adminGroupsLoading && adminGroups.length === 0 && <p className="admin-group-loading">暂无群组</p>}
                 {adminGroups.map((g) => (
                   <div className="admin-group-row" key={g.id}>
@@ -875,6 +882,42 @@ export const ProfilePanel: React.FC<ProfilePanelProps> = ({
         <div className="pp-rule-item">
           <span className="pp-rule-num">3</span>
           <p className="pp-rule-text">邀请满 10 位好友解锁 <strong>钻石会员 💎</strong>，全站内容永久免费</p>
+        </div>
+      </div>
+
+      {/* User Contribution Entry */}
+      <div className="pp-contribute-section">
+        <h3 className="pp-rules-title">📝 例句投稿</h3>
+        <p className="pp-contribute-desc">贡献你的学习例句，审核通过后将进入正式学习资源库，帮助更多人！</p>
+        <button
+          className="pp-contribute-btn"
+          onClick={() => {
+            const sentence = prompt('请输入你的外语例句：');
+            if (sentence && sentence.trim()) {
+              const translation = prompt('请输入中文翻译：');
+              if (translation && translation.trim()) {
+                const lang = prompt('请输入语言代码（ja/en/ko/fr/es/de/it/pt/ar/zh）：', profile.language_code);
+                // Save to localStorage as pending contribution
+                const contributions = JSON.parse(localStorage.getItem('user_contributions') || '[]');
+                contributions.push({
+                  id: `uc_${Date.now()}`,
+                  session_key: profile.session_key,
+                  language_code: lang || profile.language_code,
+                  target_sentence: sentence.trim(),
+                  native_sentence: translation.trim(),
+                  status: 'pending',
+                  created_at: new Date().toISOString(),
+                });
+                localStorage.setItem('user_contributions', JSON.stringify(contributions));
+                alert('✅ 例句已提交审核，感谢你的贡献！');
+              }
+            }
+          }}
+        >
+          ✏️ 提交我的例句
+        </button>
+        <div className="pp-contribute-stats">
+          <span>📊 已提交：{JSON.parse(localStorage.getItem('user_contributions') || '[]').length} 条</span>
         </div>
       </div>
 

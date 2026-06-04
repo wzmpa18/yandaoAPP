@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { speakWithPreset } from '../lib/voiceProfile';
 
 interface FlipCardProps {
   targetLang: string;
@@ -14,6 +15,7 @@ interface FlipCardProps {
   isCompleted: boolean;
   isLocked: boolean;
   onMarkComplete: () => void;
+  langCode?: string;
 }
 
 const hackColors: Record<string, { bg: string; text: string; label: string }> = {
@@ -26,11 +28,19 @@ const hackColors: Record<string, { bg: string; text: string; label: string }> = 
 export const FlipCard: React.FC<FlipCardProps> = ({
   targetLang, nativeLang, pronunciation, contextNote,
   hackTitle, hackContent, hackType, visualFormula, chineseHomophone,
-  orderIndex, isCompleted, isLocked, onMarkComplete,
+  orderIndex, isCompleted, isLocked, onMarkComplete, langCode,
 }) => {
   const [flipped, setFlipped] = useState(false);
   const [showHack, setShowHack] = useState(false);
+  const [speaking, setSpeaking] = useState(false);
   const hack = hackColors[hackType ?? ''] ?? hackColors.shortcut;
+
+  const handleSpeak = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (speaking) return;
+    setSpeaking(true);
+    speakWithPreset(targetLang, langCode || 'en').finally(() => setSpeaking(false));
+  };
 
   if (isLocked) {
     return (
@@ -61,6 +71,13 @@ export const FlipCard: React.FC<FlipCardProps> = ({
           <span className="fc-badge">Target</span>
           <p className="fc-target">{targetLang}</p>
           <p className="fc-pron">{pronunciation}</p>
+          <button
+            className={`fc-speak-btn ${speaking ? 'speaking' : ''}`}
+            onClick={handleSpeak}
+            title="听发音"
+          >
+            {speaking ? '🔊' : '🔈'}
+          </button>
           {chineseHomophone && (
             <div className="fc-homophone-hint">
               <span className="fc-zh-label">中式谐音</span>

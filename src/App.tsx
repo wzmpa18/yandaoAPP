@@ -1,16 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from './lib/supabase';
+import { hasRealSupabase } from './lib/supabase';
 import { Onboarding, UserProfile } from './components/Onboarding';
 import { MainHub } from './components/MainHub';
 import PhoneVerify from './components/PhoneVerify';
 import { UILanguageProvider } from './lib/UILanguageContext';
 import { UILang } from './lib/i18n';
+import { setOfflineMode } from './lib/offlineData';
+import { initProvider } from './providers';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 const SESSION_KEY = 'yandao_session_v5';
 const PROFILE_KEY = 'yandao_profile_v5';
 const PHONE_VERIFIED_KEY = 'yandao_phone_verified_v1';
 
+// When true, skip Onboarding and auto-create demo profile for quick testing
+// Set to false for production — users will see the full onboarding flow first
 const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === 'true';
+
+// Auto-detect if Supabase is configured with real credentials
+const HAS_REAL_SUPABASE =
+  import.meta.env.VITE_SUPABASE_URL &&
+  !import.meta.env.VITE_SUPABASE_URL.includes('your-supabase-url');
 
 function getSessionKey(): string {
   let key = localStorage.getItem(SESSION_KEY);
@@ -21,21 +31,6 @@ function getSessionKey(): string {
   return key;
 }
 
-function createDemoProfile(sessionKey: string): UserProfile {
-  return {
-    session_key: sessionKey,
-    language_code: 'ja',
-    ui_language: 'zh',
-    goal: 'daily',
-    level: 'beginner',
-    placement_score: 0,
-    completed_onboarding: true,
-    age_group: 'professional',
-    interest_tags: ['anime', 'travel'],
-    profession: 'tech',
-  };
-}
-
 const App: React.FC = () => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -43,6 +38,17 @@ const App: React.FC = () => {
   const sessionKey = getSessionKey();
 
   useEffect(() => {
+    // Initialize the data provider
+    initProvider().then(provider => {
+      console.log(`[App] Provider ready: ${provider.vendor}`);
+    });
+
+    // If Supabase is not configured, go straight to offline mode — no network wait
+    if (!HAS_REAL_SUPABASE) {
+      setOfflineMode(true);
+    }
+
+    // Step 1: Check localStorage for existing profile (returning user)
     const saved = localStorage.getItem(PROFILE_KEY);
     if (saved) {
       try {
@@ -55,41 +61,59 @@ const App: React.FC = () => {
       } catch { /* corrupt — fall through */ }
     }
 
+    // Step 2: DEMO_MODE shortcut — skip onboarding for quick testing
     if (DEMO_MODE) {
-      const demoProfile = createDemoProfile(sessionKey);
+      setOfflineMode(true);
+      const demoProfile: UserProfile = {
+        session_key: sessionKey,
+        language_code: 'ja',
+        ui_language: 'zh',
+        goal: 'daily',
+        level: 'beginner',
+        placement_score: 0,
+        completed_onboarding: true,
+        age_group: 'professional',
+        interest_tags: ['anime', 'travel'],
+        profession: 'tech',
+      };
       localStorage.setItem(PROFILE_KEY, JSON.stringify(demoProfile));
       setProfile(demoProfile);
       setLoading(false);
       return;
     }
 
-    supabase
-      .from('user_profiles')
-      .select('*')
-      .eq('session_key', sessionKey)
-      .eq('completed_onboarding', true)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle()
-      .then(({ data, error }) => {
-        if (error) {
-          console.warn('Supabase connection failed, using demo mode');
-          const demoProfile = createDemoProfile(sessionKey);
-          localStorage.setItem(PROFILE_KEY, JSON.stringify(demoProfile));
-          setProfile(demoProfile);
-        } else if (data) {
-          setProfile(data as UserProfile);
-          localStorage.setItem(PROFILE_KEY, JSON.stringify(data));
-        }
-        setLoading(false);
-      })
-      .catch(() => {
-        console.warn('Network error, using demo mode');
-        const demoProfile = createDemoProfile(sessionKey);
-        localStorage.setItem(PROFILE_KEY, JSON.stringify(demoProfile));
-        setProfile(demoProfile);
-        setLoading(false);
+    // Step 3: Try backend for returning user profile (only if configured)
+    if (HAS_REAL_SUPABASE) {
+      import('./data/supabase').then(({ supabase }) => {
+        const timeout = setTimeout(() => {
+          setLoading(false);
+        }, 5000);
+
+        supabase
+          .from('user_profiles')
+          .select('*')
+          .eq('session_key', sessionKey)
+          .eq('completed_onboarding', true)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle()
+          .then(({ data, error }) => {
+            clearTimeout(timeout);
+            if (!error && data) {
+              setProfile(data as UserProfile);
+              localStorage.setItem(PROFILE_KEY, JSON.stringify(data));
+            }
+            setLoading(false);
+          })
+          .catch(() => {
+            clearTimeout(timeout);
+            setLoading(false);
+          });
       });
+    } else {
+      // No backend configured → skip network, show Onboarding for new users
+      setLoading(false);
+    }
   }, [sessionKey]);
 
   function handleOnboardingComplete(p: UserProfile) {
@@ -115,36 +139,45 @@ const App: React.FC = () => {
 
   if (loading) {
     return (
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        minHeight: '100vh', background: '#F2EFE6',
-        fontFamily: 'Georgia,serif', fontSize: 28, fontWeight: 700,
-        color: '#9B9189', letterSpacing: 4,
-      }}>
-        言道
+      <div className="zen-app-loading">
+        <div style={{ fontSize: 36, fontWeight: 700, color: '#9B9189', letterSpacing: 6, marginBottom: 4 }}>
+          言道
+        </div>
+        <div style={{ fontSize: 14, color: '#B8B0A8', letterSpacing: 2, marginBottom: 28 }}>
+          Gendou · Language Learning
+        </div>
+        <div className="zen-loading-dots">
+          <div className="zen-loading-dot" />
+          <div className="zen-loading-dot" />
+          <div className="zen-loading-dot" />
+        </div>
       </div>
     );
   }
 
   if (!profile) {
     return (
-      <UILanguageProvider>
-        <Onboarding sessionKey={sessionKey} onComplete={handleOnboardingComplete} />
-      </UILanguageProvider>
+      <ErrorBoundary>
+        <UILanguageProvider>
+          <Onboarding sessionKey={sessionKey} onComplete={handleOnboardingComplete} />
+        </UILanguageProvider>
+      </ErrorBoundary>
     );
   }
 
   return (
-    <UILanguageProvider initial={(profile.ui_language as UILang) || 'zh'}>
-      <MainHub initialProfile={profile} onReset={handleReset} />
-      {showPhoneVerify && (
-        <PhoneVerify
-          sessionKey={sessionKey}
-          onVerified={dismissPhoneVerify}
-          onSkip={dismissPhoneVerify}
-        />
-      )}
-    </UILanguageProvider>
+    <ErrorBoundary>
+      <UILanguageProvider initial={(profile.ui_language as UILang) || 'zh'}>
+        <MainHub initialProfile={profile} onReset={handleReset} />
+        {showPhoneVerify && (
+          <PhoneVerify
+            sessionKey={sessionKey}
+            onVerified={dismissPhoneVerify}
+            onSkip={dismissPhoneVerify}
+          />
+        )}
+      </UILanguageProvider>
+    </ErrorBoundary>
   );
 };
 

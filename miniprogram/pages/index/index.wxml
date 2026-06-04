@@ -9,7 +9,7 @@
           <text class="text-muted text-sm">{{userInfo.city || '未定位'}}</text>
         </view>
       </view>
-      <view class="study-gold">
+      <view class="study-gold" bindtap="goToDashboard">
         <text class="gold-icon">💰</text>
         <text class="gold-count">{{studyGold}}</text>
       </view>
@@ -35,35 +35,31 @@
       <view class="action-icon bg-green">🤖</view>
       <text class="action-text">AI陪练</text>
     </view>
+    <view class="action-item" bindtap="goToWriting">
+      <view class="action-icon bg-purple">✍️</view>
+      <text class="action-text">AI写作</text>
+    </view>
+    <view class="action-item" bindtap="goToReading">
+      <view class="action-icon bg-blue">📖</view>
+      <text class="action-text">AI阅读</text>
+    </view>
     <view class="action-item" bindtap="goToGames">
-      <view class="action-icon bg-blue">🎮</view>
-      <text class="action-text">游戏学习</text>
-    </view>
-    <view class="action-item" bindtap="goToNewFeatures">
-      <view class="action-icon bg-gradient">✨</view>
-      <text class="action-text">新功能</text>
-    </view>
-    <view class="action-item" bindtap="goToFriends">
-      <view class="action-icon bg-purple">👥</view>
-      <text class="action-text">找语伴</text>
-    </view>
-    <view class="action-item" bindtap="goToCircle">
-      <view class="action-icon bg-orange">💬</view>
-      <text class="action-text">学习圈</text>
+      <view class="action-icon bg-orange">🎮</view>
+      <text class="action-text">游戏中心</text>
     </view>
   </view>
 
   <view class="card">
     <view class="card-header">
       <text class="text-xl font-bold">今日推荐</text>
-      <text class="text-secondary text-sm">每日5位语伴</text>
+      <text class="text-secondary text-sm">与你学习相同语言的伙伴</text>
     </view>
     <scroll-view scroll-x class="recommend-scroll">
       <view class="recommend-list">
-        <view class="recommend-item" wx:for="{{todayRecommend}}" wx:key="userId" bindtap="goToChat">
+        <view class="recommend-item" wx:for="{{todayRecommend}}" wx:key="userId" bindtap="goToChat" data-user="{{item}}">
           <view class="recommend-avatar">{{item.nickname.charAt(0)}}</view>
           <text class="recommend-name">{{item.nickname}}</text>
-          <text class="recommend-lang">{{item.targetLang}}</text>
+          <text class="recommend-lang">Lv.{{item.level}} · {{item.targetLang}}</text>
         </view>
       </view>
     </scroll-view>
@@ -72,7 +68,7 @@
   <view class="card">
     <view class="card-header">
       <text class="text-xl font-bold">学习任务</text>
-      <text class="text-primary text-sm">查看全部</text>
+      <text class="text-primary text-sm" bindtap="goToDashboard">查看全部</text>
     </view>
     <view class="task-list">
       <view class="task-item" wx:for="{{tasks}}" wx:key="id">
@@ -82,8 +78,8 @@
           <text class="task-reward">{{item.reward}}</text>
         </view>
         <view class="task-status">
-          <view class="task-check" wx:if="{{item.completed}}">✓</view>
-          <text class="task-btn" wx:else>去完成</text>
+          <view wx:if="{{item.completed}}" class="task-check">✓</view>
+          <text wx:else class="task-btn" bindtap="completeTask" data-task-id="{{item.id}}">去完成</text>
         </view>
       </view>
     </view>
@@ -95,9 +91,10 @@
       <text class="text-primary text-sm" bindtap="goToAchievements">全部成就</text>
     </view>
     <view class="achievement-grid">
-      <view class="achievement-item" wx:for="{{recentAchievements}}" wx:key="id">
-        <view class="achievement-icon">{{item.icon}}</view>
+      <view class="achievement-item {{item.unlocked ? 'unlocked' : 'locked'}}" wx:for="{{recentAchievements}}" wx:key="id">
+        <view class="achievement-icon">{{item.unlocked ? item.icon : '🔒'}}</view>
         <text class="achievement-name">{{item.name}}</text>
+        <text class="achievement-desc">{{item.unlocked ? item.desc : '未解锁'}}</text>
       </view>
     </view>
   </view>

@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase } from '../data/supabase';
 import { FloatingBack } from './FloatingBack';
 import { canAccessFeature, UpsellPlan } from '../lib/featureGate';
+import { getPartnerCandidates, isOfflineMode } from '../lib/offlineData';
 
 interface PartnerHubProps {
   sessionKey: string;
@@ -102,6 +103,11 @@ export const PartnerHub: React.FC<PartnerHubProps> = ({ sessionKey, onBack, onPa
   }, [sessionKey]);
 
   const loadCandidates = useCallback(async (profile: PartnerProfile) => {
+    if (isOfflineMode()) {
+      const offline = getPartnerCandidates();
+      setCandidates(offline as unknown as PartnerProfile[]);
+      return;
+    }
     const { data } = await supabase
       .from('user_partner_profiles')
       .select('*')
@@ -110,7 +116,13 @@ export const PartnerHub: React.FC<PartnerHubProps> = ({ sessionKey, onBack, onPa
       .eq('learning_lang', profile.native_lang)
       .neq('session_key', sessionKey)
       .limit(20);
-    setCandidates((data ?? []) as PartnerProfile[]);
+    if (data && data.length > 0) {
+      setCandidates(data as PartnerProfile[]);
+    } else {
+      // Fallback to offline data
+      const offline = getPartnerCandidates();
+      setCandidates(offline as unknown as PartnerProfile[]);
+    }
   }, [sessionKey]);
 
   const loadMyMatches = useCallback(async () => {
@@ -123,19 +135,23 @@ export const PartnerHub: React.FC<PartnerHubProps> = ({ sessionKey, onBack, onPa
     if (!matchRows) return;
     const enriched: MatchRecord[] = [];
     for (const m of matchRows) {
-      const partnerKey = m.requester_key === sessionKey ? m.receiver_key : m.requester_key;
-      const { data: pData } = await supabase
-        .from('user_partner_profiles')
-        .select('*')
-        .eq('session_key', partnerKey)
-        .maybeSingle();
-      const { data: interactions } = await supabase
-        .from('partner_interactions')
-        .select('*')
-        .eq('match_id', m.id)
-        .order('created_at', { ascending: false })
-        .limit(10);
-      enriched.push({ ...m, partner: pData ?? undefined, interactions: interactions ?? [] });
+      try {
+        const partnerKey = m.requester_key === sessionKey ? m.receiver_key : m.requester_key;
+        const { data: pData } = await supabase
+          .from('user_partner_profiles')
+          .select('*')
+          .eq('session_key', partnerKey)
+          .maybeSingle();
+        const { data: interactions } = await supabase
+          .from('partner_interactions')
+          .select('*')
+          .eq('match_id', m.id)
+          .order('created_at', { ascending: false })
+          .limit(10);
+        enriched.push({ ...m, partner: pData ?? undefined, interactions: interactions ?? [] });
+      } catch {
+        enriched.push({ ...m, partner: undefined, interactions: [] });
+      }
     }
     setMyMatches(enriched);
   }, [sessionKey]);

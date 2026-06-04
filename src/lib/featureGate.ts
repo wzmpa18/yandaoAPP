@@ -1,4 +1,7 @@
-import { supabase } from './supabase';
+import { getProviderSync } from '../providers';
+
+// 延迟获取 data provider，避免模块初始化时序问题
+function dp() { try { return getProviderSync().data; } catch { throw new Error('[featureGate] Provider not available'); } }
 
 export type FeatureType =
   | 'exam'
@@ -38,11 +41,7 @@ interface ProfilePaymentFields {
 }
 
 async function getProfile(sessionKey: string): Promise<ProfilePaymentFields | null> {
-  const { data } = await supabase
-    .from('user_profiles')
-    .select('vip_expiry,exam_credits,exam_credits_reset_at,ai_speech_credits,ai_speech_credits_reset_at,extra_partner_count,unlocked_lang_packs')
-    .eq('session_key', sessionKey)
-    .maybeSingle();
+  const data = await dp().selectOne('user_profiles', { eq: { session_key: sessionKey } });
   return data as ProfilePaymentFields | null;
 }
 
@@ -52,22 +51,17 @@ function isVip(profile: ProfilePaymentFields): boolean {
 }
 
 async function getConfig(key: string, fallback: number): Promise<number> {
-  const { data } = await supabase
-    .from('platform_configs')
-    .select('value')
-    .eq('key', key)
-    .maybeSingle();
-  return data ? parseInt(data.value) || fallback : fallback;
+  const data = await dp().selectOne('platform_configs', { eq: { key } });
+  return data ? parseInt(data.value as string) || fallback : fallback;
 }
 
 /** Count active partner matches for this session */
 async function getPartnerCount(sessionKey: string): Promise<number> {
-  const { count } = await supabase
-    .from('partner_matches')
-    .select('*', { count: 'exact', head: true })
-    .or(`requester_key.eq.${sessionKey},receiver_key.eq.${sessionKey}`)
-    .eq('status', 'accepted');
-  return count ?? 0;
+  const count = await dp().count('partner_matches', {
+    or: `requester_key.eq.${sessionKey},receiver_key.eq.${sessionKey}`,
+    eq: { status: 'accepted' },
+  });
+  return count;
 }
 
 /** Reset monthly exam credits if a new month has started */
@@ -77,10 +71,10 @@ async function maybeResetExamCredits(sessionKey: string, profile: ProfilePayment
   const monthChanged = now.getFullYear() !== resetAt.getFullYear() || now.getMonth() !== resetAt.getMonth();
   if (!monthChanged) return profile;
   const freePerMonth = await getConfig('exam_free_per_month', 2);
-  await supabase.from('user_profiles').update({
+  await dp().update('user_profiles', {
     exam_credits: freePerMonth,
     exam_credits_reset_at: now.toISOString(),
-  }).eq('session_key', sessionKey);
+  }, { eq: { session_key: sessionKey } });
   return { ...profile, exam_credits: freePerMonth, exam_credits_reset_at: now.toISOString() };
 }
 
@@ -94,10 +88,10 @@ async function maybeResetAiSpeechCredits(sessionKey: string, profile: ProfilePay
     now.getDate() !== resetAt.getDate();
   if (!dayChanged) return profile;
   const freePerDay = await getConfig('ai_speech_free_per_day', 3);
-  await supabase.from('user_profiles').update({
+  await dp().update('user_profiles', {
     ai_speech_credits: freePerDay,
     ai_speech_credits_reset_at: now.toISOString(),
-  }).eq('session_key', sessionKey);
+  }, { eq: { session_key: sessionKey } });
   return { ...profile, ai_speech_credits: freePerDay, ai_speech_credits_reset_at: now.toISOString() };
 }
 
@@ -230,5 +224,5 @@ export async function consumeCredit(sessionKey: string, featureType: 'exam' | 'a
   if (!profile) return;
   const current = featureType === 'exam' ? profile.exam_credits : profile.ai_speech_credits;
   if (current <= 0) return;
-  await supabase.from('user_profiles').update({ [col]: current - 1 }).eq('session_key', sessionKey);
+  await dp().update('user_profiles', { [col]: current - 1 }, { eq: { session_key: sessionKey } });
 }

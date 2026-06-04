@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase } from '../data/supabase';
 import { UpsellPlan } from '../lib/featureGate';
 
 interface CheckoutModalProps {

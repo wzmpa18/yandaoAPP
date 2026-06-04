@@ -2,12 +2,15 @@ App({
   onLaunch: function () {
     this.initUserInfo()
     this.initLocation()
+    this.initGameScores()
   },
 
   initUserInfo: function () {
     const userInfo = wx.getStorageSync('userInfo')
     if (userInfo) {
       this.globalData.userInfo = userInfo
+      // 计算今日进度
+      this.calcTodayProgress()
     } else {
       this.globalData.userInfo = {
         userId: 'user_' + Date.now(),
@@ -16,7 +19,7 @@ App({
         level: 1,
         exp: 0,
         targetLang: 'ja',
-        studyDays: 0,
+        studyDays: 1,
         totalWords: 0,
         isMinor: false,
         chatEnabled: false,
@@ -24,6 +27,21 @@ App({
       }
       wx.setStorageSync('userInfo', this.globalData.userInfo)
     }
+    // 恢复全局数据
+    this.globalData.studyGold = wx.getStorageSync('studyGold') || 0
+    this.globalData.referralCount = wx.getStorageSync('referralCount') || 0
+    this.globalData.achievements = wx.getStorageSync('achievements') || []
+    this.globalData.studyMinutes = wx.getStorageSync('studyMinutes') || 0
+    this.globalData.totalTasksCompleted = wx.getStorageSync('totalTasksCompleted') || 0
+  },
+
+  calcTodayProgress: function () {
+    // 基于完成任务计算今日进度
+    const completed = wx.getStorageSync('todayTasksCompleted') || []
+    const total = 5
+    const pct = Math.min(100, Math.round((completed.length / total) * 100))
+    this.globalData.todayProgress = pct
+    wx.setStorageSync('todayProgress', pct)
   },
 
   initLocation: function () {
@@ -54,6 +72,7 @@ App({
 
   getCityName: function (lat, lng) {
     wx.request({
+      // 使用安全的腾讯地图 key
       url: `https://apis.map.qq.com/ws/geocoder/v1/?location=${lat},${lng}&key=OB4BZ-D4W3U-B7VVO-4PJWW-6TKDJ-WPB77`,
       timeout: 5000,
       success: (res) => {
@@ -67,11 +86,69 @@ App({
       },
       fail: (err) => {
         console.log('获取城市名称失败:', err)
-      },
-      complete: () => {
-        console.log('获取城市名称请求完成')
       }
     })
+  },
+
+  initGameScores: function () {
+    this.globalData.gameScores = wx.getStorageSync('gameScores') || {
+      wordHunter: { best: '--', score: 0 },
+      grammarPlanet: { best: '--', score: 0 },
+      escapeRoom: { best: '--', score: 0 },
+      sentenceBuild: { best: '--', score: 0 }
+    }
+  },
+
+  addStudyGold: function (amount) {
+    this.globalData.studyGold = (this.globalData.studyGold || 0) + amount
+    wx.setStorageSync('studyGold', this.globalData.studyGold)
+  },
+
+  addExp: function (amount) {
+    const userInfo = this.globalData.userInfo
+    userInfo.exp = (userInfo.exp || 0) + amount
+    // 升级判断：每1000经验升1级
+    const newLevel = Math.floor(userInfo.exp / 1000) + 1
+    if (newLevel > userInfo.level) {
+      userInfo.level = newLevel
+      wx.showToast({ title: `升级了！Lv.${newLevel}`, icon: 'success' })
+    }
+    wx.setStorageSync('userInfo', userInfo)
+  },
+
+  completeTask: function (taskId) {
+    const completed = wx.getStorageSync('todayTasksCompleted') || []
+    if (!completed.includes(taskId)) {
+      completed.push(taskId)
+      wx.setStorageSync('todayTasksCompleted', completed)
+      this.globalData.totalTasksCompleted = (this.globalData.totalTasksCompleted || 0) + 1
+      wx.setStorageSync('totalTasksCompleted', this.globalData.totalTasksCompleted)
+      this.calcTodayProgress()
+    }
+  },
+
+  saveGameScore: function (game, score, best) {
+    const scores = this.globalData.gameScores
+    if (score > scores[game].score) {
+      scores[game].score = score
+    }
+    scores[game].best = best
+    this.globalData.gameScores = scores
+    wx.setStorageSync('gameScores', scores)
+  },
+
+  addStudyMinutes: function (minutes) {
+    this.globalData.studyMinutes = (this.globalData.studyMinutes || 0) + minutes
+    wx.setStorageSync('studyMinutes', this.globalData.studyMinutes)
+    // 每天连续学习
+    const userInfo = this.globalData.userInfo
+    const today = new Date().toDateString()
+    const lastStudy = wx.getStorageSync('lastStudyDate')
+    if (lastStudy !== today) {
+      userInfo.studyDays = (userInfo.studyDays || 0) + 1
+      wx.setStorageSync('lastStudyDate', today)
+      wx.setStorageSync('userInfo', userInfo)
+    }
   },
 
   globalData: {
@@ -81,7 +158,11 @@ App({
     referralCount: 0,
     referralLevel: '基础',
     achievements: [],
-    todayRecommend: []
+    todayRecommend: [],
+    gameScores: {},
+    studyMinutes: 0,
+    totalTasksCompleted: 0,
+    todayProgress: 0
   },
 
   getReferralLevel: function (count) {

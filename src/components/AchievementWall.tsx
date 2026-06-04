@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { FloatingBack } from './FloatingBack';
-import { supabase } from '../lib/supabase';
+import { supabase } from '../data/supabase';
 import { useUI } from '../lib/UILanguageContext';
+import { getAchievements, isOfflineMode } from '../lib/offlineData';
 
 const SESSION_KEY_STORE = 'yandao_session_v5';
 function getSessionKey() { return localStorage.getItem(SESSION_KEY_STORE) ?? 'anon'; }
@@ -53,16 +54,32 @@ export const AchievementWall: React.FC<AchievementWallProps> = ({
 
   const loadAchievements = useCallback(async () => {
     setLoading(true);
+
+    if (isOfflineMode()) {
+      // Use offline achievement data
+      setEarned(getAchievements() as Achievement[]);
+      setLoading(false);
+      return;
+    }
+
     const { data } = await supabase
       .from('user_achievements')
       .select('*')
       .eq('session_key', sessionKey)
       .order('earned_at', { ascending: false });
-    setEarned((data ?? []) as Achievement[]);
+
+    if (!data || data.length === 0) {
+      // Supabase empty — use offline data
+      setEarned(getAchievements() as Achievement[]);
+      setLoading(false);
+      return;
+    }
+
+    setEarned(data as Achievement[]);
 
     // Auto-grant achievements based on current stats
     const toGrant = ALL_ACHIEVEMENTS.filter((a) => {
-      const alreadyEarned = (data ?? []).some((e: Achievement) => e.achievement_key === a.key);
+      const alreadyEarned = data.some((e: Achievement) => e.achievement_key === a.key);
       return !alreadyEarned && a.threshold(xp, streak);
     });
 

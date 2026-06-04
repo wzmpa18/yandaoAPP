@@ -1,4 +1,9 @@
-import { supabase } from './supabase';
+import { getProviderSync } from '../providers';
+
+// 延迟获取 data provider，避免模块初始化时序问题（与 supabase.ts 修复同理）
+function dp() {
+  try { return getProviderSync().data; } catch { throw new Error('[InfiniteGameGenerator] Provider not available'); }
+}
 
 export interface GameContent {
   id: string;
@@ -48,44 +53,50 @@ export class InfiniteGameGenerator {
     difficulty: number = 5,
     count: number = 10,
   ): Promise<GameContent[]> {
-    const { data, error } = await supabase
-      .from('game_content_pool')
-      .select('*')
-      .eq('lang_code', langCode)
-      .eq('game_type', gameType)
-      .lte('difficulty', difficulty + 2)
-      .gte('difficulty', Math.max(1, difficulty - 2))
-      .order('usage_count', { ascending: true })
-      .limit(count * 3); // fetch more, then shuffle
+    try {
+      const data = await dp().select('game_content_pool', {
+        eq: { lang_code: langCode, game_type: gameType },
+        lte: { difficulty: difficulty + 2 },
+        gte: { difficulty: Math.max(1, difficulty - 2) },
+        order: { column: 'usage_count', ascending: true },
+        limit: count * 3,
+      });
 
-    if (error || !data || data.length === 0) {
+      if (!data || data.length === 0) {
+        return this.aiGenerate(gameType, langCode, difficulty, count);
+      }
+
+      // Shuffle and slice to desired count
+      const shuffled = [...data].sort(() => Math.random() - 0.5);
+      const selected = shuffled.slice(0, count) as GameContent[];
+
+      // Record usage async (fire and forget)
+      selected.forEach((c) => this.recordUsage(c.id));
+
+      if (selected.length < count) {
+        const extra = await this.aiGenerate(gameType, langCode, difficulty, count - selected.length);
+        return [...selected, ...extra];
+      }
+      return selected;
+    } catch {
+      // DB query failed, use AI fallback
       return this.aiGenerate(gameType, langCode, difficulty, count);
     }
-
-    // Shuffle and slice to desired count
-    const shuffled = [...data].sort(() => Math.random() - 0.5);
-    const selected = shuffled.slice(0, count) as GameContent[];
-
-    // Record usage async (fire and forget)
-    selected.forEach((c) => this.recordUsage(c.id));
-
-    if (selected.length < count) {
-      const extra = await this.aiGenerate(gameType, langCode, difficulty, count - selected.length);
-      return [...selected, ...extra];
-    }
-    return selected;
   }
 
   static async recordUsage(contentId: string): Promise<void> {
     if (contentId.startsWith('fallback_')) return;
-    await supabase.rpc('increment_usage_count', { row_id: contentId }).catch(() => {
-      // Fallback: direct update
-      supabase
-        .from('game_content_pool')
-        .update({ usage_count: supabase.rpc('usage_count') })
-        .eq('id', contentId)
-        .then(() => {});
-    });
+    try {
+      await dp().rpc('increment_usage_count', { row_id: contentId }).catch(() => {
+        // Fallback: increment locally
+        dp().selectOne('game_content_pool', { eq: { id: contentId } }).then(row => {
+          if (row) {
+            const current = (row.usage_count as number) || 0;
+            dp().update('game_content_pool', { usage_count: current + 1 }, { eq: { id: contentId } });
+          }
+        });
+      });
+    } catch { /* ignore usage tracking errors */ }
   }
 
   static async aiGenerate(
@@ -103,19 +114,20 @@ export class InfiniteGameGenerator {
   static async getDailyChallenge(langCode: string): Promise<{
     id: string; game_type: string; challenge_data: Record<string, unknown>; reward_xp: number
   } | null> {
-    const today = new Date().toISOString().split('T')[0];
-    const { data } = await supabase
-      .from('daily_challenges')
-      .select('*')
-      .eq('lang_code', langCode)
-      .eq('date', today)
-      .maybeSingle();
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const data = await dp().selectOne('daily_challenges', {
+        eq: { lang_code: langCode, date: today },
+      });
 
-    if (data) return data as { id: string; game_type: string; challenge_data: Record<string, unknown>; reward_xp: number };
+      if (data) return data as { id: string; game_type: string; challenge_data: Record<string, unknown>; reward_xp: number };
+    } catch {
+      // DB query failed, use synthetic fallback below
+    }
 
     // Generate a synthetic daily challenge
     return {
-      id: `daily_${langCode}_${today}`,
+      id: `daily_${langCode}_${new Date().toISOString().split('T')[0]}`,
       game_type: 'word_hunter',
       challenge_data: {
         title: `今日挑战 · ${langCode.toUpperCase()}`,
@@ -130,35 +142,31 @@ export class InfiniteGameGenerator {
   static async getSeasonInfo(): Promise<{
     id: string; season_number: number; end_date: string; reward_tiers: Record<string, unknown>
   } | null> {
-    const { data } = await supabase
-      .from('seasons')
-      .select('*')
-      .order('season_number', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    return data as typeof data & { id: string; season_number: number; end_date: string; reward_tiers: Record<string, unknown> } | null;
+    try {
+      const data = await dp().selectOne('seasons', {
+        order: { column: 'season_number', ascending: false },
+      });
+      return data as typeof data & { id: string; season_number: number; end_date: string; reward_tiers: Record<string, unknown> } | null;
+    } catch {
+      return null;
+    }
   }
 
   static async updateSeasonScore(userId: string, scoreToAdd: number): Promise<void> {
-    const season = await this.getSeasonInfo();
-    if (!season) return;
+    try {
+      const season = await this.getSeasonInfo();
+      if (!season) return;
 
-    const { data: existing } = await supabase
-      .from('season_rankings')
-      .select('id, total_score')
-      .eq('user_id', userId)
-      .eq('season_id', season.id)
-      .maybeSingle();
+      const existing = await dp().selectOne('season_rankings', {
+        eq: { user_id: userId, season_id: season.id },
+      });
 
-    if (existing) {
-      await supabase
-        .from('season_rankings')
-        .update({ total_score: existing.total_score + scoreToAdd, updated_at: new Date().toISOString() })
-        .eq('id', existing.id);
-    } else {
-      await supabase
-        .from('season_rankings')
-        .insert({ user_id: userId, season_id: season.id, total_score: scoreToAdd });
-    }
+      if (existing) {
+        const currentScore = (existing.total_score as number) || 0;
+        await dp().update('season_rankings', { total_score: currentScore + scoreToAdd, updated_at: new Date().toISOString() }, { eq: { id: existing.id as string } });
+      } else {
+        await dp().insert('season_rankings', [{ user_id: userId, season_id: season.id, total_score: scoreToAdd }]);
+      }
+    } catch { /* ignore season score errors */ }
   }
 }

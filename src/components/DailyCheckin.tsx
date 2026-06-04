@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase } from '../data/supabase';
+import { getTodayCheckin, getStreakCount, getReferralFrozenCount, isOfflineMode } from '../lib/offlineData';
 
 interface DailyCheckinProps {
   sessionKey: string;
@@ -37,6 +38,16 @@ const DailyCheckin: React.FC<DailyCheckinProps> = ({ sessionKey, languageCode, o
 
   const loadData = useCallback(async () => {
     setLoading(true);
+
+    if (isOfflineMode()) {
+      // Use offline data
+      const todayRow = getTodayCheckin(sessionKey);
+      setCheckedInToday(!!todayRow);
+      setStreak(getStreakCount(sessionKey));
+      setFrozenCount(getReferralFrozenCount());
+      setLoading(false);
+      return;
+    }
 
     // Check today's checkin
     const { data: todayRow } = await supabase

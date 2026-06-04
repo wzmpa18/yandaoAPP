@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { FloatingBack } from './FloatingBack';
-import { supabase } from '../lib/supabase';
+import { supabase } from '../data/supabase';
 import { useUI } from '../lib/UILanguageContext';
+import { getFriends, getWeeklyRanking, isOfflineMode, OfflineFriend } from '../lib/offlineData';
 
 const SESSION_KEY_STORE = 'yandao_session_v5';
 function getSessionKey() { return localStorage.getItem(SESSION_KEY_STORE) ?? 'anon'; }
@@ -111,6 +112,19 @@ export const FriendSystem: React.FC<FriendSystemProps> = ({
 
   const loadData = useCallback(async () => {
     setLoading(true);
+
+    if (isOfflineMode()) {
+      // Use offline friend data
+      const offlineFriends = getFriends();
+      setFriends(offlineFriends.filter(f => f.status === 'accepted') as Friend[]);
+      setRequests(offlineFriends.filter(f => f.status === 'pending' && !f.is_requester) as Friend[]);
+      // Friend ranking from offline weekly data
+      const ranks = getWeeklyRanking();
+      setRankEntries(ranks.map(r => ({ session_key: r.session_key, xp_earned: r.xp_earned })));
+      setLoading(false);
+      return;
+    }
+
     const [{ data: sent }, { data: received }] = await Promise.all([
       supabase.from('friendships').select('id, addressee_session_key, status')
         .eq('requester_session_key', sessionKey),
@@ -133,8 +147,15 @@ export const FriendSystem: React.FC<FriendSystemProps> = ({
       })),
     ];
 
-    setFriends(allFriends.filter((f) => f.status === 'accepted'));
-    setRequests(allFriends.filter((f) => f.status === 'pending' && !f.is_requester));
+    if (allFriends.length === 0) {
+      // Use offline data if no friends from Supabase
+      const offlineFriends = getFriends();
+      setFriends(offlineFriends.filter(f => f.status === 'accepted') as Friend[]);
+      setRequests(offlineFriends.filter(f => f.status === 'pending' && !f.is_requester) as Friend[]);
+    } else {
+      setFriends(allFriends.filter((f) => f.status === 'accepted'));
+      setRequests(allFriends.filter((f) => f.status === 'pending' && !f.is_requester));
+    }
 
     // Friend ranking
     const friendKeys = allFriends.filter((f) => f.status === 'accepted').map((f) => f.other_key);
@@ -147,7 +168,9 @@ export const FriendSystem: React.FC<FriendSystemProps> = ({
         .order('xp_earned', { ascending: false });
       setRankEntries((ranks ?? []) as typeof rankEntries);
     } else {
-      setRankEntries([]);
+      // Offline ranking
+      const ranks = getWeeklyRanking();
+      setRankEntries(ranks.map(r => ({ session_key: r.session_key, xp_earned: r.xp_earned })));
     }
 
     setLoading(false);

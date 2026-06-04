@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase } from '../data/supabase';
 import { AIModel, AIModelConfig, invalidateAIConfigCache, callAI, friendlyAIError } from '../lib/aiClient';
 
 const DEFAULT: AIModelConfig = {
@@ -42,7 +42,7 @@ export const AIModelConfigPanel: React.FC = () => {
     supabase.from('ai_model_config').select('*').eq('id', 1).maybeSingle().then(({ data }) => {
       if (data) setCfg({ ...DEFAULT, ...data });
       setLoading(false);
-    });
+    }).catch(() => {});
   }, []);
 
   async function save() {

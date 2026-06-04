@@ -1,6 +1,6 @@
 export interface Template {
   id: string;
-  type: 'joke' | 'radio' | 'grammar';
+  type: 'joke' | 'radio' | 'grammar' | 'story';
   language: string;
   template: string;
   variables: string[];
@@ -150,6 +150,62 @@ export const jokeTemplates: Template[] = [
     template: 'Warum hat das {animal} die {place} überquert? Um zur {adjective} Seite zu kommen!',
     variables: ['animal', 'place', 'adjective']
   },
+  {
+    id: 'joke_it_1',
+    type: 'joke',
+    language: 'it',
+    template: 'Perché il {animal} ha attraversato la {place}? Per andare al lato {adjective}!',
+    variables: ['animal', 'place', 'adjective']
+  },
+  {
+    id: 'joke_it_2',
+    type: 'joke',
+    language: 'it',
+    template: 'Cosa si ottiene mescolando {food1} e {food2}? {risultato}!',
+    variables: ['food1', 'food2', 'risultato']
+  },
+  {
+    id: 'joke_pt_1',
+    type: 'joke',
+    language: 'pt',
+    template: 'Por que o {animal} atravessou a {place}? Para chegar ao lado {adjective}!',
+    variables: ['animal', 'place', 'adjective']
+  },
+  {
+    id: 'joke_pt_2',
+    type: 'joke',
+    language: 'pt',
+    template: 'O que acontece quando se mistura {food1} com {food2}? {resultado}!',
+    variables: ['food1', 'food2', 'resultado']
+  },
+  {
+    id: 'joke_ar_1',
+    type: 'joke',
+    language: 'ar',
+    template: 'لماذا عبر {animal} الطريق؟ ليصل إلى الجانب {adjective}!',
+    variables: ['animal', 'place', 'adjective']
+  },
+  {
+    id: 'joke_ar_2',
+    type: 'joke',
+    language: 'ar',
+    template: 'ماذا يحدث عندما تخلط {food1} مع {food2}؟ {resultado} !',
+    variables: ['food1', 'food2', 'resultado']
+  },
+  {
+    id: 'joke_zh_1',
+    type: 'joke',
+    language: 'zh',
+    template: '为什么{animal}要过{place}？因为它想变成{adjective}的{animal}！',
+    variables: ['animal', 'place', 'adjective']
+  },
+  {
+    id: 'joke_zh_2',
+    type: 'joke',
+    language: 'zh',
+    template: '把{food1}和{food2}混在一起会得到什么？{result}！',
+    variables: ['food1', 'food2', 'result']
+  },
 ];
 
 export const radioTemplates: Template[] = [
@@ -208,6 +264,55 @@ export const radioTemplates: Template[] = [
     language: 'ko',
     template: '라디오 {프로그램명}에 오신 것을 환영합니다! 오늘은 {주제}에 대해 이야기하겠습니다. 먼저 {흥미로운 사실}을 알려드릴게요.',
     variables: ['프로그램명', '주제', '흥미로운 사실']
+  },
+  {
+    id: 'radio_fr_1',
+    type: 'radio',
+    language: 'fr',
+    template: 'Bienvenue sur Radio {nom_programme}! Aujourd\'hui, nous parlons de {sujet}. Commençons par un fait intéressant: {fait_interessant}.',
+    variables: ['nom_programme', 'sujet', 'fait_interessant']
+  },
+  {
+    id: 'radio_es_1',
+    type: 'radio',
+    language: 'es',
+    template: '¡Bienvenidos a Radio {nombre_programa}! Hoy hablamos de {tema}. Empecemos con un dato curioso: {dato_curioso}.',
+    variables: ['nombre_programa', 'tema', 'dato_curioso']
+  },
+  {
+    id: 'radio_de_1',
+    type: 'radio',
+    language: 'de',
+    template: 'Willkommen bei Radio {sendungsname}! Heute sprechen wir über {thema}. Beginnen wir mit einem interessanten Fakt: {interessanter_fakt}.',
+    variables: ['sendungsname', 'thema', 'interessanter_fakt']
+  },
+  {
+    id: 'radio_it_1',
+    type: 'radio',
+    language: 'it',
+    template: 'Benvenuti a Radio {nome_programma}! Oggi parliamo di {argomento}. Iniziamo con un fatto interessante: {fatto_interessante}.',
+    variables: ['nome_programma', 'argomento', 'fatto_interessante']
+  },
+  {
+    id: 'radio_pt_1',
+    type: 'radio',
+    language: 'pt',
+    template: 'Bem-vindos à Rádio {nome_programa}! Hoje falamos sobre {tema}. Vamos começar com um fato interessante: {fato_interessante}.',
+    variables: ['nome_programa', 'tema', 'fato_interessante']
+  },
+  {
+    id: 'radio_ar_1',
+    type: 'radio',
+    language: 'ar',
+    template: 'أهلاً بكم في راديو {اسم_البرنامج}! اليوم نتحدث عن {موضوع}. لنبدأ بمعلومة شيقة: {معلومة_شيقة}.',
+    variables: ['اسم_البرنامج', 'موضوع', 'معلومة_شيقة']
+  },
+  {
+    id: 'radio_zh_1',
+    type: 'radio',
+    language: 'zh',
+    template: '欢迎收听{节目名}！今天我们来聊聊{话题}。先分享一个冷知识：{冷知识}。',
+    variables: ['节目名', '话题', '冷知识']
   },
 ];
 
@@ -303,6 +408,286 @@ export const grammarTemplates: Template[] = [
     template: '{동사}는 어떻게 해요? (해라체로 바꾸시오)',
     variables: ['동사']
   },
+  {
+    id: 'grammar_fr_1',
+    type: 'grammar',
+    language: 'fr',
+    template: 'Choisissez la bonne forme: Je {verbe} au parc.',
+    variables: ['verbe']
+  },
+  {
+    id: 'grammar_fr_2',
+    type: 'grammar',
+    language: 'fr',
+    template: 'Complétez: Il faut que tu {verbe} à l\'école.',
+    variables: ['verbe']
+  },
+  {
+    id: 'grammar_es_1',
+    type: 'grammar',
+    language: 'es',
+    template: 'Elige la forma correcta: Yo {verbo} al parque.',
+    variables: ['verbo']
+  },
+  {
+    id: 'grammar_es_2',
+    type: 'grammar',
+    language: 'es',
+    template: 'Completa: Ojalá que él {verbo} mañana.',
+    variables: ['verbo']
+  },
+  {
+    id: 'grammar_de_1',
+    type: 'grammar',
+    language: 'de',
+    template: 'Wähle die richtige Form: Ich {verb} zur Schule.',
+    variables: ['verb']
+  },
+  {
+    id: 'grammar_de_2',
+    type: 'grammar',
+    language: 'de',
+    template: 'Ergänze: Wenn ich Zeit hätte, {verb} ich ins Kino.',
+    variables: ['verb']
+  },
+  {
+    id: 'grammar_it_1',
+    type: 'grammar',
+    language: 'it',
+    template: 'Scegli la forma corretta: Io {verbo} al parco.',
+    variables: ['verbo']
+  },
+  {
+    id: 'grammar_it_2',
+    type: 'grammar',
+    language: 'it',
+    template: 'Completa: Spero che lui {verbo} domani.',
+    variables: ['verbo']
+  },
+  {
+    id: 'grammar_pt_1',
+    type: 'grammar',
+    language: 'pt',
+    template: 'Escolha a forma correta: Eu {verbo} ao parque.',
+    variables: ['verbo']
+  },
+  {
+    id: 'grammar_pt_2',
+    type: 'grammar',
+    language: 'pt',
+    template: 'Complete: Tomara que ele {verbo} amanhã.',
+    variables: ['verbo']
+  },
+  {
+    id: 'grammar_ar_1',
+    type: 'grammar',
+    language: 'ar',
+    template: 'اختر الصيغة الصحيحة: أنا {فعل} إلى المدرسة.',
+    variables: ['فعل']
+  },
+  {
+    id: 'grammar_ar_2',
+    type: 'grammar',
+    language: 'ar',
+    template: 'أكمل: أتمنى أن {فعل} غداً.',
+    variables: ['فعل']
+  },
+  {
+    id: 'grammar_zh_1',
+    type: 'grammar',
+    language: 'zh',
+    template: '选择正确的句式：我{动词}了作业。',
+    variables: ['动词']
+  },
+  {
+    id: 'grammar_zh_2',
+    type: 'grammar',
+    language: 'zh',
+    template: '补全句子：如果明天下雨，我就{动作}。',
+    variables: ['动作']
+  },
+];
+
+/* ── Story/Novel Templates (Infinite Story Generation) ── */
+export const storyTemplates: Template[] = [
+  // English story templates
+  {
+    id: 'story_en_1',
+    type: 'story',
+    language: 'en',
+    template: 'Once upon a time, in a {adjective} {place}, there lived a {adjective2} {person} named {name}. Every day, {name} would {action} near the {landmark}. One day, something {adjective3} happened: a {animal} appeared and said, "{dialogue}". {name} was {emotion}. From that day on, everything changed.',
+    variables: ['adjective', 'place', 'adjective2', 'person', 'name', 'action', 'landmark', 'adjective3', 'animal', 'dialogue', 'emotion'],
+  },
+  {
+    id: 'story_en_2',
+    type: 'story',
+    language: 'en',
+    template: '{name} had always dreamed of visiting {place}. Finally, after {time} of saving money, they arrived. The first thing they noticed was the {adjective} {noun}. "This is even better than I imagined," {name} thought. But then, a {person} approached and asked, "{question}". What would {name} do next?',
+    variables: ['name', 'place', 'time', 'adjective', 'noun', 'person', 'question'],
+  },
+  {
+    id: 'story_en_3',
+    type: 'story',
+    language: 'en',
+    template: 'The {adjective} {noun} had been {action} for {time}. Nobody knew why. {name}, a curious {person}, decided to investigate. Armed with only a {tool} and their {quality}, {name} set out to solve the mystery. The truth was more {adjective2} than anyone could have imagined.',
+    variables: ['adjective', 'noun', 'action', 'time', 'name', 'person', 'tool', 'quality', 'adjective2'],
+  },
+  {
+    id: 'story_en_4',
+    type: 'story',
+    language: 'en',
+    template: 'It was a {adjective} {time_of_day} when {name} received the {noun}. Inside, there was a message: "{message}". {name} knew this was the beginning of an adventure. The journey would take them across {place}, through {place2}, and finally to {place3}. Along the way, they would learn about {topic} and discover their true {quality}.',
+    variables: ['adjective', 'time_of_day', 'name', 'noun', 'message', 'place', 'place2', 'place3', 'topic', 'quality'],
+  },
+  {
+    id: 'story_en_5',
+    type: 'story',
+    language: 'en',
+    template: 'The secret of {place} had been kept for {time}. Only the {animal}s knew. But when {name} accidentally discovered it while {action}, everything changed. The {animal}s decided to {action2} and share their wisdom about {topic} with the world. And so began the {adjective} journey of discovery.',
+    variables: ['place', 'time', 'animal', 'name', 'action', 'action2', 'topic', 'adjective'],
+  },
+  // Japanese story templates
+  {
+    id: 'story_ja_1',
+    type: 'story',
+    language: 'ja',
+    template: 'むかしむかし、{場所}に{人物}という名前の{職業}が住んでいました。{人物}は毎日{動作}をしていました。ある日、{動物}が現れて「{セリフ}」と言いました。{人物}は{感情}になりました。それから{時間}が経って、不思議なことが起こりました。',
+    variables: ['場所', '人物', '職業', '動作', '動物', 'セリフ', '感情', '時間'],
+  },
+  {
+    id: 'story_ja_2',
+    type: 'story',
+    language: 'ja',
+    template: '{人物}は{場所}に行くことを夢見ていました。{時間}の間お金を貯めて、ついに到着しました。最初に気づいたのは{形容詞}{名詞}でした。「想像以上だ」と{人物}は思いました。すると{職業}が近づいてきて「{質問}」と尋ねました。',
+    variables: ['人物', '場所', '時間', '形容詞', '名詞', '職業', '質問'],
+  },
+  // Korean story templates
+  {
+    id: 'story_ko_1',
+    type: 'story',
+    language: 'ko',
+    template: '옛날 옛날에, {장소}에 {이름}이라는 {직업}이 살고 있었습니다. {이름}은 매일 {행동}을 했습니다. 어느 날, {동물}이 나타나서 "{대사}"라고 말했습니다. {이름}은 {감정}이 되었습니다. 그날부터 모든 것이 달라졌습니다.',
+    variables: ['장소', '이름', '직업', '행동', '동물', '대사', '감정'],
+  },
+  {
+    id: 'story_ko_2',
+    type: 'story',
+    language: 'ko',
+    template: '{이름}은 {장소}에 가는 것을 항상 꿈꿔왔습니다. 마침내 {시간} 동안 돈을 모아 도착했습니다. 가장 먼저 눈에 띈 것은 {형용사} {명사}였습니다. "상상보다 더 좋다"고 {이름}은 생각했습니다. 그때 {직업}이 다가와 "{질문}"이라고 물었습니다.',
+    variables: ['이름', '장소', '시간', '형용사', '명사', '직업', '질문'],
+  },
+  // French story templates
+  {
+    id: 'story_fr_1',
+    type: 'story',
+    language: 'fr',
+    template: 'Il était une fois, dans un {place} {adjective}, un(e) {person} nommé(e) {name}. Chaque jour, {name} {action} près du {landmark}. Un jour, quelque chose d\'{adjective2} arriva : un(e) {animal} apparut et dit, "{dialogue}". {name} était {emotion}. À partir de ce jour, tout changea.',
+    variables: ['place', 'adjective', 'person', 'name', 'action', 'landmark', 'adjective2', 'animal', 'dialogue', 'emotion'],
+  },
+  {
+    id: 'story_fr_2',
+    type: 'story',
+    language: 'fr',
+    template: '{name} avait toujours rêvé de visiter {place}. Enfin, après {time} d\'économies, ils arrivèrent. La première chose qu\'ils remarquèrent fut le/la {adjective} {noun}. "C\'est encore mieux que ce que j\'imaginais," pensa {name}. Mais alors, un(e) {person} s\'approcha et demanda, "{question}".',
+    variables: ['name', 'place', 'time', 'adjective', 'noun', 'person', 'question'],
+  },
+  // Spanish story templates
+  {
+    id: 'story_es_1',
+    type: 'story',
+    language: 'es',
+    template: 'Érase una vez, en un {place} {adjective}, un(a) {person} llamado(a) {name}. Cada día, {name} {action} cerca del {landmark}. Un día, algo {adjective2} sucedió: un(a) {animal} apareció y dijo, "{dialogue}". {name} estaba {emotion}. Desde ese día, todo cambió.',
+    variables: ['place', 'adjective', 'person', 'name', 'action', 'landmark', 'adjective2', 'animal', 'dialogue', 'emotion'],
+  },
+  {
+    id: 'story_es_2',
+    type: 'story',
+    language: 'es',
+    template: '{name} siempre había soñado con visitar {place}. Finalmente, después de {time} ahorrando, llegaron. Lo primero que notaron fue el/la {adjective} {noun}. "Esto es mejor de lo que imaginaba," pensó {name}. Pero entonces, un(a) {person} se acercó y preguntó, "{question}".',
+    variables: ['name', 'place', 'time', 'adjective', 'noun', 'person', 'question'],
+  },
+  // German story templates
+  {
+    id: 'story_de_1',
+    type: 'story',
+    language: 'de',
+    template: 'Es war einmal, in einem/einer {adjective} {place}, ein(e) {person} namens {name}. Jeden Tag {action} {name} in der Nähe des/der {landmark}. Eines Tages geschah etwas {adjective2}: ein(e) {animal} erschien und sagte, "{dialogue}". {name} war {emotion}. Von diesem Tag an änderte sich alles.',
+    variables: ['adjective', 'place', 'person', 'name', 'action', 'landmark', 'adjective2', 'animal', 'dialogue', 'emotion'],
+  },
+  {
+    id: 'story_de_2',
+    type: 'story',
+    language: 'de',
+    template: '{name} hatte schon immer davon geträumt, {place} zu besuchen. Endlich, nach {time} des Sparens, kamen sie an. Das erste, was ihnen auffiel, war das/die {adjective} {noun}. "Das ist noch besser, als ich es mir vorgestellt habe," dachte {name}. Aber dann näherte sich ein(e) {person} und fragte, "{question}".',
+    variables: ['name', 'place', 'time', 'adjective', 'noun', 'person', 'question'],
+  },
+  // Italian story templates
+  {
+    id: 'story_it_1',
+    type: 'story',
+    language: 'it',
+    template: 'C\'era una volta, in un(a) {place} {adjective}, un(a) {person} di nome {name}. Ogni giorno, {name} {action} vicino al/alla {landmark}. Un giorno, accadde qualcosa di {adjective2}: un(a) {animal} apparve e disse, "{dialogue}". {name} era {emotion}. Da quel giorno, tutto cambiò.',
+    variables: ['place', 'adjective', 'person', 'name', 'action', 'landmark', 'adjective2', 'animal', 'dialogue', 'emotion'],
+  },
+  {
+    id: 'story_it_2',
+    type: 'story',
+    language: 'it',
+    template: '{name} aveva sempre sognato di visitare {place}. Finalmente, dopo {time} di risparmi, arrivarono. La prima cosa che notarono fu il/la {adjective} {noun}. "È ancora meglio di quanto immaginassi," pensò {name}. Ma poi, un(a) {person} si avvicinò e chiese, "{question}".',
+    variables: ['name', 'place', 'time', 'adjective', 'noun', 'person', 'question'],
+  },
+  // Portuguese story templates
+  {
+    id: 'story_pt_1',
+    type: 'story',
+    language: 'pt',
+    template: 'Era uma vez, em um(a) {place} {adjective}, um(a) {person} chamado(a) {name}. Todos os dias, {name} {action} perto do/da {landmark}. Um dia, algo {adjective2} aconteceu: um(a) {animal} apareceu e disse, "{dialogue}". {name} ficou {emotion}. A partir desse dia, tudo mudou.',
+    variables: ['place', 'adjective', 'person', 'name', 'action', 'landmark', 'adjective2', 'animal', 'dialogue', 'emotion'],
+  },
+  {
+    id: 'story_pt_2',
+    type: 'story',
+    language: 'pt',
+    template: '{name} sempre sonhou em visitar {place}. Finalmente, depois de {time} economizando, chegaram. A primeira coisa que notaram foi o/a {adjective} {noun}. "Isso é ainda melhor do que eu imaginava," pensou {name}. Mas então, um(a) {person} se aproximou e perguntou, "{question}".',
+    variables: ['name', 'place', 'time', 'adjective', 'noun', 'person', 'question'],
+  },
+  // Arabic story templates
+  {
+    id: 'story_ar_1',
+    type: 'story',
+    language: 'ar',
+    template: 'كان يا ما كان، في {place} {adjective}، {person} اسمه {name}. كل يوم، كان {name} {action} قرب {landmark}. في أحد الأيام، حدث شيء {adjective2}: ظهر {animal} وقال، "{dialogue}". كان {name} {emotion}. منذ ذلك اليوم، تغير كل شيء.',
+    variables: ['place', 'adjective', 'person', 'name', 'action', 'landmark', 'adjective2', 'animal', 'dialogue', 'emotion'],
+  },
+  {
+    id: 'story_ar_2',
+    type: 'story',
+    language: 'ar',
+    template: 'لطالما حلم {name} بزيارة {place}. أخيراً، بعد {time} من الادخار، وصلوا. أول ما لاحظوه كان {adjective} {noun}. "هذا أفضل مما تخيلت"، فكر {name}. ولكن بعد ذلك، اقترب {person} وسأل، "{question}".',
+    variables: ['name', 'place', 'time', 'adjective', 'noun', 'person', 'question'],
+  },
+  // Chinese story templates
+  {
+    id: 'story_zh_1',
+    type: 'story',
+    language: 'zh',
+    template: '从前，在{place}有一个{adjective}的{person}，名叫{name}。{name}每天都会在{landmark}旁边{action}。有一天，一件{adjective2}的事情发生了：一只{animal}突然出现，说："{dialogue}"。{name}感到非常{emotion}。从那天起，一切都变了。',
+    variables: ['place', 'adjective', 'person', 'name', 'action', 'landmark', 'adjective2', 'animal', 'dialogue', 'emotion'],
+  },
+  {
+    id: 'story_zh_2',
+    type: 'story',
+    language: 'zh',
+    template: '{name}一直梦想着去{place}旅行。终于，在攒了{time}的钱之后，他们到达了目的地。第一眼看到的是{adjective}的{noun}。"这比我想象的还要好，"{name}心想。这时，一个{person}走过来问："{question}？"',
+    variables: ['name', 'place', 'time', 'adjective', 'noun', 'person', 'question'],
+  },
+  {
+    id: 'story_zh_3',
+    type: 'story',
+    language: 'zh',
+    template: '{place}的秘密已经被保守了{time}。只有{animal}们知道。但是当{name}在{action}时偶然发现了它，一切都变了。{animal}们决定{action2}，向世界分享关于{topic}的智慧。于是，一段{adjective}的发现之旅开始了。',
+    variables: ['place', 'time', 'animal', 'name', 'action', 'action2', 'topic', 'adjective'],
+  },
 ];
 
 export const wordBanks: Record<string, WordBank> = {
@@ -359,6 +744,42 @@ export const wordBanks: Record<string, WordBank> = {
     adjectives: ['glücklich', 'traurig', 'wütend', 'aufgeregt', 'langweilig', 'müde', 'hungrig', 'durstig', 'schläfrig', 'wach', 'schön', 'hässlich', 'klug', 'dumm', 'lustig', 'ernst', 'freundlich', 'böse', 'nett', 'grausam', 'tapfer', 'ängstlich', 'selbstsicher', 'schüchtern', 'laut', 'leise', 'schnell', 'langsam', 'groß', 'klein', 'hoch', 'niedrig', 'fett', 'dünn', 'alt', 'jung', 'neu', 'alt', 'heiß', 'kalt', 'warm', 'kühl', 'nass', 'trocken', 'weich', 'hart', 'glatt', 'rau', 'hell', 'dunkel'],
     nouns: ['Katze', 'Hund', 'Vogel', 'Fisch', 'Kaninchen', 'Hamster', 'Schildkröte', 'Schlange', 'Frosch', 'Schmetterling', 'Biene', 'Ameise', 'Spinne', 'Blume', 'Baum', 'Gras', 'Wasser', 'Feuer', 'Sonne', 'Mond', 'Sterne', 'Wolke', 'Regen', 'Schnee', 'Wind', 'Berg', 'Fluss', 'Ozean', 'Insel', 'Wüste', 'Wald', 'Dschungel', 'Stadt', 'Gebäude', 'Auto', 'Bus', 'Zug', 'Flugzeug', 'Boot', 'Fahrrad', 'Telefon', 'Computer', 'Buch', 'Stift', 'Papier', 'Tisch', 'Stuhl', 'Bett', 'Lampe', 'Uhr', 'Armbanduhr'],
     adverbs: ['schnell', 'langsam', 'glücklicherweise', 'traurig', 'wütend', 'leise', 'laut', 'vorsichtig', 'unvorsichtig', 'einfach', 'fast', 'wirklich', 'sehr', 'zu', 'genug', 'ziemlich', 'fast', 'fast', 'gerade', 'nur', 'sogar', 'auch', 'auch', 'weder', 'noch', 'immer noch', 'schon', 'noch nicht', 'gerade', 'kürzlich', 'letztens', 'oft', 'normalerweise', 'immer', 'manchmal', 'gelegentlich', 'selten', 'selten', 'nie', 'täglich', 'wöchentlich', 'monatlich', 'jährlich']
+  },
+  it: {
+    language: 'it',
+    people: ['insegnante', 'studente', 'medico', 'pompiere', 'chef', 'pilota', 'artista', 'musicista', 'ingegnere', 'scienziato', 'poliziotto', 'infermiera', 'attore', 'scrittore', 'atleta', 'autista', 'fotografo', 'designer', 'sviluppatore', 'manager', 'contabile', 'avvocato', 'architetto', 'falegname', 'elettricista', 'idraulico', 'pittore', 'ballerino', 'cantante', 'comico', 'mago', 'veterinario', 'farmacista', 'dentista', 'chirurgo', 'professore', 'giornalista', 'reporter', 'editore', 'imprenditore', 'investitore', 'banchiere', 'commerciante', 'agricoltore', 'pescatore', 'cacciatore', 'esploratore'],
+    places: ['parco', 'negozio', 'scuola', 'ospedale', 'ristorante', 'caffè', 'biblioteca', 'museo', 'teatro', 'stadio', 'aeroporto', 'stazione', 'fermata', 'ufficio', 'fabbrica', 'mercato', 'centro commerciale', 'spiaggia', 'montagna', 'foresta', 'fiume', 'lago', 'oceano', 'isola', 'città', 'villaggio', 'campagna', 'deserto', 'giungla', 'caverna', 'castello', 'palazzo', 'tempio', 'chiesa', 'moschea', 'sinagoga', 'zoo', 'acquario', 'parco divertimenti', 'circo', 'palestra', 'spa', 'hotel', 'motel', 'ostello', 'campeggio', 'casa al mare', 'capanna', 'tenda'],
+    actions: ['correre', 'saltare', 'nuotare', 'ballare', 'cantare', 'ridere', 'piangere', 'mangiare', 'bere', 'dormire', 'leggere', 'scrivere', 'disegnare', 'dipingere', 'cucinare', 'pulire', 'lavare', 'stirare', 'cucire', 'lavorare a maglia', 'giardinaggio', 'pescare', 'fare escursioni', 'campeggiare', 'viaggiare', 'fare shopping', 'lavorare', 'studiare', 'insegnare', 'imparare', 'giocare', 'guardare', 'ascoltare', 'parlare', 'chattare', 'discutere', 'spiegare', 'chiedere', 'rispondere', 'aiutare', 'riparare', 'costruire', 'rompere', 'aggiustare', 'creare', 'distruggere', 'trovare', 'perdere', 'nascondere', 'cercare'],
+    adjectives: ['felice', 'triste', 'arrabbiato', 'eccitato', 'annoiato', 'stanco', 'affamato', 'assetato', 'assonnato', 'sveglio', 'bello', 'brutto', 'intelligente', 'stupido', 'divertente', 'serio', 'amichevole', 'cattivo', 'gentile', 'crudele', 'coraggioso', 'spaventato', 'sicuro di sé', 'timido', 'rumoroso', 'silenzioso', 'veloce', 'lento', 'grande', 'piccolo', 'alto', 'basso', 'grasso', 'magro', 'vecchio', 'giovane', 'nuovo', 'vecchio', 'caldo', 'freddo', 'tiepido', 'fresco', 'bagnato', 'asciutto', 'morbido', 'duro', 'liscio', 'ruvido', 'chiaro', 'scuro'],
+    nouns: ['gatto', 'cane', 'uccello', 'pesce', 'coniglio', 'criceto', 'tartaruga', 'serpente', 'rana', 'farfalla', 'ape', 'formica', 'ragno', 'fiore', 'albero', 'erba', 'acqua', 'fuoco', 'sole', 'luna', 'stella', 'nuvola', 'pioggia', 'neve', 'vento', 'montagna', 'fiume', 'oceano', 'isola', 'deserto', 'foresta', 'giungla', 'città', 'edificio', 'auto', 'autobus', 'treno', 'aereo', 'barca', 'bicicletta', 'telefono', 'computer', 'libro', 'penna', 'carta', 'tavolo', 'sedia', 'letto', 'lampada', 'orologio', 'orologio da polso'],
+    adverbs: ['velocemente', 'lentamente', 'felicemente', 'tristemente', 'arrabbiatamente', 'silenziosamente', 'fortemente', 'attentamente', 'distrattamente', 'facilmente', 'quasi', 'veramente', 'molto', 'troppo', 'abbastanza', 'piuttosto', 'quasi', 'appena', 'solo', 'anche', 'pure', 'neppure', 'né', 'ancora', 'già', 'non ancora', 'appena', 'recentemente', 'ultimamente', 'spesso', 'normalmente', 'sempre', 'a volte', 'occasionalmente', 'raramente', 'raramente', 'mai', 'quotidianamente', 'settimanalmente', 'mensilmente', 'annualmente']
+  },
+  pt: {
+    language: 'pt',
+    people: ['professor', 'estudante', 'médico', 'bombeiro', 'chef', 'piloto', 'artista', 'músico', 'engenheiro', 'cientista', 'policial', 'enfermeira', 'ator', 'escritor', 'atleta', 'motorista', 'fotógrafo', 'designer', 'desenvolvedor', 'gerente', 'contador', 'advogado', 'arquiteto', 'carpinteiro', 'eletricista', 'encanador', 'pintor', 'dançarino', 'cantor', 'comediante', 'mágico', 'veterinário', 'farmacêutico', 'dentista', 'cirurgião', 'professor', 'jornalista', 'repórter', 'editor', 'empresário', 'investidor', 'banqueiro', 'comerciante', 'agricultor', 'pescador', 'caçador', 'explorador'],
+    places: ['parque', 'loja', 'escola', 'hospital', 'restaurante', 'café', 'biblioteca', 'museu', 'teatro', 'estádio', 'aeroporto', 'estação', 'ponto de ônibus', 'escritório', 'fábrica', 'mercado', 'shopping', 'praia', 'montanha', 'floresta', 'rio', 'lago', 'oceano', 'ilha', 'cidade', 'vila', 'campo', 'deserto', 'selva', 'caverna', 'castelo', 'palácio', 'templo', 'igreja', 'mesquita', 'sinagoga', 'zoológico', 'aquário', 'parque de diversões', 'circo', 'academia', 'spa', 'hotel', 'motel', 'albergue', 'acampamento', 'casa de praia', 'cabana', 'tenda'],
+    actions: ['correr', 'saltar', 'nadar', 'dançar', 'cantar', 'rir', 'chorar', 'comer', 'beber', 'dormir', 'ler', 'escrever', 'desenhar', 'pintar', 'cozinhar', 'limpar', 'lavar', 'passar roupa', 'costurar', 'tricotar', 'jardinagem', 'pescar', 'fazer trilha', 'acampar', 'viajar', 'fazer compras', 'trabalhar', 'estudar', 'ensinar', 'aprender', 'jogar', 'assistir', 'ouvir', 'falar', 'conversar', 'discutir', 'explicar', 'perguntar', 'responder', 'ajudar', 'consertar', 'construir', 'quebrar', 'reparar', 'criar', 'destruir', 'encontrar', 'perder', 'esconder', 'procurar'],
+    adjectives: ['feliz', 'triste', 'bravo', 'animado', 'entediado', 'cansado', 'faminto', 'sedento', 'sonolento', 'acordado', 'bonito', 'feio', 'inteligente', 'burro', 'engraçado', 'sério', 'amigável', 'mau', 'gentil', 'cruel', 'corajoso', 'assustado', 'confiante', 'tímido', 'barulhento', 'quieto', 'rápido', 'lento', 'grande', 'pequeno', 'alto', 'baixo', 'gordo', 'magro', 'velho', 'jovem', 'novo', 'velho', 'quente', 'frio', 'morno', 'fresco', 'molhado', 'seco', 'macio', 'duro', 'liso', 'rugoso', 'claro', 'escuro'],
+    nouns: ['gato', 'cachorro', 'pássaro', 'peixe', 'coelho', 'hamster', 'tartaruga', 'cobra', 'sapo', 'borboleta', 'abelha', 'formiga', 'aranha', 'flor', 'árvore', 'grama', 'água', 'fogo', 'sol', 'lua', 'estrela', 'nuvem', 'chuva', 'neve', 'vento', 'montanha', 'rio', 'oceano', 'ilha', 'deserto', 'floresta', 'selva', 'cidade', 'prédio', 'carro', 'ônibus', 'trem', 'avião', 'barco', 'bicicleta', 'telefone', 'computador', 'livro', 'caneta', 'papel', 'mesa', 'cadeira', 'cama', 'lâmpada', 'relógio', 'relógio de pulso'],
+    adverbs: ['rapidamente', 'lentamente', 'felizmente', 'tristemente', 'bravamente', 'silenciosamente', 'fortemente', 'cuidadosamente', 'descuidadosamente', 'facilmente', 'quase', 'realmente', 'muito', 'demais', 'suficientemente', 'bastante', 'quase', 'apenas', 'só', 'até', 'também', 'tampouco', 'nem', 'ainda', 'já', 'ainda não', 'recentemente', 'ultimamente', 'frequentemente', 'normalmente', 'sempre', 'às vezes', 'ocasionalmente', 'raramente', 'nunca', 'diariamente', 'semanalmente', 'mensalmente', 'anualmente']
+  },
+  ar: {
+    language: 'ar',
+    people: ['معلم', 'طالب', 'طبيب', 'رجل إطفاء', 'طاهٍ', 'طيار', 'فنان', 'موسيقي', 'مهندس', 'عالم', 'شرطي', 'ممرضة', 'ممثل', 'كاتب', 'رياضي', 'سائق', 'مصور', 'مصمم', 'مبرمج', 'مدير', 'محاسب', 'محامٍ', 'مهندس معماري', 'نجار', 'كهربائي', 'سباك', 'رسام', 'راقص', 'مغني', 'كوميدي', 'ساحر', 'طبيب بيطري', 'صيدلي', 'طبيب أسنان', 'جراح', 'أستاذ', 'صحفي', 'مراسل', 'محرر', 'رجل أعمال', 'مستثمر', 'مصرفي', 'تاجر', 'مزارع', 'صياد', 'مستكشف'],
+    places: ['حديقة', 'متجر', 'مدرسة', 'مستشفى', 'مطعم', 'مقهى', 'مكتبة', 'متحف', 'مسرح', 'ملعب', 'مطار', 'محطة', 'موقف حافلات', 'مكتب', 'مصنع', 'سوق', 'مركز تجاري', 'شاطئ', 'جبل', 'غابة', 'نهر', 'بحيرة', 'محيط', 'جزيرة', 'مدينة', 'قرية', 'ريف', 'صحراء', 'أدغال', 'كهف', 'قلعة', 'قصر', 'معبد', 'كنيسة', 'مسجد', 'كنيس', 'حديقة حيوان', 'حوض أسماك', 'مدينة ملاهي', 'سيرك', 'صالة رياضية', 'سبا', 'فندق', 'موتيل', 'نزل', 'مخيم', 'منزل شاطئي', 'كوخ', 'خيمة'],
+    actions: ['يركض', 'يقفز', 'يسبح', 'يرقص', 'يغني', 'يضحك', 'يبكي', 'يأكل', 'يشرب', 'ينام', 'يقرأ', 'يكتب', 'يرسم', 'يلون', 'يطبخ', 'ينظف', 'يغسل', 'يكوي', 'يخيط', 'يحبك', 'يزرع', 'يصطاد', 'يتنزه', 'يخيم', 'يسافر', 'يتسوق', 'يعمل', 'يدرس', 'يدرس', 'يتعلم', 'يلعب', 'يشاهد', 'يستمع', 'يتحدث', 'يدردش', 'يتجادل', 'يشرح', 'يسأل', 'يجيب', 'يساعد', 'يصلح', 'يبني', 'يكسر', 'يصلح', 'يخلق', 'يدمر', 'يجد', 'يخسر', 'يخفي', 'يبحث'],
+    adjectives: ['سعيد', 'حزين', 'غاضب', 'متحمس', 'ضجر', 'متعب', 'جائع', 'عطشان', 'نعسان', 'مستيقظ', 'جميل', 'قبيح', 'ذكي', 'غبي', 'مضحك', 'جاد', 'ودود', 'لئيم', 'لطيف', 'قاسٍ', 'شجاع', 'خائف', 'واثق', 'خجول', 'صاخب', 'هادئ', 'سريع', 'بطيء', 'كبير', 'صغير', 'طويل', 'قصير', 'سمين', 'نحيف', 'كبير السن', 'شاب', 'جديد', 'قديم', 'حار', 'بارد', 'دافئ', 'منعش', 'مبلل', 'جاف', 'ناعم', 'صلب', 'أملس', 'خشن', 'فاتح', 'داكن'],
+    nouns: ['قطة', 'كلب', 'طائر', 'سمكة', 'أرنب', 'هامستر', 'سلحفاة', 'ثعبان', 'ضفدع', 'فراشة', 'نحلة', 'نملة', 'عنكبوت', 'زهرة', 'شجرة', 'عشب', 'ماء', 'نار', 'شمس', 'قمر', 'نجم', 'سحابة', 'مطر', 'ثلج', 'رياح', 'جبل', 'نهر', 'محيط', 'جزيرة', 'صحراء', 'غابة', 'أدغال', 'مدينة', 'مبنى', 'سيارة', 'حافلة', 'قطار', 'طائرة', 'قارب', 'دراجة', 'هاتف', 'حاسوب', 'كتاب', 'قلم', 'ورق', 'طاولة', 'كرسي', 'سرير', 'مصباح', 'ساعة', 'ساعة يد'],
+    adverbs: ['بسرعة', 'ببطء', 'بسعادة', 'بحزن', 'بغضب', 'بهدوء', 'بصوت عالٍ', 'بعناية', 'بإهمال', 'بسهولة', 'تقريباً', 'حقاً', 'جداً', 'كثيراً', 'بما يكفي', 'تماماً', 'تقريباً', 'بالكاد', 'فقط', 'حتى', 'أيضاً', 'كذلك', 'أيضاً', 'ولا', 'لا يزال', 'بالفعل', 'ليس بعد', 'مؤخراً', 'حديثاً', 'غالباً', 'عادةً', 'دائماً', 'أحياناً', 'بين الحين والآخر', 'نادراً', 'نادراً', 'أبداً', 'يومياً', 'أسبوعياً', 'شهرياً', 'سنوياً']
+  },
+  zh: {
+    language: 'zh',
+    people: ['老师', '学生', '医生', '消防员', '厨师', '飞行员', '艺术家', '音乐家', '工程师', '科学家', '警察', '护士', '演员', '作家', '运动员', '司机', '摄影师', '设计师', '开发者', '经理', '会计', '律师', '建筑师', '木匠', '电工', '管道工', '画家', '舞者', '歌手', '喜剧演员', '魔术师', '兽医', '药剂师', '牙医', '外科医生', '教授', '记者', '编辑', '商人', '投资人', '银行家', '农民', '渔夫', '猎人', '探险家'],
+    places: ['公园', '商店', '学校', '医院', '餐厅', '咖啡馆', '图书馆', '博物馆', '剧院', '体育场', '机场', '火车站', '公交站', '办公室', '工厂', '市场', '商场', '海滩', '山', '森林', '河', '湖', '海洋', '岛', '城市', '村庄', '乡村', '沙漠', '丛林', '洞穴', '城堡', '宫殿', '寺庙', '教堂', '清真寺', '动物园', '水族馆', '游乐园', '马戏团', '健身房', '水疗中心', '酒店', '汽车旅馆', '青年旅舍', '露营地', '度假屋', '小屋', '帐篷'],
+    actions: ['跑', '跳', '游泳', '跳舞', '唱歌', '笑', '哭', '吃', '喝', '睡觉', '阅读', '写作', '画画', '烹饪', '清洁', '洗衣服', '熨衣服', '缝纫', '编织', '园艺', '钓鱼', '远足', '露营', '旅行', '购物', '工作', '学习', '教学', '玩', '看', '听', '说话', '聊天', '争论', '解释', '问', '回答', '帮助', '修理', '建造', '破坏', '创造', '找到', '丢失', '隐藏', '寻找'],
+    adjectives: ['开心', '难过', '生气', '兴奋', '无聊', '累', '饿', '渴', '困', '醒着', '美丽', '丑陋', '聪明', '笨', '有趣', '严肃', '友好', '坏', '善良', '残忍', '勇敢', '害怕', '自信', '害羞', '吵', '安静', '快', '慢', '大', '小', '高', '矮', '胖', '瘦', '老', '年轻', '新', '旧', '热', '冷', '暖', '凉', '湿', '干', '软', '硬', '光滑', '粗糙', '亮', '暗'],
+    nouns: ['猫', '狗', '鸟', '鱼', '兔子', '仓鼠', '乌龟', '蛇', '青蛙', '蝴蝶', '蜜蜂', '蚂蚁', '蜘蛛', '花', '树', '草', '水', '火', '太阳', '月亮', '星星', '云', '雨', '雪', '风', '山', '河', '海洋', '岛', '沙漠', '森林', '丛林', '城市', '建筑', '汽车', '公交车', '火车', '飞机', '船', '自行车', '手机', '电脑', '书', '笔', '纸', '桌子', '椅子', '床', '灯', '时钟', '手表'],
+    adverbs: ['快速地', '慢慢地', '开心地', '难过地', '生气地', '安静地', '大声地', '小心地', '粗心地', '容易地', '几乎', '真的', '非常', '太', '足够', '相当', '差不多', '刚刚', '只', '甚至', '也', '也不', '还不', '已经', '还没', '最近', '经常', '通常', '总是', '有时', '偶尔', '很少', '从不', '每天', '每周', '每月', '每年']
   }
 };
 
@@ -422,5 +843,68 @@ export const extraVariables: Record<string, Record<string, string[]>> = {
     korperteil: ['Herz', 'Knochen', 'Musklen', 'Gehirn', 'Magen'],
     werkzeug: ['ein Schraubenschlüssel', 'ein Schraubenzieher', 'ein Hammer', 'ein Computer', 'ihre Hände'],
     ergebnis: ['ein schokoladenbedeckter Gurke', 'eine Erdnussbutterpizza', 'ein Eiscremesuppe', 'ein sehr verwirrter Koch']
+  },
+  it: {
+    animale: ['gatto', 'cane', 'elefante', 'giraffa', 'pinguino', 'delfino', 'scimmia', 'tigre', 'leone', 'orso', 'coniglio', 'volpe', 'gufo', 'serpente', 'rana', 'farfalla', 'ape', 'uccello', 'pesce', 'criceto'],
+    numero: ['due', 'tre', 'quattro', 'cinque', 'dieci', 'venti', 'cento', 'un milione'],
+    contenitore: ['scatola', 'borsa', 'barattolo', 'secchio', 'cesto', 'tazza', 'bicchiere', 'ciotola'],
+    nome_collettivo: ['mandria', 'stormo', 'branco', 'sciame', 'banco', 'orgoglio', 'colonia', 'truppa'],
+    risposta_computer: ['Mi dispiace, ho bisogno di una pausa anch\'io.', 'Ma mi hai appena acceso!', 'Errore: L\'umano ha bisogno di caffè.', 'Elaborazione... Attendere prego... per sempre.'],
+    parte_corpo: ['cuore', 'ossa', 'muscoli', 'cervello', 'stomaco'],
+    attrezzo: ['una chiave inglese', 'un cacciavite', 'un martello', 'un computer', 'le loro mani'],
+    risultato: ['un cetriolo ricoperto di cioccolato', 'una pizza al burro di arachidi', 'una zuppa di gelato', 'uno chef molto confuso']
+  },
+  pt: {
+    animal: ['gato', 'cachorro', 'elefante', 'girafa', 'pinguim', 'golfinho', 'macaco', 'tigre', 'leao', 'urso', 'coelho', 'raposa', 'coruja', 'cobra', 'sapo', 'borboleta', 'abelha', 'passaro', 'peixe', 'hamster'],
+    numero: ['dois', 'tres', 'quatro', 'cinco', 'dez', 'vinte', 'cem', 'um milhao'],
+    recipiente: ['caixa', 'saco', 'pote', 'balde', 'cesta', 'xicara', 'copo', 'tigela'],
+    nome_coletivo: ['rebanho', 'bando', 'alcateia', 'enxame', 'cardume', 'orgulho', 'colonia', 'tropa'],
+    resposta_computador: ['Desculpe, tambem preciso de uma pausa.', 'Mas voce acabou de me ligar!', 'Erro: Humano precisa de cafe.', 'Processando... Aguarde... para sempre.'],
+    parte_corpo: ['coração', 'ossos', 'musculos', 'cerebro', 'estomago'],
+    ferramenta: ['uma chave inglesa', 'uma chave de fenda', 'um martelo', 'um computador', 'suas maos'],
+    resultado: ['um pepino coberto de chocolate', 'uma pizza de manteiga de amendoim', 'uma sopa de sorvete', 'um chef muito confuso']
+  },
+  ar: {
+    حيوان: ['قطة', 'كلب', 'فيل', 'زرافة', 'بطريق', 'دلفين', 'قرد', 'نمر', 'أسد', 'دب', 'أرنب', 'ثعلب', 'بومة', 'ثعبان', 'ضفدع', 'فراشة', 'نحلة', 'طائر', 'سمكة', 'هامستر'],
+    رقم: ['اثنان', 'ثلاثة', 'أربعة', 'خمسة', 'عشرة', 'عشرون', 'مئة', 'مليون'],
+    وعاء: ['صندوق', 'حقيبة', 'جرة', 'دلو', 'سلة', 'كوب', 'زجاج', 'وعاء'],
+    اسم_جمع: ['قطيع', 'سرب', 'مجموعة', 'حشد', 'مدرسة', 'فخر', 'مستعمرة', 'فرقة'],
+    رد_الكمبيوتر: ['آسف، أحتاج إلى استراحة أيضاً.', 'لكنك للتو قمت بتشغيلي!', 'خطأ: الإنسان يحتاج إلى قهوة.', 'جاري المعالجة... يرجى الانتظار... إلى الأبد.'],
+    جزء_جسم: ['قلب', 'عظام', 'عضلات', 'دماغ', 'معدة'],
+    أداة: ['مفتاح ربط', 'مفك براغي', 'مطرقة', 'كمبيوتر', 'أيديهم'],
+    نتيجة: ['خيار مغطى بالشوكولاتة', 'بيتزا بزبدة الفول السوداني', 'حساء الآيس كريم', 'طاهٍ مرتبك جداً']
+  },
+  zh: {
+    动物: ['猫', '狗', '大象', '长颈鹿', '企鹅', '海豚', '猴子', '老虎', '狮子', '熊', '兔子', '狐狸', '猫头鹰', '蛇', '青蛙', '蝴蝶', '蜜蜂', '鸟', '鱼', '仓鼠'],
+    数字: ['二', '三', '四', '五', '十', '二十', '一百', '一百万'],
+    容器: ['盒子', '袋子', '罐子', '桶', '篮子', '杯子', '玻璃杯', '碗'],
+    集体名词: ['一群', '一队', '一堆', '一批', '一班', '一帮', '一窝', '一组'],
+    电脑回复: ['抱歉，我也需要休息。', '但你刚刚才开机！', '错误：人类需要咖啡。', '处理中...请等待...永久。'],
+    身体部位: ['心', '骨头', '肌肉', '大脑', '胃'],
+    工具: ['扳手', '螺丝刀', '锤子', '电脑', '他们的手'],
+    搞笑结果: ['巧克力黄瓜', '花生酱披萨', '冰淇淋汤', '非常困惑的厨师'],
+    话题: ['学外语', '旅行', '美食', '科技', '运动', '音乐', '读书', '电影', '文化差异', '语言趣事'],
+    有趣事实: ['历史上最短的战争是1896年英国和桑给巴尔之间的战争，只持续了38分钟。', '蜂蜜永远不会变质。', '章鱼有三颗心脏。', '香蕉是浆果，但草莓不是。', '考拉和人类一样有指纹。'],
+    问题: ['你最喜欢的学习方式是什么？', '你怎么练习口语？', '你现在在学什么语言？', '你喜欢阅读还是听力？', '你有没有有趣的语言学习经历？'],
+    嘉宾名: ['小明', '小红', '李老师', '张同学', '王教授', '陈博士'],
+    主题: ['语言学习小技巧', '文化趣谈', '旅行故事', '学习习惯', '记忆方法'],
+    观点1: ['设定合理的目标', '每天坚持练习', '使用闪卡', '找到语言伙伴'],
+    观点2: ['看外语电影', '读原文书籍', '听播客', '参加语言角'],
+    观点3: ['练习写作', '模仿母语者', '录音自己', '使用App学习'],
+    节目名: ['语言加油站', '外语脱口秀', '每日一句', '文化杂谈', '学习达人'],
+    番組名: ['言語ラボ', 'バイリンガルトーク', 'ワールドニュース'],
+    時間帯: ['朝', '午後', '夕方', '夜'],
+    ゲスト名: ['田中さん', '佐藤先生', '山田教授', '鈴木さん'],
+    トピック: ['言語学習', '文化', '旅行', 'テクノロジー'],
+    興味深い事実: ['世界最短の戦争は1896年、イギリスとザンジバルの間で38分間。', '蜂蜜は永遠に腐らない。', 'タコには3つの心臓がある。'],
+    プログラム명: ['언어연구소', '글로벌토크', '매일한마디'],
+    주제: ['언어학습', '문화', '여행', '기술', '음악', '음식'],
+    흥미로운_사실: ['역사상 가장 짧은 전쟁은 1896년 영국과 잔지바르 사이의 전쟁으로 38분간 지속됐습니다.', '꿀은 영원히 상하지 않습니다.', '문어는 심장이 세 개입니다.'],
+    fait_interessant: ['La guerre la plus courte de l\'histoire a duré 38 minutes en 1896.', 'Le miel ne se gâte jamais.', 'Les pieuvres ont trois cœurs.'],
+    dato_curioso: ['La guerra más corta de la historia duró 38 minutos en 1896.', 'La miel nunca se echa a perder.', 'Los pulpos tienen tres corazones.'],
+    interessanter_fakt: ['Der kürzeste Krieg der Geschichte dauerte 1896 nur 38 Minuten.', 'Honig wird nie schlecht.', 'Kraken haben drei Herzen.'],
+    fatto_interessante: ['La guerra più breve della storia è durata 38 minuti nel 1896.', 'Il miele non va mai a male.', 'I polpi hanno tre cuori.'],
+    fato_interessante: ['A guerra mais curta da história durou 38 minutos em 1896.', 'O mel nunca estraga.', 'Os polvos têm três corações.'],
+    حقيقة_مثيرة: ['أقصر حرب في التاريخ استمرت 38 دقيقة عام 1896.', 'العسل لا يفسد أبداً.', 'الأخطبوط لديه ثلاثة قلوب.'],
   }
 };

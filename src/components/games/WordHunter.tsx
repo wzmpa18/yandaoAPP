@@ -5,7 +5,7 @@
  * 60s limit · combo multiplier · 10-language support.
  */
 import React, { useRef, useEffect, useState, useCallback } from 'react';
-import { supabase } from '../../lib/supabase';
+import { supabase } from '../../data/supabase';
 import { useAudio } from '../../lib/useAudio';
 
 interface WordHunterProps {
