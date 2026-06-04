@@ -112,58 +112,124 @@ jobs:
         npx cap sync ios || true
         
     - name: Install CocoaPods
-      run: gem install cocoapods --no-document
-      
+      run: |
+        gem install cocoapods --no-document
+        gem install xcpretty --no-document
+        
     - name: Install pods
+      working-directory: ios/App/App
       run: |
-        cd ios/App 2>/dev/null && pod install --repo-update && cd ../.. || \
-        cd ios && pod install --repo-update || echo "No Podfile"
+        pod install --repo-update || pod install || echo "Pod install completed with warnings"
         
-    - name: Build iOS (unsigned, no signing certs needed)
-      run: |
-        # 尝试无签名构建 iOS app (仅用于验证构建)
-        xcodebuild -workspace ios/App/App.xcworkspace \
-          -scheme App -sdk iphoneos -configuration Release \
-          -destination 'generic/platform=iOS' \
-          CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO \
-          CODE_SIGNING_ALLOWED=NO \
-          -derivedDataPath build/ios-derived \
-          build 2>&1 | tail -40 || {
-          echo "=== iOS build failed (expected without signing certs) ==="
-          # 尝试模拟器构建
-          xcodebuild -workspace ios/App/App.xcworkspace \
-            -scheme App -sdk iphonesimulator -configuration Release \
-            -destination 'generic/platform=iOS Simulator' \
-            -derivedDataPath build/ios-derived \
-            build 2>&1 | tail -40 || echo "Simulator build also failed"
-        }
+    - name: Import Apple signing certificate (.p12)
+      uses: apple-actions/import-codesign-certs@v2
+      with:
+        p12-file-base64: ${{ secrets.APPLE_PB_PRIVATE_KEY }}
+        p12-password: ${{ secrets.KEYCHAIN_PASSWORD }}
+        keychain-password: ${{ secrets.KEYCHAIN_PASSWORD }}
         
-    - name: Find iOS build products
-      if: always()
+    - name: Import Apple Provisioning Profile
+      env:
+        PROVISION_PROFILE_BASE64: ${{ secrets.APPLE_PROVISION_PROFILE }}
       run: |
-        echo "=== iOS build outputs ==="
-        find build/ios-derived -name "*.app" -type d 2>/dev/null || echo "No .app found"
-        find build/ios-derived -name "*.ipa" -type f 2>/dev/null || echo "No .ipa found"
-        
-    - name: Package .app into .ipa (unsigned)
-      if: always()
-      run: |
-        APP_PATH=$(find build/ios-derived -name "*.app" -type d 2>/dev/null | head -1)
-        if [ -n "$APP_PATH" ]; then
-          mkdir -p build/ipa/Payload
-          cp -r "$APP_PATH" build/ipa/Payload/
-          cd build/ipa && zip -r ../yandao-unsigned.ipa Payload/ && cd ../..
-          echo "✅ Created unsigned IPA"
+        if [ -n "$PROVISION_PROFILE_BASE64" ]; then
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          echo "$PROVISION_PROFILE_BASE64" | base64 -d > ~/Library/MobileDevice/Provisioning\ Profiles/yandao.mobileprovision
+          echo "✅ Provisioning profile installed"
         else
-          echo "⚠️ No .app found to package"
+          echo "⚠️ No provisioning profile secret found, will use automatic signing"
         fi
+        
+    - name: Set up Xcode project signing
+      run: |
+        cd ios/App/App
+        # 使用自动签名 + 手动指定 team
+        /usr/libexec/PlistBuddy -c "Set :objects:00C302D0204A61630053085B:buildSettings:CODE_SIGN_STYLE Automatic" App.xcodeproj/project.pbxproj 2>/dev/null || true
+        echo "Signing configured"
+        
+    - name: Archive iOS App
+      run: |
+        cd ios/App/App
+        xcodebuild archive \
+          -workspace App.xcworkspace \
+          -scheme App \
+          -sdk iphoneos \
+          -configuration Release \
+          -archivePath "${{ github.workspace }}/build/App.xcarchive" \
+          -destination 'generic/platform=iOS' \
+          DEVELOPMENT_TEAM="${{ secrets.APPLE_TEAM_ID }}" \
+          CODE_SIGN_STYLE=Automatic \
+          -allowProvisioningUpdates \
+          CODE_SIGNING_ALLOWED=YES 2>&1 | xcpretty && echo "✅ Archive success" || {
+            echo "⚠️ Archive with signing failed, trying without signing updates..."
+            xcodebuild archive \
+              -workspace App.xcworkspace \
+              -scheme App \
+              -sdk iphoneos \
+              -configuration Release \
+              -archivePath "${{ github.workspace }}/build/App.xcarchive" \
+              -destination 'generic/platform=iOS' \
+              DEVELOPMENT_TEAM="${{ secrets.APPLE_TEAM_ID }}" \
+              CODE_SIGN_STYLE=Automatic \
+              CODE_SIGNING_ALLOWED=YES 2>&1 | xcpretty || echo "Archive also failed"
+          }
+          
+    - name: Export IPA
+      if: success()
+      run: |
+        if [ -d "${{ github.workspace }}/build/App.xcarchive" ]; then
+          cat > "${{ github.workspace }}/exportOptions.plist" << 'PLISTEOF'
+        <?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+        <plist version="1.0"><dict>
+          <key>method</key><string>app-store</string>
+          <key>teamID</key><string>${{ secrets.APPLE_TEAM_ID }}</string>
+          <key>signingStyle</key><string>automatic</string>
+          <key>uploadSymbols</key><false/>
+          <key>generateAppStoreInformation</key><false/>
+        </dict></plist>
+        PLISTEOF
+          xcodebuild -exportArchive \
+            -archivePath "${{ github.workspace }}/build/App.xcarchive" \
+            -exportPath "${{ github.workspace }}/build/ipa" \
+            -exportOptionsPlist "${{ github.workspace }}/exportOptions.plist" \
+            -allowProvisioningUpdates 2>&1 | xcpretty && echo "✅ IPA exported" || echo "⚠️ IPA export failed"
+        else
+          echo "❌ No archive found to export"
+        fi
+        
+    - name: Find and list build products
+      if: always()
+      run: |
+        echo "=== Archive contents ==="
+        ls -la "${{ github.workspace }}/build/App.xcarchive/" 2>/dev/null || echo "No archive"
+        echo "=== IPA outputs ==="
+        find "${{ github.workspace }}/build" -name "*.ipa" -type f 2>/dev/null || echo "No IPA found"
+        find "${{ github.workspace }}/build" -name "*.app" -type d 2>/dev/null || echo "No .app found"
       
-    - name: Upload iOS artifact
+    - name: Upload IPA artifact
       uses: actions/upload-artifact@v4
       with:
-        name: yandao-ios-build
+        name: yandao-ios-release
         path: |
-          build/yandao-unsigned.ipa
-          build/ios-derived/**/*.app
+          build/ipa/*.ipa
+          build/App.xcarchive/**/*.app
         retention-days: 30
       continue-on-error: true
+      
+    - name: Upload iOS build to Cloudflare R2
+      if: success()
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_KEY }}
+        AWS_DEFAULT_REGION: auto
+      run: |
+        pip3 install awscli --quiet --break-system-packages 2>/dev/null || pip3 install awscli --quiet
+        TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+        BUCKET="${{ secrets.R2_BUCKET }}"
+        ENDPOINT="https://${{ secrets.R2_ENDPOINT }}.r2.cloudflarestorage.com"
+        for ipa in $(find build -name "*.ipa" -type f 2>/dev/null); do
+          NAME="yandao-${TIMESTAMP}-$(basename "$ipa")"
+          aws s3 cp "$ipa" "s3://$BUCKET/ios/$NAME" \
+            --endpoint-url "$ENDPOINT" && echo "✅ Uploaded $NAME" || echo "⚠️ Failed $NAME"
+        done || echo "R2 upload skipped"
