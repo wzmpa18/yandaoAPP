@@ -58,6 +58,8 @@ const DEMO_RESULTS: Record<string, AnalysisResult[]> = {
   ],
   ar: [
     { recognizedText: 'ممنوع التدخين', pronunciation: 'mam-NOO-uh at-tad-KHEEN', translation: '禁止吸烟 No Smoking', explanation: 'ممنوع (mamnoo) = forbidden/prohibited + التدخين (at-tadkheen) = smoking. Standard no-smoking sign across the Arab world.' },
+    { recognizedText: 'مدخل', pronunciation: 'MAD-khal', translation: '入口 Entrance', explanation: 'مدخل (madkhal) = entrance/entry point. From the root د-خ-ل (d-kh-l) meaning "to enter". You\'ll see this at building entrances.' },
+    { recognizedText: 'مخرج طوارئ', pronunciation: 'MAKH-raj ta-WA-ri\'', translation: '紧急出口 Emergency Exit', explanation: 'مخرج (makhraj) = exit + طوارئ (tawari\') = emergencies. Green sign in Arabic buildings. The root خ-ر-ج (kh-r-j) means "to exit".' },
   ],
 };
 

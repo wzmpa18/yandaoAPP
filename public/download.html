@@ -252,6 +252,54 @@
             text-decoration: underline;
         }
 
+        .install-guide {
+            text-align: left;
+            margin-top: 30px;
+            padding: 24px;
+            background: #f0f7ff;
+            border-radius: 15px;
+            border: 1px solid #d0e3ff;
+        }
+        .install-guide h3 {
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            font-size: 16px;
+            text-align: center;
+        }
+        .install-step {
+            display: flex;
+            gap: 14px;
+            margin-bottom: 16px;
+            align-items: flex-start;
+        }
+        .install-step:last-child {
+            margin-bottom: 0;
+        }
+        .step-num {
+            width: 28px;
+            height: 28px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            font-size: 14px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .step-content strong {
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+        .step-content p {
+            color: var(--text-secondary);
+            font-size: 12px;
+            margin-top: 4px;
+            line-height: 1.6;
+        }
+
         @media (max-width: 600px) {
             .download-btn {
                 flex-direction: column;
@@ -274,7 +322,7 @@
             <img src="/parrot.jpg" alt="鹦鹉图标" />
         </div>
         <h1>言道学外语</h1>
-        <p class="subtitle">AI驱动的智能语言学习平台</p>
+        <p class="subtitle">AI驱动的智能语言学习平台 · 10种语言全覆盖</p>
 
         <div class="download-card">
             <a href="https://youdao-app.10d815d2a0718caa6d0fa86a79c244c8.r2.dev/android/yandao-latest.apk" class="download-btn" id="androidBtn">
@@ -297,9 +345,41 @@
                 <span class="btn-icon">🌐</span>
                 <span class="btn-text">
                     直接使用 Web 版
-                    <small>无需下载，立即体验</small>
+                    <small>无需下载，立即体验 · 功能完整</small>
                 </span>
             </a>
+
+            <div class="install-guide">
+                <h3>📲 安装指南</h3>
+                <div class="install-step">
+                    <span class="step-num">1</span>
+                    <div class="step-content">
+                        <strong>下载安装包</strong>
+                        <p>点击上方对应按钮下载 APK (Android) 或 IPA (iOS)</p>
+                    </div>
+                </div>
+                <div class="install-step">
+                    <span class="step-num">2</span>
+                    <div class="step-content">
+                        <strong>允许安装（Android）</strong>
+                        <p>设置 → 安全 → 允许安装未知来源应用。部分手机在下载完成后会自动弹出安装提示</p>
+                    </div>
+                </div>
+                <div class="install-step">
+                    <span class="step-num">3</span>
+                    <div class="step-content">
+                        <strong>iOS 安装说明</strong>
+                        <p>当前通过 TestFlight 内测分发。安装后需在设置 → 通用 → VPN与设备管理 中信任企业证书</p>
+                    </div>
+                </div>
+                <div class="install-step">
+                    <span class="step-num">4</span>
+                    <div class="step-content">
+                        <strong>首次启动</strong>
+                        <p>首次启动约需要200MB+空间，APP会自动下载所需语言包和学习资料。建议在WiFi环境下首次启动</p>
+                    </div>
+                </div>
+            </div>
 
             <div class="feature-list">
                 <h3>✨ APP 特色功能</h3>

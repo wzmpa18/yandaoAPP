@@ -20,6 +20,7 @@ import { MerchantHub } from './MerchantHub';
 import { PrivacySettings } from './PrivacySettings';
 import { AIAssistant } from './AIAssistant';
 import { VirtualRadio } from './VirtualRadio';
+import { GlobalAIChat } from './GlobalAIChat';
 import DailyCheckin from './DailyCheckin';
 import PhoneVerify from './PhoneVerify';
 import { WeeklyLeaderboard } from './WeeklyLeaderboard';
@@ -70,6 +71,10 @@ export const MainHub: React.FC<MainHubProps> = ({ initialProfile, onReset }) => 
   const [pendingView, setPendingView]   = useState<HubView | null>(null);
   // Phone verify (show once on first load if not verified)
   const [showPhoneVerify, setShowPhoneVerify] = useState(false);
+  // AI context pre-fill from other pages
+  const [aiContext, setAiContext] = useState<string | undefined>(undefined);
+  // Global AI chat visibility
+  const [showGlobalAI, setShowGlobalAI] = useState(false);
 
   useEffect(() => {
     supabase.from('languages').select('*').order('order_index').then(({ data, error }) => {
@@ -268,6 +273,10 @@ export const MainHub: React.FC<MainHubProps> = ({ initialProfile, onReset }) => 
               externalLang={lang}
               externalLanguages={languages}
               onXP={handleXP}
+              onNavigateToAI={(context) => {
+                setAiContext(context);
+                navigateToWithStack('ai' as HubView);
+              }}
             />
           </>
         )}
@@ -351,7 +360,8 @@ export const MainHub: React.FC<MainHubProps> = ({ initialProfile, onReset }) => 
             languageCode={lang}
             languageName={currentLang ? getLangZh(currentLang) : lang}
             sessionKey={profile.session_key}
-            onBack={() => setView('path')}
+            onBack={() => { setView('path'); setViewStack(['path']); setAiContext(undefined); }}
+            prefillContext={aiContext}
           />
         )}
         {view === 'radio' && (
@@ -498,6 +508,14 @@ export const MainHub: React.FC<MainHubProps> = ({ initialProfile, onReset }) => 
           sessionKey={profile.session_key}
           onVerified={() => setShowPhoneVerify(false)}
           onSkip={() => setShowPhoneVerify(false)}
+        />
+      )}
+
+      {/* ── Global AI Floating Chat ── */}
+      {view !== 'ai' && (
+        <GlobalAIChat
+          languageCode={lang}
+          languageName={currentLang ? getLangZh(currentLang) : lang}
         />
       )}
     </div>

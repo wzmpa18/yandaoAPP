@@ -80,6 +80,7 @@ interface HomePageProps {
   externalLang?: string;
   externalLanguages?: Language[];
   onXP?: (delta: number) => void;
+  onNavigateToAI?: (context: string) => void;
 }
 
 /* ──────────────────── Root ──────────────────── */
@@ -88,6 +89,7 @@ export const HomePage: React.FC<HomePageProps> = ({
   externalLang,
   externalLanguages,
   onXP,
+  onNavigateToAI,
 }) => {
   const activeLang = externalLang || 'ja';
   const [scenarios, setScenarios]     = useState<Scenario[]>([]);
@@ -252,42 +254,42 @@ export const HomePage: React.FC<HomePageProps> = ({
           </div>
         </section>
 
-        {/* AI 补充内容 */}
+        {/* AI 补充内容 — 已激活！直达 AI 助手 */}
         <section className="zen-ai-section">
           <h2 className="zen-section-title">🤖 AI 智能辅助</h2>
           <div className="ai-supplement-grid">
             <button
               className="ai-supplement-btn"
-              onClick={() => showToast('AI 功能即将开放 — 将根据你的水平生成更多练习题')}
+              onClick={() => onNavigateToAI?.('帮我根据当前学习进度，生成10道配套练习题，包含选择题和填空题')}
             >
               <span className="ai-supplement-icon">📝</span>
               <div className="ai-supplement-info">
                 <span className="ai-supplement-label">AI 帮我生成更多练习题</span>
                 <span className="ai-supplement-desc">根据当前进度智能出题</span>
               </div>
-              <span className="ai-supplement-badge">即将开放</span>
+              <span className="ai-supplement-badge active">已激活</span>
             </button>
             <button
               className="ai-supplement-btn"
-              onClick={() => showToast('AI 功能即将开放 — 将根据你的水平智能推荐内容')}
+              onClick={() => onNavigateToAI?.('根据我的学习情况，推荐接下来应该学习什么内容，为什么？')}
             >
               <span className="ai-supplement-icon">🎯</span>
               <div className="ai-supplement-info">
                 <span className="ai-supplement-label">AI 根据我的水平推荐内容</span>
                 <span className="ai-supplement-desc">个性化难度匹配</span>
               </div>
-              <span className="ai-supplement-badge">即将开放</span>
+              <span className="ai-supplement-badge active">已激活</span>
             </button>
             <button
               className="ai-supplement-btn"
-              onClick={() => showToast('AI 功能即将开放 — 将为你补充更多场景对话')}
+              onClick={() => onNavigateToAI?.('请为我生成更多类似场景的实用对话，包含不同语境和难度')}
             >
               <span className="ai-supplement-icon">💬</span>
               <div className="ai-supplement-info">
                 <span className="ai-supplement-label">AI 补充这个场景的更多对话</span>
                 <span className="ai-supplement-desc">扩展真实语境表达</span>
               </div>
-              <span className="ai-supplement-badge">即将开放</span>
+              <span className="ai-supplement-badge active">已激活</span>
             </button>
           </div>
         </section>
@@ -494,33 +496,17 @@ const ScenarioPage: React.FC<ScenarioPageProps> = ({
         </div>
       )}
 
-      {/* AI 补充按钮 — 场景内 */}
+      {/* AI 补充按钮 — 场景内 — 已激活！ */}
       <div className="zen-scene-ai-bar">
         <button
           className="zen-scene-ai-btn"
-          onClick={() => {
-            try {
-              const toast = document.createElement('div');
-              toast.className = 'ai-toast';
-              toast.textContent = 'AI 功能即将开放 — 将为你生成更多同类场景对话';
-              document.body.appendChild(toast);
-              setTimeout(() => toast.remove(), 2500);
-            } catch { /* 静默 */ }
-          }}
+          onClick={() => onNavigateToAI?.(`请基于"${scenario?.title}"这个场景，帮我生成5句类似的${currentLang ? '' : ''}实用对话，从简单到困难排列`)}
         >
           🤖 AI 帮我生成更多同类对话
         </button>
         <button
           className="zen-scene-ai-btn"
-          onClick={() => {
-            try {
-              const toast = document.createElement('div');
-              toast.className = 'ai-toast';
-              toast.textContent = 'AI 功能即将开放 — 将为你推荐下一个适合的场景';
-              document.body.appendChild(toast);
-              setTimeout(() => toast.remove(), 2500);
-            } catch { /* 静默 */ }
-          }}
+          onClick={() => onNavigateToAI?.(`我刚刚学完了"${scenario?.title}"，根据我的学习进度，AI推荐下一个适合的场景`) }
         >
           🎯 AI 推荐下一个学习场景
         </button>

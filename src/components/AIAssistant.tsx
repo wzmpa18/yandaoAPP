@@ -15,6 +15,7 @@ interface AIAssistantProps {
   languageName: string;
   sessionKey?: string;
   onBack: () => void;
+  prefillContext?: string;
 }
 
 type AIMode = 'home' | 'camera' | 'voice' | 'text' | 'chat';
@@ -367,7 +368,7 @@ async function saveConversationMsg(sessionKey: string, role: ChatRoleKey, sender
   }
 }
 
-export const AIAssistant: React.FC<AIAssistantProps> = ({ languageCode, languageName, sessionKey = 'guest', onBack }) => {
+export const AIAssistant: React.FC<AIAssistantProps> = ({ languageCode, languageName, sessionKey = 'guest', onBack, prefillContext }) => {
   const { s } = useUI();
   const [mode, setMode] = useState<AIMode>('home');
   const [chatRole, setChatRole] = useState<ChatRoleKey>('panda');
@@ -475,6 +476,56 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ languageCode, language
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, chatRole]);
+
+  // Auto-send prefillContext when provided from other pages
+  useEffect(() => {
+    if (prefillContext && prefillContext.trim()) {
+      const timer = setTimeout(() => {
+        setMode('chat');
+        const contextMsg: Message = {
+          id: `prefill${Date.now()}`,
+          role: 'user',
+          text: prefillContext,
+          ts: Date.now(),
+        };
+        setMessages((prev) => {
+          // Don't duplicate if already sent
+          if (prev.some(m => m.text === prefillContext)) return prev;
+          return [...prev, contextMsg];
+        });
+        // Trigger AI reply
+        const history: AIMessage[] = [
+          { role: 'system', content: buildSystemPrompt(chatRole, languageName) },
+          { role: 'user', content: prefillContext },
+        ];
+        const msgId = `aip${Date.now()}`;
+        setMessages((m) => [...m, { id: msgId, role: 'ai', text: '', ts: Date.now() }]);
+        setThinking(true);
+
+        callRealAI({
+          messages: history,
+          langCode: languageCode,
+          callType: 'chat',
+          sessionKey,
+          setApiError,
+          onChunk: (chunk) => {
+            setMessages((m) =>
+              m.map((msg) => msg.id === msgId ? { ...msg, text: msg.text + chunk } : msg)
+            );
+          },
+          fallbackFn: () => simulateAIResponse(prefillContext, languageCode, 'chat', chatRole, messages),
+        }).then(({ text: reply }) => {
+          setMessages((m) =>
+            m.map((msg) => msg.id === msgId && msg.text === '' ? { ...msg, text: reply } : msg)
+          );
+          setThinking(false);
+          speakText(reply, languageCode, speechSpeed, voiceGender);
+        });
+      }, 600);
+      return () => clearTimeout(timer);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prefillContext]);
 
   // Cold-fire timer: prompt user after 5s of silence
   const resetColdFire = useCallback(() => {
@@ -958,7 +1009,7 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ languageCode, language
                 </button>
               </div>
               <div className="ai-home-notice">
-                支持豆包 / Claude / OpenAI · 在创始人后台「AI配置」中填写密钥即可启用真实回复
+                DeepSeek AI 驱动 · 支持豆包/OpenAI/Claude · 真实 AI 实时回复
               </div>
             </>
           )}

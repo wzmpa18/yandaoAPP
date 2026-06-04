@@ -111,42 +111,42 @@ export const NewFeatures: React.FC = () => {
         ))}
       </div>
 
-      {/* AI 补充内容占位按钮 */}
+      {/* AI 补充内容 (已激活) */}
       <div className="ai-supplement-section">
         <h2 className="intro-title">🤖 AI 智能辅助</h2>
         <div className="ai-supplement-grid">
           <button
             className="ai-supplement-btn"
-            onClick={() => showToast('AI 功能即将开放 — 我们将根据你的水平生成更多练习题')}
+            onClick={() => showToast('切换到底部"AI助手"标签，输入"帮我生成练习题"即可！')}
           >
             <span className="ai-supplement-icon">📝</span>
             <div className="ai-supplement-info">
               <span className="ai-supplement-label">AI 帮我生成更多练习题</span>
-              <span className="ai-supplement-desc">根据当前进度智能出题</span>
+              <span className="ai-supplement-desc">打开AI助手 → 输入需求</span>
             </div>
-            <span className="ai-supplement-badge">即将开放</span>
+            <span className="ai-supplement-badge active">已激活</span>
           </button>
           <button
             className="ai-supplement-btn"
-            onClick={() => showToast('AI 功能即将开放 — 将根据你的水平智能推荐内容')}
+            onClick={() => showToast('切换到底部"AI助手"标签，AI 会根据你的学习情况智能推荐！')}
           >
             <span className="ai-supplement-icon">🎯</span>
             <div className="ai-supplement-info">
               <span className="ai-supplement-label">AI 根据我的水平推荐内容</span>
-              <span className="ai-supplement-desc">个性化难度匹配</span>
+              <span className="ai-supplement-desc">Open AI助手 → 个性化推荐</span>
             </div>
-            <span className="ai-supplement-badge">即将开放</span>
+            <span className="ai-supplement-badge active">已激活</span>
           </button>
           <button
             className="ai-supplement-btn"
-            onClick={() => showToast('AI 功能即将开放 — 将为你补充更多场景对话')}
+            onClick={() => showToast('切换到底部"AI助手"标签，输入场景关键词获取更多对话！')}
           >
             <span className="ai-supplement-icon">💬</span>
             <div className="ai-supplement-info">
-              <span className="ai-supplement-label">AI 补充这个场景的更多对话</span>
-              <span className="ai-supplement-desc">扩展真实语境表达</span>
+              <span className="ai-supplement-label">AI 补充场景对话</span>
+              <span className="ai-supplement-desc">在AI助手中输入场景即可</span>
             </div>
-            <span className="ai-supplement-badge">即将开放</span>
+            <span className="ai-supplement-badge active">已激活</span>
           </button>
         </div>
       </div>

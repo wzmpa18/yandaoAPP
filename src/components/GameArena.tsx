@@ -762,6 +762,43 @@ export const GameArena: React.FC<GameArenaProps> = ({
                 <p>邀请好友获得钻石补血，或等待自动恢复</p>
               </div>
             )}
+
+            {/* AI 学习锦囊 */}
+            <div className="ga-ai-tips-section">
+              <div className="ga-ai-tips-header">🤖 AI 学习锦囊</div>
+              <div className="ga-ai-tips-cards">
+                <button className="ga-ai-tip-card" onClick={() => {
+                  const tip = TIPS[languageCode] || TIPS.ja;
+                  const toast = document.createElement('div');
+                  toast.className = 'ai-toast';
+                  toast.textContent = `💡 ${tip.title}: ${tip.body.slice(0, 80)}...`;
+                  document.body.appendChild(toast);
+                  setTimeout(() => toast.remove(), 4000);
+                }}>
+                  <span className="ga-ai-tip-icon">💡</span>
+                  <div className="ga-ai-tip-info">
+                    <span className="ga-ai-tip-label">{languageName}学习窍门</span>
+                    <span className="ga-ai-tip-desc">点击查看大咖秘籍</span>
+                  </div>
+                </button>
+                <button
+                  className="ga-ai-tip-card"
+                  onClick={() => {
+                    const toast = document.createElement('div');
+                    toast.className = 'ai-toast';
+                    toast.textContent = '🤖 打开底部导航"AI助手"，可让DeepSeek帮你：解析题目、讲解语法、生成练习！';
+                    document.body.appendChild(toast);
+                    setTimeout(() => toast.remove(), 4000);
+                  }}
+                >
+                  <span className="ga-ai-tip-icon">🎓</span>
+                  <div className="ga-ai-tip-info">
+                    <span className="ga-ai-tip-label">AI帮你解题</span>
+                    <span className="ga-ai-tip-desc">不会的题，问AI助手</span>
+                  </div>
+                </button>
+              </div>
+            </div>
           </div>
         )}
 
