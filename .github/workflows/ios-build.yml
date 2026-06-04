@@ -204,6 +204,9 @@ jobs:
           echo "dist/ contents:"
           ls -la dist/ 2>/dev/null
         fi
+        # Run CF API diagnostics
+        echo "=== Running r2_diag.py ==="
+        python3 r2_diag.py 2>&1 | tee r2_diag_log.txt
         # Use Python boto3 for verbose R2 upload
         pip3 install boto3 --quiet --break-system-packages 2>/dev/null || pip3 install boto3 --quiet
         echo "=== Running r2_upload.py ==="
@@ -245,7 +248,9 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: r2-upload-log
-        path: r2_upload_log.txt
+        path: |
+          r2_upload_log.txt
+          r2_diag_log.txt
         retention-days: 7
       continue-on-error: true
 
