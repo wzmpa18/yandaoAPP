@@ -158,7 +158,13 @@ jobs:
         pip3 install awscli --quiet --break-system-packages 2>/dev/null || pip3 install awscli --quiet
         TIMESTAMP=$(date +%Y%m%d-%H%M%S)
         BUCKET="${{ secrets.R2_BUCKET }}"
-        ENDPOINT="https://${{ secrets.R2_ENDPOINT }}.r2.cloudflarestorage.com"
+        R2_EP="${{ secrets.R2_ENDPOINT }}"
+        if echo "$R2_EP" | grep -q '^https\?://'; then
+          ENDPOINT="$R2_EP"
+        else
+          ENDPOINT="https://$R2_EP.r2.cloudflarestorage.com"
+        fi
+        echo "APK Upload: BUCKET=$BUCKET ENDPOINT=$ENDPOINT"
         UPLOADED=false
         for apk in $(find android -name "*.apk" -type f 2>/dev/null); do
           SIZE=$(stat -c%s "$apk" 2>/dev/null || echo 0)
@@ -186,22 +192,33 @@ jobs:
         AWS_DEFAULT_REGION: auto
       run: |
         BUCKET="${{ secrets.R2_BUCKET }}"
-        ENDPOINT="https://${{ secrets.R2_ENDPOINT }}.r2.cloudflarestorage.com"
+        R2_EP="${{ secrets.R2_ENDPOINT }}"
+        # R2_ENDPOINT might be just the account ID or a full URL
+        if echo "$R2_EP" | grep -q '^https\?://'; then
+          ENDPOINT="$R2_EP"
+        else
+          ENDPOINT="https://$R2_EP.r2.cloudflarestorage.com"
+        fi
         echo "=== R2 Connection Test ==="
         echo "BUCKET=$BUCKET"
+        echo "R2_EP raw=$R2_EP"
         echo "ENDPOINT=$ENDPOINT"
         # Test write access with a small file
         echo "test_$(date +%s)" > /tmp/r2test.txt
         aws s3 cp /tmp/r2test.txt "s3://$BUCKET/r2test.txt" \
           --endpoint-url "$ENDPOINT" 2>&1 && echo "✅ R2 write test PASSED" || echo "❌ R2 write test FAILED"
-        # Test read access
+        # Test read access  
         aws s3 ls "s3://$BUCKET/" --endpoint-url "$ENDPOINT" 2>&1 | head -20 || echo "❌ R2 list FAILED"
         echo "=== Checking dist directory ==="
         ls -la dist/ 2>/dev/null || echo "dist/ NOT FOUND!"
         ls -la dist/index.html 2>/dev/null && echo "dist/index.html EXISTS" || echo "dist/index.html MISSING!"
         echo "=== dist/index.html content (first 5 lines) ==="
         head -5 dist/index.html 2>/dev/null || echo "Cannot read dist/index.html"
-        # 上传dist目录（构建产物）
+        # Write build verifier with timestamp
+        TIMESTAMP=$(date -u +%Y%m%d-%H%M%S)
+        echo "$TIMESTAMP - Build ${{ github.run_id }} - SHA ${{ github.sha }}" > dist/build-verifier.txt
+        echo "Build verifier: $(cat dist/build-verifier.txt)"
+        # 上传dist目录（构建产物）-- with explicit force overwrite
         if [ -d "dist" ]; then
           for file in $(find dist -type f 2>/dev/null); do
             r2path=$(echo "$file" | sed 's|^dist/||')
@@ -214,15 +231,20 @@ jobs:
               *.png) ct="image/png" ;;
               *.jpg|*.jpeg) ct="image/jpeg" ;;
               *.json) ct="application/json; charset=utf-8" ;;
+              *.txt) ct="text/plain; charset=utf-8" ;;
             esac
+            # First delete then re-upload to ensure fresh content
+            aws s3 rm "s3://$BUCKET/$r2path" --endpoint-url "$ENDPOINT" 2>/dev/null || true
             aws s3 cp "$file" "s3://$BUCKET/$r2path" --content-type "$ct" \
               --cache-control "no-cache, no-store, must-revalidate" \
               --endpoint-url "$ENDPOINT" 2>&1 && echo "✅ Web: $r2path" || echo "❌ Failed: $r2path"
           done
         fi
+        # Verify build-verifier.txt was uploaded correctly
+        echo "=== Verifying build-verifier.txt on R2 ==="
+        aws s3 cp "s3://$BUCKET/build-verifier.txt" - --endpoint-url "$ENDPOINT" 2>&1 || echo "Cannot download build-verifier.txt from R2"
         # Verify index.html was uploaded
         echo "=== Verifying index.html on R2 ==="
-        aws s3 ls "s3://$BUCKET/index.html" --endpoint-url "$ENDPOINT" 2>&1 || echo "Cannot list index.html on R2"
         aws s3 cp "s3://$BUCKET/index.html" - --endpoint-url "$ENDPOINT" 2>&1 | head -5 || echo "Cannot download index.html from R2"
         # 上传public目录（HTML页面）
         if [ -d "public" ]; then
@@ -238,29 +260,51 @@ jobs:
               *.jpg|*.jpeg) ct="image/jpeg" ;;
               *.json) ct="application/json; charset=utf-8" ;;
             esac
+            aws s3 rm "s3://$BUCKET/$r2path" --endpoint-url "$ENDPOINT" 2>/dev/null || true
             aws s3 cp "$file" "s3://$BUCKET/$r2path" --content-type "$ct" \
               --cache-control "no-cache, no-store, must-revalidate" \
               --endpoint-url "$ENDPOINT" && echo "✅ Public: $r2path" || echo "⚠️ Failed: $r2path"
           done
         fi
         echo "✅ Web files uploaded to R2"
-        # Purge Cloudflare cache
+        # Purge Cloudflare cache + verify via Cloudflare API
         CF_TOKEN="${{ secrets.CF_API_TOKEN }}"
         echo "CF_API_TOKEN exists: $([ -n "$CF_TOKEN" ] && echo YES || echo NO)"
         if [ -n "$CF_TOKEN" ]; then
           ZONE_ID="${{ secrets.CF_ZONE_ID }}"
           echo "CF_ZONE_ID: $([ -n "$ZONE_ID" ] && echo YES || echo NO)"
           if [ -n "$ZONE_ID" ]; then
-            echo "Purging Cloudflare cache..."
+            echo "Purging Cloudflare cache (purge_everything)..."
             curl -s -X POST "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/purge_cache" \
               -H "Authorization: Bearer $CF_TOKEN" \
               -H "Content-Type: application/json" \
-              -d '{"purge_everything":true}' | head -c 500 || true
+              -d '{"purge_everything":true}' 2>&1 | head -c 500
+            echo ""
+            echo "Cache purge requested. Waiting 10s for propagation..."
+            sleep 10
+            echo "Verifying yandao.vip serves latest build-verifier..."
+            curl -s -H "Cache-Control: no-cache" "https://yandao.vip/build-verifier.txt" 2>&1 | head -5 || echo "Cannot reach yandao.vip/build-verifier.txt"
           else
-            echo "⚠️ CF_ZONE_ID not set, cannot purge cache"
+            echo "⚠️ CF_ZONE_ID not set, trying to find zone for yandao.vip..."
+            ZONES=$(curl -s -H "Authorization: Bearer $CF_TOKEN" "https://api.cloudflare.com/client/v4/zones?name=yandao.vip" 2>&1)
+            echo "Zone search result: $(echo $ZONES | head -c 300)"
+            ZONE_ID=$(echo "$ZONES" | grep -o '"id":"[^"]*"' | head -1 | cut -d'"' -f4)
+            if [ -n "$ZONE_ID" ]; then
+              echo "Found ZONE_ID=$ZONE_ID, purging cache..."
+              curl -s -X POST "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/purge_cache" \
+                -H "Authorization: Bearer $CF_TOKEN" \
+                -H "Content-Type: application/json" \
+                -d '{"purge_everything":true}' 2>&1 | head -c 500
+              sleep 10
+              curl -s -H "Cache-Control: no-cache" "https://yandao.vip/build-verifier.txt" 2>&1 | head -5 || true
+            else
+              echo "⚠️ Could not auto-detect zone ID for yandao.vip"
+            fi
           fi
         else
           echo "⚠️ CF_API_TOKEN not set, cannot purge cache"
+          echo "⚠️ Website will serve stale content until CDN cache expires"
+          echo "⚠️ Try direct R2 URL: https://pub-$R2_EP.r2.dev/build-verifier.txt"
         fi
 
   ios-build:
@@ -484,7 +528,13 @@ jobs:
         pip3 install awscli --quiet --break-system-packages 2>/dev/null || pip3 install awscli --quiet
         TIMESTAMP=$(date +%Y%m%d-%H%M%S)
         BUCKET="${{ secrets.R2_BUCKET }}"
-        ENDPOINT="https://${{ secrets.R2_ENDPOINT }}.r2.cloudflarestorage.com"
+        R2_EP="${{ secrets.R2_ENDPOINT }}"
+        if echo "$R2_EP" | grep -q '^https\?://'; then
+          ENDPOINT="$R2_EP"
+        else
+          ENDPOINT="https://$R2_EP.r2.cloudflarestorage.com"
+        fi
+        echo "iOS Upload: BUCKET=$BUCKET ENDPOINT=$ENDPOINT"
         for ipa in $(find build -name "*.ipa" -type f 2>/dev/null); do
           NAME="yandao-${TIMESTAMP}-$(basename "$ipa")"
           aws s3 cp "$ipa" "s3://$BUCKET/ios/$NAME" \
@@ -501,10 +551,18 @@ jobs:
         AWS_DEFAULT_REGION: auto
       run: |
         BUCKET="${{ secrets.R2_BUCKET }}"
-        ENDPOINT="https://${{ secrets.R2_ENDPOINT }}.r2.cloudflarestorage.com"
+        R2_EP="${{ secrets.R2_ENDPOINT }}"
+        if echo "$R2_EP" | grep -q '^https\?://'; then
+          ENDPOINT="$R2_EP"
+        else
+          ENDPOINT="https://$R2_EP.r2.cloudflarestorage.com"
+        fi
         echo "=== iOS: Checking dist directory ==="
         ls -la dist/ 2>/dev/null || echo "iOS: dist/ NOT FOUND!"
         ls -la dist/index.html 2>/dev/null && echo "iOS: dist/index.html EXISTS" || echo "iOS: dist/index.html MISSING!"
+        # Write build verifier
+        TIMESTAMP=$(date -u +%Y%m%d-%H%M%S)
+        echo "$TIMESTAMP - iOS Build ${{ github.run_id }} - SHA ${{ github.sha }}" > dist/build-verifier.txt
         if [ -d "dist" ]; then
           for file in $(find dist -type f 2>/dev/null); do
             r2path=$(echo "$file" | sed 's|^dist/||')
@@ -517,7 +575,9 @@ jobs:
               *.png) ct="image/png" ;;
               *.jpg|*.jpeg) ct="image/jpeg" ;;
               *.json) ct="application/json; charset=utf-8" ;;
+              *.txt) ct="text/plain; charset=utf-8" ;;
             esac
+            aws s3 rm "s3://$BUCKET/$r2path" --endpoint-url "$ENDPOINT" 2>/dev/null || true
             aws s3 cp "$file" "s3://$BUCKET/$r2path" --content-type "$ct" \
               --cache-control "no-cache, no-store, must-revalidate" \
               --endpoint-url "$ENDPOINT" && echo "iOS Web: $r2path" || echo "iOS Failed: $r2path"
@@ -536,26 +596,38 @@ jobs:
               *.jpg|*.jpeg) ct="image/jpeg" ;;
               *.json) ct="application/json; charset=utf-8" ;;
             esac
+            aws s3 rm "s3://$BUCKET/$r2path" --endpoint-url "$ENDPOINT" 2>/dev/null || true
             aws s3 cp "$file" "s3://$BUCKET/$r2path" --content-type "$ct" \
               --cache-control "no-cache, no-store, must-revalidate" \
               --endpoint-url "$ENDPOINT" && echo "iOS Public: $r2path" || echo "iOS Failed: $r2path"
           done
         fi
         echo "✅ iOS Web files uploaded to R2"
+        # Verify build-verifier.txt
+        echo "=== iOS: Verifying build-verifier.txt on R2 ==="
+        aws s3 cp "s3://$BUCKET/build-verifier.txt" - --endpoint-url "$ENDPOINT" 2>&1 || echo "Cannot download from R2"
         # Purge Cloudflare cache
         CF_TOKEN="${{ secrets.CF_API_TOKEN }}"
         echo "iOS CF_API_TOKEN exists: $([ -n "$CF_TOKEN" ] && echo YES || echo NO)"
         if [ -n "$CF_TOKEN" ]; then
           ZONE_ID="${{ secrets.CF_ZONE_ID }}"
           echo "iOS CF_ZONE_ID: $([ -n "$ZONE_ID" ] && echo YES || echo NO)"
+          if [ -z "$ZONE_ID" ]; then
+            echo "Auto-detecting zone ID for yandao.vip..."
+            ZONES=$(curl -s -H "Authorization: Bearer $CF_TOKEN" "https://api.cloudflare.com/client/v4/zones?name=yandao.vip" 2>&1)
+            ZONE_ID=$(echo "$ZONES" | grep -o '"id":"[^"]*"' | head -1 | cut -d'"' -f4)
+          fi
           if [ -n "$ZONE_ID" ]; then
-            echo "iOS: Purging Cloudflare cache..."
+            echo "iOS: Purging Cloudflare cache (zone=$ZONE_ID)..."
             curl -s -X POST "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/purge_cache" \
               -H "Authorization: Bearer $CF_TOKEN" \
               -H "Content-Type: application/json" \
-              -d '{"purge_everything":true}' | head -c 500 || true
+              -d '{"purge_everything":true}' 2>&1 | head -c 500
+            sleep 10
+            echo "Verifying yandao.vip..."
+            curl -s -H "Cache-Control: no-cache" "https://yandao.vip/build-verifier.txt" 2>&1 | head -5 || true
           else
-            echo "iOS ⚠️ CF_ZONE_ID not set, cannot purge cache"
+            echo "iOS ⚠️ Cannot determine zone ID, cannot purge cache"
           fi
         else
           echo "iOS ⚠️ CF_API_TOKEN not set, cannot purge cache"
