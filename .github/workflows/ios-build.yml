@@ -187,6 +187,11 @@ jobs:
       run: |
         BUCKET="${{ secrets.R2_BUCKET }}"
         ENDPOINT="https://${{ secrets.R2_ENDPOINT }}.r2.cloudflarestorage.com"
+        echo "=== Checking dist directory ==="
+        ls -la dist/ 2>/dev/null || echo "dist/ NOT FOUND!"
+        ls -la dist/index.html 2>/dev/null && echo "dist/index.html EXISTS" || echo "dist/index.html MISSING!"
+        echo "=== dist/index.html content (first 5 lines) ==="
+        head -5 dist/index.html 2>/dev/null || echo "Cannot read dist/index.html"
         # 上传dist目录（构建产物）
         if [ -d "dist" ]; then
           for file in $(find dist -type f 2>/dev/null); do
@@ -206,6 +211,10 @@ jobs:
               --endpoint-url "$ENDPOINT" && echo "✅ Web: $r2path" || echo "⚠️ Failed: $r2path"
           done
         fi
+        # Verify index.html was uploaded
+        echo "=== Verifying index.html on R2 ==="
+        aws s3 ls "s3://$BUCKET/index.html" --endpoint-url "$ENDPOINT" 2>&1 || echo "Cannot list index.html on R2"
+        aws s3 cp "s3://$BUCKET/index.html" - --endpoint-url "$ENDPOINT" 2>&1 | head -5 || echo "Cannot download index.html from R2"
         # 上传public目录（HTML页面）
         if [ -d "public" ]; then
           for file in $(find public -type f ! -path '*/audio/*' 2>/dev/null); do
@@ -476,6 +485,9 @@ jobs:
       run: |
         BUCKET="${{ secrets.R2_BUCKET }}"
         ENDPOINT="https://${{ secrets.R2_ENDPOINT }}.r2.cloudflarestorage.com"
+        echo "=== iOS: Checking dist directory ==="
+        ls -la dist/ 2>/dev/null || echo "iOS: dist/ NOT FOUND!"
+        ls -la dist/index.html 2>/dev/null && echo "iOS: dist/index.html EXISTS" || echo "iOS: dist/index.html MISSING!"
         if [ -d "dist" ]; then
           for file in $(find dist -type f 2>/dev/null); do
             r2path=$(echo "$file" | sed 's|^dist/||')
