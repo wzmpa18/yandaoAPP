@@ -39,10 +39,8 @@ jobs:
     - name: Fix gradlew permission & Build APK
       run: |
         cd android
-        # 确保执行权限
         chmod +x gradlew
         ls -la gradlew
-        # 使用 gradle wrapper 自带 JDK，不依赖外部 Gradle
         ./gradlew assembleRelease --no-daemon --warning-mode all 2>&1 | tail -50
         echo "=== BUILD EXIT CODE: $? ==="
 
@@ -111,7 +109,7 @@ jobs:
         npm install -g @capacitor/cli
         npx cap sync ios || true
         
-    - name: Install CocoaPods
+    - name: Install CocoaPods & tools
       run: |
         gem install cocoapods --no-document
         gem install xcpretty --no-document
@@ -120,36 +118,60 @@ jobs:
       working-directory: ios/App/App
       run: |
         pod install --repo-update || pod install || echo "Pod install completed with warnings"
+
+    - name: Check signing credentials
+      id: check_creds
+      run: |
+        HAS_P12=false
+        HAS_P8=false
+        if [ -n "${{ secrets.APPLE_PB_PRIVATE_KEY }}" ]; then
+          # 检测是 p12 还是 p8
+          FIRST_LINE=$(echo "${{ secrets.APPLE_PB_PRIVATE_KEY }}" | base64 -d 2>/dev/null | head -1 || echo "")
+          if echo "$FIRST_LINE" | grep -q "BEGIN PRIVATE KEY"; then
+            echo "Detected p8 private key format"
+            HAS_P8=true
+          elif echo "$FIRST_LINE" | grep -q "BEGIN"; then
+            echo "Detected p12/pem certificate format"
+            HAS_P12=true
+          else
+            echo "Unknown format, trying as p12"
+            HAS_P12=true
+          fi
+        else
+          echo "No APPLE_PB_PRIVATE_KEY secret found"
+        fi
+        echo "has_p12=$HAS_P12" >> $GITHUB_OUTPUT
+        echo "has_p8=$HAS_P8" >> $GITHUB_OUTPUT
+        echo "has_team=$([ -n "${{ secrets.APPLE_TEAM_ID }}" ] && echo true || echo false)" >> $GITHUB_OUTPUT
         
-    - name: Import Apple signing certificate (.p12)
+    - name: Install p12 certificate
+      if: steps.check_creds.outputs.has_p12 == 'true'
       uses: apple-actions/import-codesign-certs@v2
       with:
         p12-file-base64: ${{ secrets.APPLE_PB_PRIVATE_KEY }}
         p12-password: ${{ secrets.KEYCHAIN_PASSWORD }}
         keychain-password: ${{ secrets.KEYCHAIN_PASSWORD }}
-        
-    - name: Import Apple Provisioning Profile
-      env:
-        PROVISION_PROFILE_BASE64: ${{ secrets.APPLE_PROVISION_PROFILE }}
+
+    - name: Setup App Store Connect API Key (p8)
+      if: steps.check_creds.outputs.has_p8 == 'true'
       run: |
-        if [ -n "$PROVISION_PROFILE_BASE64" ]; then
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          echo "$PROVISION_PROFILE_BASE64" | base64 -d > ~/Library/MobileDevice/Provisioning\ Profiles/yandao.mobileprovision
-          echo "✅ Provisioning profile installed"
-        else
-          echo "⚠️ No provisioning profile secret found, will use automatic signing"
-        fi
-        
-    - name: Set up Xcode project signing
+        mkdir -p ~/private_keys
+        echo "${{ secrets.APPLE_PB_PRIVATE_KEY }}" | base64 -d > ~/private_keys/AuthKey_${{ secrets.APPLE_KEY_ID }}.p8
+        chmod 600 ~/private_keys/AuthKey_${{ secrets.APPLE_KEY_ID }}.p8
+        echo "✅ App Store Connect API key installed"
+
+    - name: Set up Xcode project for signing
       run: |
         cd ios/App/App
-        # 使用自动签名 + 手动指定 team
+        # 设置为自动签名
         /usr/libexec/PlistBuddy -c "Set :objects:00C302D0204A61630053085B:buildSettings:CODE_SIGN_STYLE Automatic" App.xcodeproj/project.pbxproj 2>/dev/null || true
-        echo "Signing configured"
+        /usr/libexec/PlistBuddy -c "Set :objects:00C302D0204A61630053085B:buildSettings:DEVELOPMENT_TEAM ${{ secrets.APPLE_TEAM_ID }}" App.xcodeproj/project.pbxproj 2>/dev/null || true
+        echo "✅ Signing configured with team: ${{ secrets.APPLE_TEAM_ID }}"
         
     - name: Archive iOS App
       run: |
         cd ios/App/App
+        set +e
         xcodebuild archive \
           -workspace App.xcworkspace \
           -scheme App \
@@ -160,25 +182,29 @@ jobs:
           DEVELOPMENT_TEAM="${{ secrets.APPLE_TEAM_ID }}" \
           CODE_SIGN_STYLE=Automatic \
           -allowProvisioningUpdates \
-          CODE_SIGNING_ALLOWED=YES 2>&1 | xcpretty && echo "✅ Archive success" || {
-            echo "⚠️ Archive with signing failed, trying without signing updates..."
-            xcodebuild archive \
-              -workspace App.xcworkspace \
-              -scheme App \
-              -sdk iphoneos \
-              -configuration Release \
-              -archivePath "${{ github.workspace }}/build/App.xcarchive" \
-              -destination 'generic/platform=iOS' \
-              DEVELOPMENT_TEAM="${{ secrets.APPLE_TEAM_ID }}" \
-              CODE_SIGN_STYLE=Automatic \
-              CODE_SIGNING_ALLOWED=YES 2>&1 | xcpretty || echo "Archive also failed"
-          }
+          -verbose 2>&1 | tail -80
+        EXIT_CODE=$?
+        echo "Archive exit code: $EXIT_CODE"
+        if [ $EXIT_CODE -ne 0 ]; then
+          echo "⚠️ Archive failed, trying without provisioning updates..."
+          xcodebuild archive \
+            -workspace App.xcworkspace \
+            -scheme App \
+            -sdk iphoneos \
+            -configuration Release \
+            -archivePath "${{ github.workspace }}/build/App.xcarchive" \
+            -destination 'generic/platform=iOS' \
+            DEVELOPMENT_TEAM="${{ secrets.APPLE_TEAM_ID }}" \
+            CODE_SIGN_STYLE=Automatic \
+            -verbose 2>&1 | tail -80 || echo "Archive also failed"
+        fi
+        # 无论成功失败，标记后续步骤继续
+        echo "ARCHIVE_EXISTS=$([ -d "${{ github.workspace }}/build/App.xcarchive" ] && echo true || echo false)" >> $GITHUB_ENV
           
     - name: Export IPA
-      if: success()
+      if: env.ARCHIVE_EXISTS == 'true'
       run: |
-        if [ -d "${{ github.workspace }}/build/App.xcarchive" ]; then
-          cat > "${{ github.workspace }}/exportOptions.plist" << 'PLISTEOF'
+        cat > "${{ github.workspace }}/exportOptions.plist" << PLISTEOF
         <?xml version="1.0" encoding="UTF-8"?>
         <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
         <plist version="1.0"><dict>
@@ -186,17 +212,13 @@ jobs:
           <key>teamID</key><string>${{ secrets.APPLE_TEAM_ID }}</string>
           <key>signingStyle</key><string>automatic</string>
           <key>uploadSymbols</key><false/>
-          <key>generateAppStoreInformation</key><false/>
         </dict></plist>
         PLISTEOF
-          xcodebuild -exportArchive \
-            -archivePath "${{ github.workspace }}/build/App.xcarchive" \
-            -exportPath "${{ github.workspace }}/build/ipa" \
-            -exportOptionsPlist "${{ github.workspace }}/exportOptions.plist" \
-            -allowProvisioningUpdates 2>&1 | xcpretty && echo "✅ IPA exported" || echo "⚠️ IPA export failed"
-        else
-          echo "❌ No archive found to export"
-        fi
+        xcodebuild -exportArchive \
+          -archivePath "${{ github.workspace }}/build/App.xcarchive" \
+          -exportPath "${{ github.workspace }}/build/ipa" \
+          -exportOptionsPlist "${{ github.workspace }}/exportOptions.plist" \
+          -allowProvisioningUpdates 2>&1 | tail -40 && echo "✅ IPA exported" || echo "⚠️ IPA export failed"
         
     - name: Find and list build products
       if: always()
@@ -218,7 +240,6 @@ jobs:
       continue-on-error: true
       
     - name: Upload iOS build to Cloudflare R2
-      if: success()
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_KEY }}
