@@ -254,27 +254,34 @@ jobs:
     - name: Install p12 certificate
       if: steps.check_creds.outputs.has_p12 == 'true'
       run: |
-        echo "=== Decoding and installing p12 certificate ==="
+        set -ex
         KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
         KEYCHAIN_PW="${{ secrets.KEYCHAIN_PASSWORD }}"
         
-        # Decode p12 file
-        echo "${{ secrets.APPLE_PB_PRIVATE_KEY }}" | base64 -d > $RUNNER_TEMP/certificate.p12
+        # Decode p12
+        echo "${{ secrets.APPLE_PB_PRIVATE_KEY }}" | base64 -d -o $RUNNER_TEMP/certificate.p12
+        ls -la $RUNNER_TEMP/certificate.p12
+        echo "P12 file decoded: $(wc -c < $RUNNER_TEMP/certificate.p12) bytes"
         
-        # Create temporary keychain
-        security create-keychain -p "$KEYCHAIN_PW" $KEYCHAIN_PATH
-        security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
-        security unlock-keychain -p "$KEYCHAIN_PW" $KEYCHAIN_PATH
+        # Also verify with openssl
+        openssl pkcs12 -in $RUNNER_TEMP/certificate.p12 -passin pass:"$KEYCHAIN_PW" -nokeys -info 2>&1 | head -5 || true
         
-        # Import p12 into keychain
-        security import $RUNNER_TEMP/certificate.p12 -k $KEYCHAIN_PATH -P "$KEYCHAIN_PW" -T /usr/bin/codesign -T /usr/bin/security
+        # Create temp keychain
+        security create-keychain -p "$KEYCHAIN_PW" $KEYCHAIN_PATH || true
+        security default-keychain -s $KEYCHAIN_PATH 2>/dev/null || true
+        security unlock-keychain -p "$KEYCHAIN_PW" $KEYCHAIN_PATH || true
         
-        # Set as default keychain and allow access
-        security list-keychains -d user -s $KEYCHAIN_PATH login.keychain
+        # Import p12
+        security import $RUNNER_TEMP/certificate.p12 -k $KEYCHAIN_PATH -P "$KEYCHAIN_PW" -A || {
+          echo "WARNING: p12 import failed, trying alternative method..."
+          security import $RUNNER_TEMP/certificate.p12 -k login.keychain -P "$KEYCHAIN_PW" -A || true
+        }
+        
+        # Allow access
         security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PW" $KEYCHAIN_PATH 2>/dev/null || true
         
-        echo "Certificate installed successfully"
-        security find-identity -v -p codesigning $KEYCHAIN_PATH
+        echo "=== Installed identities ==="
+        security find-identity -v -p codesigning 2>&1 || true
 
     - name: Setup App Store Connect API Key (p8)
       if: steps.check_creds.outputs.has_p8 == 'true'
