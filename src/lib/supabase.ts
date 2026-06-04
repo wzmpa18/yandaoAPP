@@ -20,7 +20,8 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   global: {
     fetch: (...args: Parameters<typeof fetch>) => {
       const controller = new AbortController();
-      const timeout = IS_PLACEHOLDER ? 500 : 8000;
+      // 极短超时：Supabase 不可用时快速降级到离线模式，避免页面卡顿
+      const timeout = IS_PLACEHOLDER ? 300 : 1500;
       const timer = setTimeout(() => controller.abort(), timeout);
       const [url, init] = args;
       return fetch(url, { ...init, signal: controller.signal }).finally(() => clearTimeout(timer));
