@@ -119,45 +119,51 @@ jobs:
         cd ios/App 2>/dev/null && pod install --repo-update && cd ../.. || \
         cd ios && pod install --repo-update || echo "No Podfile"
         
-    - name: Import Apple signing certs
-      uses: apple-actions/import-codesign-certs@v2
-      continue-on-error: true
-      with:
-        p8-private-key: ${{ secrets.APPLE_P8_PRIVATE_KEY || secrets.APPLE_PB_PRIVATE_KEY }}
-        p8-key-id: ${{ secrets.APPLE_KEY_ID }}
-        p8-issuer-id: ${{ secrets.APPLE_ISSUER_ID }}
-        keychain-password: ${{ secrets.KEYCHAIN_PASSWORD || '' }}
-        team-id: ${{ secrets.APPLE_TEAM_ID }}
-        
-    - name: Build IPA (with signing)
+    - name: Build iOS (unsigned, no signing certs needed)
       run: |
+        # 尝试无签名构建 iOS app (仅用于验证构建)
         xcodebuild -workspace ios/App/App.xcworkspace \
           -scheme App -sdk iphoneos -configuration Release \
-          -archivePath build/App.xcarchive \
-          -archive -allowProvisioningUpdates CODE_SIGNING_ALLOWED=YES | xcpretty || \
-        xcodebuild -workspace ios/App/App.xcworkspace \
-          -scheme App -sdk iphoneos -configuration Release \
-          -archivePath build/App.xcarchive CODE_SIGNING_ALLOWED=NO | xcpretty || true
-        [ -f build/App.xcarchive ] && {
-          cat > ios/exportOptions.plist << EOF
-        <?xml version="1.0" encoding="UTF-8"?>
-        <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-        <plist version="1.0"><dict>
-        <key>method</key><string>app-store</string>
-        <key>teamID</key><string>${{ secrets.APPLE_TEAM_ID }}</string>
-        <key>signingStyle</key><string>automatic</string>
-        </dict></plist>
-        EOF
-          xcodebuild -exportArchive -archivePath build/App.xcarchive \
-            -exportPath build/ipa -exportOptionsPlist ios/exportOptions.plist | xcpretty || true
+          -destination 'generic/platform=iOS' \
+          CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO \
+          CODE_SIGNING_ALLOWED=NO \
+          -derivedDataPath build/ios-derived \
+          build 2>&1 | tail -40 || {
+          echo "=== iOS build failed (expected without signing certs) ==="
+          # 尝试模拟器构建
+          xcodebuild -workspace ios/App/App.xcworkspace \
+            -scheme App -sdk iphonesimulator -configuration Release \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build/ios-derived \
+            build 2>&1 | tail -40 || echo "Simulator build also failed"
         }
+        
+    - name: Find iOS build products
+      if: always()
+      run: |
+        echo "=== iOS build outputs ==="
+        find build/ios-derived -name "*.app" -type d 2>/dev/null || echo "No .app found"
+        find build/ios-derived -name "*.ipa" -type f 2>/dev/null || echo "No .ipa found"
+        
+    - name: Package .app into .ipa (unsigned)
+      if: always()
+      run: |
+        APP_PATH=$(find build/ios-derived -name "*.app" -type d 2>/dev/null | head -1)
+        if [ -n "$APP_PATH" ]; then
+          mkdir -p build/ipa/Payload
+          cp -r "$APP_PATH" build/ipa/Payload/
+          cd build/ipa && zip -r ../yandao-unsigned.ipa Payload/ && cd ../..
+          echo "✅ Created unsigned IPA"
+        else
+          echo "⚠️ No .app found to package"
+        fi
       
-    - name: Upload IPA artifact
+    - name: Upload iOS artifact
       uses: actions/upload-artifact@v4
       with:
-        name: yandao-ios-release
+        name: yandao-ios-build
         path: |
-          build/ipa/*.ipa
-          ios/build/Build/Products/Release-iphoneos/*.app
+          build/yandao-unsigned.ipa
+          build/ios-derived/**/*.app
         retention-days: 30
       continue-on-error: true
