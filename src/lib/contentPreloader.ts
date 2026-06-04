@@ -207,51 +207,85 @@ async function preloadContent(lang: string, type: ContentType): Promise<void> {
   }
 }
 
-async function preloadVocabForLang(lang: string): Promise<void> {
-  // 动态导入离线词汇数据
+// 真正的内容预加载 - 从内置JSON文件或CDN加载
+async function fetchContent<T>(url: string, fallback: T[]): Promise<T> {
   try {
-    const { getVocabPairsForLang } = await import('../data/seedData');
-    const vocab = getVocabPairsForLang?.(lang);
-    if (vocab) {
-      console.log(`[Preloader] Loaded ${vocab.length} vocab pairs for ${lang}`);
+    // 优先从本地data目录（已由bundle-offline-assets.js生成）
+    const localResp = await fetch(`/data/${url.split('/').pop()}`);
+    if (localResp.ok) {
+      const data = await localResp.json();
+      console.log(`[Preloader] ✅ Loaded local ${url}:`, Array.isArray(data) ? data.length : 'ok');
+      return data;
     }
-  } catch (err) {
-    // 种子数据可能没有该语言的词汇，这是正常的
-    console.log(`[Preloader] No preloadable vocab for ${lang}, using dynamic data`);
+  } catch { /* local not available, try CDN */ }
+
+  try {
+    // 尝试从CDN加载
+    const cdnUrl = `${CONTENT_CDN}/${url}`;
+    const cdnResp = await fetch(cdnUrl);
+    if (cdnResp.ok) {
+      const data = await cdnResp.json();
+      console.log(`[Preloader] ✅ Loaded from CDN ${url}`);
+      return data;
+    }
+  } catch { /* CDN failed */ }
+
+  console.log(`[Preloader] ⚠️ Using fallback data for ${url}`);
+  return fallback;
+}
+
+async function preloadVocabForLang(lang: string): Promise<void> {
+  try {
+    const data = await fetchContent<any[]>(`${lang}/vocab_packs.json`, []);
+    if (data && data.length > 0) {
+      // 缓存到localStorage供快速访问
+      const sample = data.slice(0, 100);
+      localStorage.setItem(`yandao_vocab_${lang}_sample`, JSON.stringify(sample));
+      console.log(`[Preloader] ✅ Loaded ${data.length} vocab items for ${lang}`);
+    }
+  } catch (e) {
+    console.log(`[Preloader] Vocab preload error:`, e);
   }
 }
 
 async function preloadPhrasesForLang(lang: string): Promise<void> {
   try {
-    const { getPhrasesForLang } = await import('../data/seedData');
-    const phrases = getPhrasesForLang?.(lang);
-    if (phrases) {
-      console.log(`[Preloader] Loaded phrases for ${lang}`);
-    }
-  } catch {
-    console.log(`[Preloader] No preloadable phrases for ${lang}`);
+    const data = await fetchContent<Record<string, any>>(`${lang}/scenario_phrases.json`, {});
+    const count = Object.values(data).reduce((s: number, arr: any) => s + (Array.isArray(arr) ? arr.length : 0), 0);
+    if (count > 0) console.log(`[Preloader] ✅ Loaded ${count} phrase lines for ${lang}`);
+  } catch (e) {
+    console.log(`[Preloader] Phrases preload error:`, e);
   }
 }
 
 async function preloadQuizForLang(lang: string): Promise<void> {
-  // 预热题库数据
   try {
-    const { getQuizForLang } = await import('../data/seedData');
-    getQuizForLang?.(lang);
-    console.log(`[Preloader] Quiz data ready for ${lang}`);
-  } catch {
-    console.log(`[Preloader] No preloadable quiz for ${lang}`);
+    const data = await fetchContent<any[]>(`${lang}/quiz_packs.json`, []);
+    if (data && data.length > 0) {
+      localStorage.setItem(`yandao_quiz_${lang}_count`, String(data.length));
+      console.log(`[Preloader] ✅ Loaded ${data.length} quiz questions for ${lang}`);
+    }
+  } catch (e) {
+    console.log(`[Preloader] Quiz preload error:`, e);
   }
 }
 
 async function preloadRadioForLang(lang: string): Promise<void> {
-  // 预热电台内容
-  console.log(`[Preloader] Radio content ready for ${lang}`);
+  try {
+    const data = await fetchContent<any[]>(`${lang}/radio_packs.json`, []);
+    if (data && data.length > 0) console.log(`[Preloader] ✅ Loaded ${data.length} radio programs for ${lang}`);
+  } catch (e) {
+    console.log(`[Preloader] Radio preload error:`, e);
+  }
 }
 
 async function preloadStoriesForLang(lang: string): Promise<void> {
-  // 预热故事内容
-  console.log(`[Preloader] Stories ready for ${lang}`);
+  try {
+    const data = await fetchContent<any[]>(`${lang}/story_packs.json`, []);
+    if (data && data.length > 0) console.log(`[Preloader] ✅ Loaded ${data.length} stories for ${lang}`);
+  } catch (e) {
+    console.log(`[Preloader] Stories preload error:`, e);
+  }
 }
 
 function sleep(ms: number): Promise<void> {
