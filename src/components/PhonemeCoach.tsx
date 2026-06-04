@@ -99,7 +99,11 @@ export const PhonemeCoach: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       || (window as Window & { SpeechRecognition?: typeof SpeechRecognition; webkitSpeechRecognition?: typeof SpeechRecognition }).webkitSpeechRecognition;
 
     if (!SRClass) {
-      alert('此浏览器不支持语音识别，请使用 Chrome 或 Safari');
+      const toastEl = document.createElement('div');
+      toastEl.textContent = '⚠️ 此浏览器不支持语音识别，请使用 Chrome 或 Safari';
+      toastEl.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:99999;background:#ef4444;color:#fff;padding:10px 24px;border-radius:99px;font-size:13px;font-weight:600;box-shadow:0 6px 24px rgba(0,0,0,.2);animation:toastSlide .3s ease,toastSlide .3s ease 3.5s reverse forwards;';
+      document.body.appendChild(toastEl);
+      setTimeout(() => toastEl.remove(), 4000);
       return;
     }
 

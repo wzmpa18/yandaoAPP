@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getAllFavorites, removeFromFavorites, clearAllFavorites } from '../lib/historyService';
 import type { FavoriteItem } from '../lib/historyService';
+import { useGlobalToast } from './GlobalToast';
 
 interface FavoriteCardProps {
   item: FavoriteItem;
@@ -39,6 +40,7 @@ function FavoriteCard({ item, onRemove, onClick }: FavoriteCardProps) {
 
 export function FavoritesPage() {
   const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
+  const { showToast } = useGlobalToast();
 
   useEffect(() => {
     loadFavorites();
@@ -66,9 +68,8 @@ export function FavoritesPage() {
     if (detailUrl) {
       window.location.hash = detailUrl;
     }
-    // Fallback: show as alert with title and content
     if (item.title) {
-      alert(`${item.title}\n\n${item.content?.substring(0, 200) || ''}`);
+      showToast(`已打开：${item.title}`, 'info');
     }
   };
 

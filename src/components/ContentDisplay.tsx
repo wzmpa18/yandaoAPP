@@ -34,7 +34,7 @@ export const ContentDisplay = ({ type, language }: ContentDisplayProps) => {
         };
       }
     } catch {
-      console.log('Falling back to local content');
+      // Silent fallback to local content
     }
     return null;
   };

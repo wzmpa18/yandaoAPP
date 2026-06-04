@@ -81,11 +81,9 @@ export const MainHub: React.FC<MainHubProps> = ({ initialProfile, onReset }) => 
       if (data && data.length > 0) {
         setLanguages(data);
       } else {
-        console.log('Using mock languages data');
         setLanguages(mockLanguages);
       }
     }).catch(() => {
-      console.log('Supabase connection failed, using mock data');
       setLanguages(mockLanguages);
     });
   }, []);

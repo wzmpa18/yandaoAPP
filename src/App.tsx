@@ -9,6 +9,7 @@ import { setOfflineMode } from './lib/offlineData';
 import { initProvider } from './providers';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { initContentPreloader, preloadVoiceEngine } from './lib/contentPreloader';
+import { ToastProvider } from './components/GlobalToast';
 
 const SESSION_KEY = 'yandao_session_v5';
 const PROFILE_KEY = 'yandao_profile_v5';
@@ -40,9 +41,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     // Initialize the data provider
-    initProvider().then(provider => {
-      console.log(`[App] Provider ready: ${provider.vendor}`);
-    });
+    initProvider();
 
     // If Supabase is not configured, go straight to offline mode — no network wait
     if (!HAS_REAL_SUPABASE) {
@@ -177,14 +176,16 @@ const App: React.FC = () => {
   return (
     <ErrorBoundary>
       <UILanguageProvider initial={(profile.ui_language as UILang) || 'zh'}>
-        <MainHub initialProfile={profile} onReset={handleReset} />
-        {showPhoneVerify && (
-          <PhoneVerify
-            sessionKey={sessionKey}
-            onVerified={dismissPhoneVerify}
-            onSkip={dismissPhoneVerify}
-          />
-        )}
+        <ToastProvider>
+          <MainHub initialProfile={profile} onReset={handleReset} />
+          {showPhoneVerify && (
+            <PhoneVerify
+              sessionKey={sessionKey}
+              onVerified={dismissPhoneVerify}
+              onSkip={dismissPhoneVerify}
+            />
+          )}
+        </ToastProvider>
       </UILanguageProvider>
     </ErrorBoundary>
   );

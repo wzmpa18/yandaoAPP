@@ -32,7 +32,12 @@ export function ReferralPage() {
   async function handleCopyLink() {
     if (referralInfo?.referral_link) {
       await navigator.clipboard.writeText(referralInfo.referral_link);
-      alert('推广链接已复制到剪贴板！');
+      // Show inline toast
+      const toastEl = document.createElement('div');
+      toastEl.textContent = '✅ 推广链接已复制到剪贴板！';
+      toastEl.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:99999;background:#10b981;color:#fff;padding:10px 24px;border-radius:99px;font-size:13px;font-weight:600;box-shadow:0 6px 24px rgba(0,0,0,.2);animation:toastSlide .3s ease,toastSlide .3s ease 2.5s reverse forwards;';
+      document.body.appendChild(toastEl);
+      setTimeout(() => toastEl.remove(), 3000);
     }
   }
 

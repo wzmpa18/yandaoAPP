@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getTodayViewed, getRecentViewed, getMostViewed, clearAllHistory, getHistoryStatistics } from '../lib/historyService';
 import type { HistoryItem } from '../lib/historyService';
+import { useGlobalToast } from './GlobalToast';
 
 interface HistorySectionProps {
   title: string;
@@ -52,6 +53,7 @@ export function HistoryPage() {
   const [recentHistory, setRecentHistory] = useState<HistoryItem[]>([]);
   const [mostViewed, setMostViewed] = useState<HistoryItem[]>([]);
   const [stats, setStats] = useState({ totalItems: 0, todayCount: 0, favoriteCount: 0, mostViewedType: '' });
+  const { showToast } = useGlobalToast();
 
   useEffect(() => {
     loadHistory();
@@ -72,14 +74,12 @@ export function HistoryPage() {
   };
 
   const handleItemClick = (item: HistoryItem) => {
-    // Navigate to content or display it
     const detailUrl = item.id ? `#/content/${encodeURIComponent(item.id)}` : null;
     if (detailUrl) {
       window.location.hash = detailUrl;
     }
-    // Fallback: show as alert
     if (item.title) {
-      alert(`${item.title}\n\n${item.content?.substring(0, 200) || ''}`);
+      showToast(`已打开：${item.title}`, 'info');
     }
   };
 
