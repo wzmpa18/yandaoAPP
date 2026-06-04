@@ -187,9 +187,8 @@ jobs:
 
     - name: Upload web dist to Cloudflare R2
       env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_KEY }}
-        AWS_DEFAULT_REGION: auto
+        R2_ACCESS_KEY: ${{ secrets.R2_ACCESS_KEY }}
+        R2_SECRET_KEY: ${{ secrets.R2_SECRET_KEY }}
         R2_BUCKET: ${{ secrets.R2_BUCKET }}
         R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
         CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
@@ -198,120 +197,48 @@ jobs:
         GITHUB_SHA: ${{ github.sha }}
       run: |
         set +e
-        BUCKET="${R2_BUCKET}"
-        R2_EP="${R2_ENDPOINT}"
+        # Write build verifier
+        TIMESTAMP=$(date -u +%Y%m%d-%H%M%S)
+        if [ -d "dist" ]; then
+          echo "${TIMESTAMP} - Build ${GITHUB_RUN_ID} - SHA ${GITHUB_SHA}" > dist/build-verifier.txt
+          echo "dist/ contents:"
+          ls -la dist/ 2>/dev/null
+        fi
+        # Use Python boto3 for verbose R2 upload
+        pip3 install boto3 --quiet --break-system-packages 2>/dev/null || pip3 install boto3 --quiet
+        echo "=== Running r2_upload.py ==="
+        python3 r2_upload.py "${R2_BUCKET}" "${R2_ENDPOINT}" "${R2_ACCESS_KEY}" "${R2_SECRET_KEY}" "dist"
+        echo "=== r2_upload.py exit code: $? ==="
+        # Also upload public/ if exists
+        if [ -d "public" ]; then
+          python3 r2_upload.py "${R2_BUCKET}" "${R2_ENDPOINT}" "${R2_ACCESS_KEY}" "${R2_SECRET_KEY}" "public"
+        fi
+        # Purge Cloudflare cache if token available
         CF_TOKEN="${CF_API_TOKEN}"
         ZONE_ID="${CF_ZONE_ID}"
-        if echo "$R2_EP" | grep -q '^https\?://'; then
-          ENDPOINT="$R2_EP"
-        else
-          ENDPOINT="https://${R2_EP}.r2.cloudflarestorage.com"
-        fi
-        echo "=== R2 Connection Test ==="
-        echo "BUCKET=$BUCKET"
-        echo "R2_EP raw=$R2_EP"
-        echo "ENDPOINT=$ENDPOINT"
-        echo "CF_TOKEN set: $([ -n "$CF_TOKEN" ] && echo YES || echo NO)"
-        echo "ZONE_ID set: $([ -n "$ZONE_ID" ] && echo YES || echo NO)"
-        # Test write access
-        echo "test_$(date +%s)" > /tmp/r2test.txt
-        aws s3 cp /tmp/r2test.txt "s3://${BUCKET}/r2test.txt" --endpoint-url "${ENDPOINT}" 2>&1 && echo "R2 write test PASSED" || echo "R2 write test FAILED"
-        aws s3 ls "s3://${BUCKET}/" --endpoint-url "${ENDPOINT}" 2>&1 | head -20 || echo "R2 list FAILED"
-        # Check dist
-        echo "=== dist check ==="
-        ls -la dist/ 2>/dev/null || echo "dist/ NOT FOUND"
-        ls -la dist/index.html 2>/dev/null && echo "dist/index.html OK" || echo "dist/index.html MISSING"
-        head -5 dist/index.html 2>/dev/null || true
-        # Upload dist with delete-then-upload pattern
-        if [ -d "dist" ]; then
-          TIMESTAMP=$(date -u +%Y%m%d-%H%M%S)
-          echo "${TIMESTAMP} - Build ${GITHUB_RUN_ID} - SHA ${GITHUB_SHA}" > dist/build-verifier.txt
-          for file in $(find dist -type f 2>/dev/null); do
-            r2path=$(echo "$file" | sed 's|^dist/||')
-            ct="application/octet-stream"
-            case "$r2path" in
-              *.html) ct="text/html; charset=utf-8" ;;
-              *.css) ct="text/css; charset=utf-8" ;;
-              *.js) ct="application/javascript; charset=utf-8" ;;
-              *.svg) ct="image/svg+xml" ;;
-              *.png) ct="image/png" ;;
-              *.jpg|*.jpeg) ct="image/jpeg" ;;
-              *.json) ct="application/json; charset=utf-8" ;;
-              *.txt) ct="text/plain; charset=utf-8" ;;
-            esac
-            aws s3 rm "s3://${BUCKET}/${r2path}" --endpoint-url "${ENDPOINT}" 2>/dev/null || true
-            aws s3 cp "$file" "s3://${BUCKET}/${r2path}" --content-type "$ct" \
-              --cache-control "no-cache, no-store, must-revalidate" \
-              --endpoint-url "${ENDPOINT}" 2>&1 && echo "OK: $r2path" || echo "FAIL: $r2path"
-          done
-        fi
-        # Upload public dir
-        if [ -d "public" ]; then
-          for file in $(find public -type f ! -path '*/audio/*' 2>/dev/null); do
-            r2path=$(echo "$file" | sed 's|^public/||')
-            ct="application/octet-stream"
-            case "$r2path" in
-              *.html) ct="text/html; charset=utf-8" ;;
-              *.css) ct="text/css; charset=utf-8" ;;
-              *.js) ct="application/javascript; charset=utf-8" ;;
-              *.svg) ct="image/svg+xml" ;;
-              *.png) ct="image/png" ;;
-              *.jpg|*.jpeg) ct="image/jpeg" ;;
-              *.json) ct="application/json; charset=utf-8" ;;
-            esac
-            aws s3 rm "s3://${BUCKET}/${r2path}" --endpoint-url "${ENDPOINT}" 2>/dev/null || true
-            aws s3 cp "$file" "s3://${BUCKET}/${r2path}" --content-type "$ct" \
-              --cache-control "no-cache, no-store, must-revalidate" \
-              --endpoint-url "${ENDPOINT}" 2>&1 && echo "OK: $r2path" || echo "FAIL: $r2path"
-          done
-        fi
-        # Verify upload
-        echo "=== Verifying uploads ==="
-        aws s3 cp "s3://${BUCKET}/build-verifier.txt" - --endpoint-url "${ENDPOINT}" 2>&1 || echo "Cannot verify build-verifier.txt"
-        aws s3 cp "s3://${BUCKET}/index.html" - --endpoint-url "${ENDPOINT}" 2>&1 | head -5 || echo "Cannot verify index.html"
-        echo "Web files uploaded to R2"
-        # Purge Cloudflare cache if token available
         if [ -n "$CF_TOKEN" ] && [ -n "$ZONE_ID" ]; then
-          echo "Purging Cloudflare cache for zone $ZONE_ID..."
+          echo "Purging Cloudflare cache..."
           curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${ZONE_ID}/purge_cache" \
             -H "Authorization: Bearer ${CF_TOKEN}" \
             -H "Content-Type: application/json" \
             -d '{"purge_everything":true}' 2>&1 | head -c 500 || true
-          echo ""
           sleep 10
           echo "Verifying yandao.vip..."
           curl -s -H "Cache-Control: no-cache" "https://yandao.vip/build-verifier.txt" 2>&1 | head -5 || true
         elif [ -n "$CF_TOKEN" ]; then
-          echo "CF token set but no zone ID - trying auto-detect..."
           ZONES=$(curl -s -H "Authorization: Bearer ${CF_TOKEN}" "https://api.cloudflare.com/client/v4/zones?name=yandao.vip" 2>&1)
           FOUND_ZONE=$(echo "$ZONES" | grep -o '"id":"[^"]*"' | head -1 | cut -d'"' -f4)
           if [ -n "$FOUND_ZONE" ]; then
-            echo "Found zone: $FOUND_ZONE, purging..."
             curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${FOUND_ZONE}/purge_cache" \
               -H "Authorization: Bearer ${CF_TOKEN}" \
               -H "Content-Type: application/json" \
               -d '{"purge_everything":true}' 2>&1 | head -c 500 || true
             sleep 10
             curl -s -H "Cache-Control: no-cache" "https://yandao.vip/build-verifier.txt" 2>&1 | head -5 || true
-          else
-            echo "Could not auto-detect zone ID"
           fi
         else
           echo "CF_API_TOKEN not set - cannot purge cache"
         fi
-
-    - name: Deploy to GitHub Pages
-      if: success()
-      uses: peaceiris/actions-gh-pages@v4
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./dist
-        destination_dir: .
-        keep_files: false
-        commit_message: "Deploy web dist ${{ github.sha }}"
-        user_name: 'github-actions[bot]'
-        user_email: 'github-actions[bot]@users.noreply.github.com'
-      continue-on-error: true
 
   ios-build:
     runs-on: macos-14
@@ -552,9 +479,8 @@ jobs:
 
     - name: Upload web dist to Cloudflare R2 (iOS job)
       env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_KEY }}
-        AWS_DEFAULT_REGION: auto
+        R2_ACCESS_KEY: ${{ secrets.R2_ACCESS_KEY }}
+        R2_SECRET_KEY: ${{ secrets.R2_SECRET_KEY }}
         R2_BUCKET: ${{ secrets.R2_BUCKET }}
         R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
         CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
@@ -563,65 +489,21 @@ jobs:
         GITHUB_SHA: ${{ github.sha }}
       run: |
         set +e
-        BUCKET="${R2_BUCKET}"
-        R2_EP="${R2_ENDPOINT}"
+        TIMESTAMP=$(date -u +%Y%m%d-%H%M%S)
+        if [ -d "dist" ]; then
+          echo "${TIMESTAMP} - iOS Build ${GITHUB_RUN_ID} - SHA ${GITHUB_SHA}" > dist/build-verifier.txt
+          echo "iOS dist/ contents:"
+          ls -la dist/ 2>/dev/null
+        fi
+        pip3 install boto3 --quiet --break-system-packages 2>/dev/null || pip3 install boto3 --quiet
+        echo "=== iOS: Running r2_upload.py ==="
+        python3 r2_upload.py "${R2_BUCKET}" "${R2_ENDPOINT}" "${R2_ACCESS_KEY}" "${R2_SECRET_KEY}" "dist"
+        echo "=== r2_upload.py exit code: $? ==="
+        if [ -d "public" ]; then
+          python3 r2_upload.py "${R2_BUCKET}" "${R2_ENDPOINT}" "${R2_ACCESS_KEY}" "${R2_SECRET_KEY}" "public"
+        fi
         CF_TOKEN="${CF_API_TOKEN}"
         ZONE_ID="${CF_ZONE_ID}"
-        if echo "$R2_EP" | grep -q '^https\?://'; then
-          ENDPOINT="$R2_EP"
-        else
-          ENDPOINT="https://${R2_EP}.r2.cloudflarestorage.com"
-        fi
-        echo "=== iOS: dist check ==="
-        ls -la dist/ 2>/dev/null || echo "iOS: dist/ NOT FOUND"
-        ls -la dist/index.html 2>/dev/null && echo "iOS: dist/index.html OK" || echo "iOS: dist/index.html MISSING"
-        if [ -d "dist" ]; then
-          TIMESTAMP=$(date -u +%Y%m%d-%H%M%S)
-          echo "${TIMESTAMP} - iOS Build ${GITHUB_RUN_ID} - SHA ${GITHUB_SHA}" > dist/build-verifier.txt
-          for file in $(find dist -type f 2>/dev/null); do
-            r2path=$(echo "$file" | sed 's|^dist/||')
-            ct="application/octet-stream"
-            case "$r2path" in
-              *.html) ct="text/html; charset=utf-8" ;;
-              *.css) ct="text/css; charset=utf-8" ;;
-              *.js) ct="application/javascript; charset=utf-8" ;;
-              *.svg) ct="image/svg+xml" ;;
-              *.png) ct="image/png" ;;
-              *.jpg|*.jpeg) ct="image/jpeg" ;;
-              *.json) ct="application/json; charset=utf-8" ;;
-              *.txt) ct="text/plain; charset=utf-8" ;;
-            esac
-            aws s3 rm "s3://${BUCKET}/${r2path}" --endpoint-url "${ENDPOINT}" 2>/dev/null || true
-            aws s3 cp "$file" "s3://${BUCKET}/${r2path}" --content-type "$ct" \
-              --cache-control "no-cache, no-store, must-revalidate" \
-              --endpoint-url "${ENDPOINT}" 2>&1 && echo "OK: $r2path" || echo "FAIL: $r2path"
-          done
-        fi
-        if [ -d "public" ]; then
-          for file in $(find public -type f ! -path '*/audio/*' 2>/dev/null); do
-            r2path=$(echo "$file" | sed 's|^public/||')
-            ct="application/octet-stream"
-            case "$r2path" in
-              *.html) ct="text/html; charset=utf-8" ;;
-              *.css) ct="text/css; charset=utf-8" ;;
-              *.js) ct="application/javascript; charset=utf-8" ;;
-              *.svg) ct="image/svg+xml" ;;
-              *.png) ct="image/png" ;;
-              *.jpg|*.jpeg) ct="image/jpeg" ;;
-              *.json) ct="application/json; charset=utf-8" ;;
-            esac
-            aws s3 rm "s3://${BUCKET}/${r2path}" --endpoint-url "${ENDPOINT}" 2>/dev/null || true
-            aws s3 cp "$file" "s3://${BUCKET}/${r2path}" --content-type "$ct" \
-              --cache-control "no-cache, no-store, must-revalidate" \
-              --endpoint-url "${ENDPOINT}" 2>&1 && echo "OK: $r2path" || echo "FAIL: $r2path"
-          done
-        fi
-        # Verify upload
-        echo "=== iOS: verifying uploads ==="
-        aws s3 cp "s3://${BUCKET}/build-verifier.txt" - --endpoint-url "${ENDPOINT}" 2>&1 || echo "Cannot verify"
-        aws s3 cp "s3://${BUCKET}/index.html" - --endpoint-url "${ENDPOINT}" 2>&1 | head -5 || echo "Cannot verify"
-        echo "iOS Web files uploaded to R2"
-        # Purge cache
         if [ -n "$CF_TOKEN" ] && [ -n "$ZONE_ID" ]; then
           echo "iOS: Purging Cloudflare cache..."
           curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${ZONE_ID}/purge_cache" \
@@ -631,33 +513,18 @@ jobs:
           sleep 10
           curl -s -H "Cache-Control: no-cache" "https://yandao.vip/build-verifier.txt" 2>&1 | head -5 || true
         elif [ -n "$CF_TOKEN" ]; then
-          echo "iOS: Auto-detecting zone ID..."
           ZONES=$(curl -s -H "Authorization: Bearer ${CF_TOKEN}" "https://api.cloudflare.com/client/v4/zones?name=yandao.vip" 2>&1)
           FOUND_ZONE=$(echo "$ZONES" | grep -o '"id":"[^"]*"' | head -1 | cut -d'"' -f4)
           if [ -n "$FOUND_ZONE" ]; then
-            echo "Found zone: $FOUND_ZONE"
             curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${FOUND_ZONE}/purge_cache" \
               -H "Authorization: Bearer ${CF_TOKEN}" \
               -H "Content-Type: application/json" \
               -d '{"purge_everything":true}' 2>&1 | head -c 500 || true
             sleep 10
             curl -s -H "Cache-Control: no-cache" "https://yandao.vip/build-verifier.txt" 2>&1 | head -5 || true
-          else
-            echo "iOS: Could not auto-detect zone ID"
           fi
         else
           echo "iOS: CF_API_TOKEN not set - cannot purge cache"
         fi
 
-    - name: Deploy to GitHub Pages (iOS job)
-      if: success()
-      uses: peaceiris/actions-gh-pages@v4
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./dist
-        destination_dir: .
-        keep_files: false
-        commit_message: "Deploy web dist from iOS job ${{ github.sha }}"
-        user_name: 'github-actions[bot]'
-        user_email: 'github-actions[bot]@users.noreply.github.com'
-      continue-on-error: true
+
