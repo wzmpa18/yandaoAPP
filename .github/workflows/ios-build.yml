@@ -236,14 +236,22 @@ jobs:
         fi
         echo "✅ Web files uploaded to R2"
         # Purge Cloudflare cache
-        if [ -n "${{ secrets.CF_API_TOKEN }}" ]; then
+        CF_TOKEN="${{ secrets.CF_API_TOKEN }}"
+        echo "CF_API_TOKEN exists: $([ -n "$CF_TOKEN" ] && echo YES || echo NO)"
+        if [ -n "$CF_TOKEN" ]; then
           ZONE_ID="${{ secrets.CF_ZONE_ID }}"
+          echo "CF_ZONE_ID: $([ -n "$ZONE_ID" ] && echo YES || echo NO)"
           if [ -n "$ZONE_ID" ]; then
+            echo "Purging Cloudflare cache..."
             curl -s -X POST "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/purge_cache" \
-              -H "Authorization: Bearer ${{ secrets.CF_API_TOKEN }}" \
+              -H "Authorization: Bearer $CF_TOKEN" \
               -H "Content-Type: application/json" \
-              -d '{"purge_everything":true}' | head -c 300 || true
+              -d '{"purge_everything":true}' | head -c 500 || true
+          else
+            echo "⚠️ CF_ZONE_ID not set, cannot purge cache"
           fi
+        else
+          echo "⚠️ CF_API_TOKEN not set, cannot purge cache"
         fi
 
   ios-build:
@@ -526,12 +534,20 @@ jobs:
         fi
         echo "✅ iOS Web files uploaded to R2"
         # Purge Cloudflare cache
-        if [ -n "${{ secrets.CF_API_TOKEN }}" ]; then
+        CF_TOKEN="${{ secrets.CF_API_TOKEN }}"
+        echo "iOS CF_API_TOKEN exists: $([ -n "$CF_TOKEN" ] && echo YES || echo NO)"
+        if [ -n "$CF_TOKEN" ]; then
           ZONE_ID="${{ secrets.CF_ZONE_ID }}"
+          echo "iOS CF_ZONE_ID: $([ -n "$ZONE_ID" ] && echo YES || echo NO)"
           if [ -n "$ZONE_ID" ]; then
+            echo "iOS: Purging Cloudflare cache..."
             curl -s -X POST "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/purge_cache" \
-              -H "Authorization: Bearer ${{ secrets.CF_API_TOKEN }}" \
+              -H "Authorization: Bearer $CF_TOKEN" \
               -H "Content-Type: application/json" \
-              -d '{"purge_everything":true}' | head -c 300 || true
+              -d '{"purge_everything":true}' | head -c 500 || true
+          else
+            echo "iOS ⚠️ CF_ZONE_ID not set, cannot purge cache"
           fi
+        else
+          echo "iOS ⚠️ CF_API_TOKEN not set, cannot purge cache"
         fi
