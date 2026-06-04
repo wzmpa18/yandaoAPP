@@ -8,6 +8,7 @@ import { UILang } from './lib/i18n';
 import { setOfflineMode } from './lib/offlineData';
 import { initProvider } from './providers';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { initContentPreloader, preloadVoiceEngine } from './lib/contentPreloader';
 
 const SESSION_KEY = 'yandao_session_v5';
 const PROFILE_KEY = 'yandao_profile_v5';
@@ -119,6 +120,14 @@ const App: React.FC = () => {
   function handleOnboardingComplete(p: UserProfile) {
     localStorage.setItem(PROFILE_KEY, JSON.stringify(p));
     setProfile(p);
+
+    // 启动内容预加载：根据用户选择的语言自动下载学习资料
+    if (p.language_code) {
+      initContentPreloader(p.language_code);
+      // 预热语音引擎
+      preloadVoiceEngine(p.language_code);
+    }
+
     if (!localStorage.getItem(PHONE_VERIFIED_KEY)) {
       setShowPhoneVerify(true);
     }

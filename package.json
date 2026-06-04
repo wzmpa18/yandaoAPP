@@ -4,13 +4,14 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node scripts/bundle-offline-assets.js",
     "build:check": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "capacitor:android": "npx cap add android",
     "capacitor:ios": "npx cap add ios",
     "capacitor:sync": "npx cap sync",
-    "capacitor:copy": "npx cap copy"
+    "capacitor:copy": "npx cap copy",
+    "bundle-assets": "node scripts/bundle-offline-assets.js"
   },
   "dependencies": {
     "react": "^18.2.0",

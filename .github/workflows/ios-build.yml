@@ -81,10 +81,60 @@ jobs:
         BUCKET="${{ secrets.R2_BUCKET }}"
         ENDPOINT="https://${{ secrets.R2_ENDPOINT }}.r2.cloudflarestorage.com"
         for apk in $(find android -name "*.apk" -type f 2>/dev/null); do
+          # 带时间戳版本
           NAME="yandao-${TIMESTAMP}-$(basename "$apk")"
           aws s3 cp "$apk" "s3://$BUCKET/android/$NAME" \
             --endpoint-url "$ENDPOINT" && echo "✅ Uploaded $NAME" || echo "⚠️ Failed $NAME"
+          # 固定latest版本（供下载页直接引用）
+          aws s3 cp "$apk" "s3://$BUCKET/android/yandao-latest.apk" \
+            --endpoint-url "$ENDPOINT" && echo "✅ Updated yandao-latest.apk" || echo "⚠️ Failed latest"
         done || echo "R2 upload skipped (no credentials)"
+
+    - name: Upload web dist to Cloudflare R2
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_KEY }}
+        AWS_DEFAULT_REGION: auto
+      run: |
+        BUCKET="${{ secrets.R2_BUCKET }}"
+        ENDPOINT="https://${{ secrets.R2_ENDPOINT }}.r2.cloudflarestorage.com"
+        # 上传dist目录（构建产物）
+        if [ -d "dist" ]; then
+          for file in $(find dist -type f 2>/dev/null); do
+            r2path=$(echo "$file" | sed 's|^dist/||')
+            ct="application/octet-stream"
+            case "$r2path" in
+              *.html) ct="text/html; charset=utf-8" ;;
+              *.css) ct="text/css; charset=utf-8" ;;
+              *.js) ct="application/javascript; charset=utf-8" ;;
+              *.svg) ct="image/svg+xml" ;;
+              *.png) ct="image/png" ;;
+              *.jpg|*.jpeg) ct="image/jpeg" ;;
+              *.json) ct="application/json; charset=utf-8" ;;
+            esac
+            aws s3 cp "$file" "s3://$BUCKET/$r2path" --content-type "$ct" \
+              --endpoint-url "$ENDPOINT" && echo "✅ Web: $r2path" || echo "⚠️ Failed: $r2path"
+          done
+        fi
+        # 上传public目录（HTML页面）
+        if [ -d "public" ]; then
+          for file in $(find public -type f ! -path '*/audio/*' 2>/dev/null); do
+            r2path=$(echo "$file" | sed 's|^public/||')
+            ct="application/octet-stream"
+            case "$r2path" in
+              *.html) ct="text/html; charset=utf-8" ;;
+              *.css) ct="text/css; charset=utf-8" ;;
+              *.js) ct="application/javascript; charset=utf-8" ;;
+              *.svg) ct="image/svg+xml" ;;
+              *.png) ct="image/png" ;;
+              *.jpg|*.jpeg) ct="image/jpeg" ;;
+              *.json) ct="application/json; charset=utf-8" ;;
+            esac
+            aws s3 cp "$file" "s3://$BUCKET/$r2path" --content-type "$ct" \
+              --endpoint-url "$ENDPOINT" && echo "✅ Public: $r2path" || echo "⚠️ Failed: $r2path"
+          done
+        fi
+        echo "✅ Web files uploaded to R2"
 
   ios-build:
     runs-on: macos-14
@@ -253,4 +303,51 @@ jobs:
           NAME="yandao-${TIMESTAMP}-$(basename "$ipa")"
           aws s3 cp "$ipa" "s3://$BUCKET/ios/$NAME" \
             --endpoint-url "$ENDPOINT" && echo "✅ Uploaded $NAME" || echo "⚠️ Failed $NAME"
+          # 固定latest版本
+          aws s3 cp "$ipa" "s3://$BUCKET/ios/yandao-latest.ipa" \
+            --endpoint-url "$ENDPOINT" && echo "✅ Updated yandao-latest.ipa" || echo "⚠️ Failed latest"
         done || echo "R2 upload skipped"
+
+    - name: Upload web dist to Cloudflare R2 (iOS job)
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_KEY }}
+        AWS_DEFAULT_REGION: auto
+      run: |
+        BUCKET="${{ secrets.R2_BUCKET }}"
+        ENDPOINT="https://${{ secrets.R2_ENDPOINT }}.r2.cloudflarestorage.com"
+        if [ -d "dist" ]; then
+          for file in $(find dist -type f 2>/dev/null); do
+            r2path=$(echo "$file" | sed 's|^dist/||')
+            ct="application/octet-stream"
+            case "$r2path" in
+              *.html) ct="text/html; charset=utf-8" ;;
+              *.css) ct="text/css; charset=utf-8" ;;
+              *.js) ct="application/javascript; charset=utf-8" ;;
+              *.svg) ct="image/svg+xml" ;;
+              *.png) ct="image/png" ;;
+              *.jpg|*.jpeg) ct="image/jpeg" ;;
+              *.json) ct="application/json; charset=utf-8" ;;
+            esac
+            aws s3 cp "$file" "s3://$BUCKET/$r2path" --content-type "$ct" \
+              --endpoint-url "$ENDPOINT" && echo "✅ Web: $r2path" || echo "⚠️ Failed: $r2path"
+          done
+        fi
+        if [ -d "public" ]; then
+          for file in $(find public -type f ! -path '*/audio/*' 2>/dev/null); do
+            r2path=$(echo "$file" | sed 's|^public/||')
+            ct="application/octet-stream"
+            case "$r2path" in
+              *.html) ct="text/html; charset=utf-8" ;;
+              *.css) ct="text/css; charset=utf-8" ;;
+              *.js) ct="application/javascript; charset=utf-8" ;;
+              *.svg) ct="image/svg+xml" ;;
+              *.png) ct="image/png" ;;
+              *.jpg|*.jpeg) ct="image/jpeg" ;;
+              *.json) ct="application/json; charset=utf-8" ;;
+            esac
+            aws s3 cp "$file" "s3://$BUCKET/$r2path" --content-type "$ct" \
+              --endpoint-url "$ENDPOINT" && echo "✅ Public: $r2path" || echo "⚠️ Failed: $r2path"
+          done
+        fi
+        echo "✅ Web files uploaded to R2"

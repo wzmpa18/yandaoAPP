@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
+  publicDir: 'public',
   optimizeDeps: {
     exclude: ['lucide-react'],
     cacheDir: './node_modules/.vite-cache',
@@ -20,6 +21,8 @@ export default defineConfig({
     assetsInlineLimit: 4096,
     minify: 'esbuild',
     sourcemap: false,
+    // 确保大文件不被内联
+    chunkSizeWarningLimit: 5000,
   },
   server: {
     timeout: 60000,
