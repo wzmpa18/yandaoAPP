@@ -16,7 +16,7 @@
  * 
  * CDN基础URL：Cloudflare R2
  */
-const CDN_BASE = 'https://pub-10d815d2a0718caa6d0fa86a79c244c8.r2.dev';
+const CDN_BASE = 'https://youdao-app.10d815d2a0718caa6d0fa86a79c244c8.r2.dev';
 const CONTENT_CDN = `${CDN_BASE}/content`;
 
 // 内容清单：每种语言 + 每个等级需要预加载的内容

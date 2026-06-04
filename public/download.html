@@ -277,7 +277,7 @@
         <p class="subtitle">AI驱动的智能语言学习平台</p>
 
         <div class="download-card">
-            <a href="https://pub-10d815d2a0718caa6d0fa86a79c244c8.r2.dev/android/yandao-latest.apk" class="download-btn" id="androidBtn">
+            <a href="https://youdao-app.10d815d2a0718caa6d0fa86a79c244c8.r2.dev/android/yandao-latest.apk" class="download-btn" id="androidBtn">
                 <span class="btn-icon">🤖</span>
                 <span class="btn-text">
                     下载 Android APP
@@ -285,7 +285,7 @@
                 </span>
             </a>
 
-            <a href="https://pub-10d815d2a0718caa6d0fa86a79c244c8.r2.dev/ios/yandao-latest.ipa" class="download-btn ios" id="iosBtn">
+            <a href="https://youdao-app.10d815d2a0718caa6d0fa86a79c244c8.r2.dev/ios/yandao-latest.ipa" class="download-btn ios" id="iosBtn">
                 <span class="btn-icon">🍎</span>
                 <span class="btn-text">
                     下载 iOS APP
@@ -359,7 +359,7 @@
 
     <script>
         // 智能检测APK可用性，优先R2直链
-        const R2_APK_URL = 'https://pub-10d815d2a0718caa6d0fa86a79c244c8.r2.dev/android/yandao-latest.apk';
+        const R2_APK_URL = 'https://youdao-app.10d815d2a0718caa6d0fa86a79c244c8.r2.dev/android/yandao-latest.apk';
         const FALLBACK_APK_URL = '/app-release.apk';
         const androidBtn = document.getElementById('androidBtn');
 
@@ -403,7 +403,7 @@
 
         async function checkIpaAvailability() {
             const iosBtn = document.getElementById('iosBtn');
-            const IPA_URL = 'https://pub-10d815d2a0718caa6d0fa86a79c244c8.r2.dev/ios/yandao-latest.ipa';
+            const IPA_URL = 'https://youdao-app.10d815d2a0718caa6d0fa86a79c244c8.r2.dev/ios/yandao-latest.ipa';
             try {
                 const resp = await fetch(IPA_URL, { method: 'HEAD', mode: 'no-cors' });
                 iosBtn.classList.remove('disabled');
