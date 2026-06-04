@@ -300,6 +300,19 @@ jobs:
           echo "CF_API_TOKEN not set - cannot purge cache"
         fi
 
+    - name: Deploy to GitHub Pages
+      if: success()
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./dist
+        destination_dir: .
+        keep_files: false
+        commit_message: "Deploy web dist ${{ github.sha }}"
+        user_name: 'github-actions[bot]'
+        user_email: 'github-actions[bot]@users.noreply.github.com'
+      continue-on-error: true
+
   ios-build:
     runs-on: macos-14
     timeout-minutes: 30
@@ -635,3 +648,16 @@ jobs:
         else
           echo "iOS: CF_API_TOKEN not set - cannot purge cache"
         fi
+
+    - name: Deploy to GitHub Pages (iOS job)
+      if: success()
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./dist
+        destination_dir: .
+        keep_files: false
+        commit_message: "Deploy web dist from iOS job ${{ github.sha }}"
+        user_name: 'github-actions[bot]'
+        user_email: 'github-actions[bot]@users.noreply.github.com'
+      continue-on-error: true
