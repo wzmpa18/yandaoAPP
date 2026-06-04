@@ -381,21 +381,31 @@ jobs:
     - name: Export IPA
       if: env.ARCHIVE_EXISTS == 'true'
       run: |
-        cat > "${{ github.workspace }}/exportOptions.plist" << PLISTEOF
+        # Try multiple export methods: enterprise (for in-house dist), ad-hoc, then app-store
+        for METHOD in enterprise ad-hoc app-store; do
+          echo "=== Trying export method: $METHOD ==="
+          cat > "${{ github.workspace }}/exportOptions.plist" << PLISTEOF
         <?xml version="1.0" encoding="UTF-8"?>
         <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
         <plist version="1.0"><dict>
-          <key>method</key><string>app-store</string>
+          <key>method</key><string>$METHOD</string>
           <key>teamID</key><string>${{ secrets.APPLE_TEAM_ID }}</string>
           <key>signingStyle</key><string>automatic</string>
           <key>uploadSymbols</key><false/>
         </dict></plist>
         PLISTEOF
-        xcodebuild -exportArchive \
-          -archivePath "${{ github.workspace }}/build/App.xcarchive" \
-          -exportPath "${{ github.workspace }}/build/ipa" \
-          -exportOptionsPlist "${{ github.workspace }}/exportOptions.plist" \
-          -allowProvisioningUpdates 2>&1 | tail -40 && echo "✅ IPA exported" || echo "⚠️ IPA export failed"
+          xcodebuild -exportArchive \
+            -archivePath "${{ github.workspace }}/build/App.xcarchive" \
+            -exportPath "${{ github.workspace }}/build/ipa" \
+            -exportOptionsPlist "${{ github.workspace }}/exportOptions.plist" \
+            -allowProvisioningUpdates 2>&1 | tail -20
+          if [ -d "${{ github.workspace }}/build/ipa" ] && ls "${{ github.workspace }}/build/ipa/"*.ipa 2>/dev/null; then
+            echo "✅ IPA exported successfully with method: $METHOD"
+            break
+          else
+            echo "⚠️ Export failed with method: $METHOD, trying next..."
+          fi
+        done
         
     - name: Find and list build products
       if: always()
