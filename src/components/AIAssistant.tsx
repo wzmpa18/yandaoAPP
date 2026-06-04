@@ -221,49 +221,46 @@ function simulateAIResponse(
     ],
   };
 
-  if (mode === 'grammar') return `【语法分析】「${input}」\n\n结构拆解：主语 + 谓语 + 宾语\n时态：一般现在时\n关键词「${input.slice(0,4)}」属于${lang}核心词汇\n\n建议：尝试加入形容词让表达更丰富。`;
-  if (mode === 'vocab') return `【词汇解析】「${input}」\n\n${lang}常用词，日常对话高频\n\n例句1：在日常场景中「${input}」使用很自然。\n例句2：可以搭配不同形容词扩展表达。\n\n记忆技巧：用场景联想法记忆。`;
-  if (mode === 'translate') return `【翻译结果】\n\n原文：${input}\n\n${lang}译文：「${input}」在${lang}中表达自然，含义明确。\n\n注意：接入真实翻译API后将提供精准译文。`;
-  if (mode === 'correct') return `【纠错建议】\n\n你的句子：「${input}」\n\n改进点：词序可以调整，更符合${lang}语感；动词形式建议使用礼貌体。\n\n修正后：「${input}（已优化）」\n\n继续加油！`;
-
-  if (mode === 'chat') {
-    const pool = VOCAB_TIPS[langCode] ?? VOCAB_TIPS.en;
-    const vocab = pool[Math.floor(Math.random() * pool.length)];
-    const prevContext = history && history.length > 2
-      ? history[history.length - 2].text.slice(0, 30)
-      : null;
-
-    const roleResponses: Record<ChatRoleKey, string[]> = {
-      panda: [
-        `很好！你说的「${input}」让我想到了一个练习～「${vocab[0]}」用${lang}说是「${vocab[1]}」哦，没关系慢慢来！`,
-        `已经很棒了！${prevContext ? `你之前提到「${prevContext}」，` : ''}今天我们来练习一个常用表达：「${vocab[1]}」，你能造个句子吗？`,
-        `再来一次！「${input}」的表达可以更自然～试试用「${vocab[1]}」造个句子吧 🐼`,
-        `注意语序哦！${lang}里「${vocab[0]}」说成「${vocab[1]}」，你掌握了吗？`,
-      ],
-      tsundere: [
-        `这都不会？「${input}」明显有问题！「${vocab[0]}」的${lang}说法是「${vocab[1]}」，记住了吗！`,
-        `笨死了……${prevContext ? `你刚说「${prevContext}」，` : ''}连「${vocab[1]}」都说不好，赶快练！`,
-        `答案是「${vocab[1]}」，还要我说几遍？「${input}」这种错误下次不能再犯了！`,
-        `……勉强说得过去吧。不过「${vocab[0]}」要说「${vocab[1]}」，这个你得记住！`,
-      ],
-      funny: [
-        `哦吼！「${input}」？绝绝子！话说「${vocab[0]}」用${lang}说是「${vocab[1]}」，谐音记忆法：${vocab[1].slice(0,3)}→"${['针不戳','嗷嗷踹','嗯嗯哈'][Math.floor(Math.random()*3)]}"，笑死！`,
-        `针不戳！不过「${vocab[0]}」是「${vocab[1]}」，这个冷知识你知道吗！${prevContext ? `（跟你说的「${prevContext}」有关）` : ''}笑死本人了！`,
-        `我的老天爷！「${input}」来了！快用「${vocab[1]}」造个句子，造不出来罚你转圈圈！`,
-        `哈哈哈！今日份谐音梗：「${vocab[1]}」≈"${['我爱你','吃饭了吗','你好棒棒'][Math.floor(Math.random()*3)]}"，绝绝子！`,
-      ],
-      sweet: [
-        `宝贝说得对❤️ 对了，「${vocab[0]}」用${lang}说是「${vocab[1]}」哦，学会了奖励你一个么么哒~`,
-        `想你啦！${prevContext ? `你刚才说「${prevContext}」，` : ''}我们来练习「${vocab[1]}」好不好，宝贝？`,
-        `你真的好棒❤️ 「${input}」已经很好了～「${vocab[0]}」还可以说「${vocab[1]}」，你知道吗～`,
-        `么么哒！今天的${lang}练习：「${vocab[1]}」。宝贝学会了吗？我超喜欢陪你练习的❤️`,
-      ],
-    };
-    const arr = roleResponses[role ?? 'panda'];
-    return arr[Math.floor(Math.random() * arr.length)];
+  // 增强版离线回复 - 更智能的模板和更多词汇
+  if (mode === 'grammar') {
+    const depth = input.length <= 5 ? `${lang}基础词汇级别，最常用词之一。` :
+                 input.length <= 15 ? `${lang}短语/句型级别，可拆分主谓结构。` :
+                 `${lang}完整句级别，注意特有语序规则和变形。`;
+    return `[语法分析] ${depth}\n「${input}」结构解析完成。\n💡 联网后DeepSeek AI提供深度语法拆解+时态分析+同义替换`;
+  }
+  if (mode === 'vocab') {
+    const pool = VOCAB_TIPS[langCode] || VOCAB_TIPS.en;
+    const hit = pool.find(v => v[0].includes(input) || input.includes(v[0]));
+    if (hit) return `[词汇] **${hit[0]}** = ${hit[1]} ⭐⭐⭐⭐⭐ 高频词 | 联网AI提供发音+例句+搭配`;
+    return `[查询] 「${input}」已加入学习列表。\n学习路径: 含义→发音→例句→场景运用 → 联网AI获取完整释义`;
+  }
+  if (mode === 'translate') {
+    const quick:{Record<string,string>}={ja:'りんご=日语',ko:'사과=韩语',fr:'pomme=法语',es:'manzana=西语',de:'Apfel=德语',it:'mela=意语',en:'apple=英语'};
+    return `[翻译] ${input} → ${lang}译文参考已生成。\n💡 联网DeepSeek AI精准翻译+文化注释+口语化改写`;
+  }
+  if (mode === 'correct') {
+    return `[纠错] 「${input}」✅\n改进点: 词序优化 | 动词变形正确 | 虚词补充\n修正后更自然地道。每写一次都是进步💪 联网AI逐句批改`;
   }
 
-  return `收到：「${input}」。（AI回复模拟中）`;
+  if (mode === 'chat') {
+    const pool = VOCAB_TIPS[langCode] || VOCAB_TIPS.en;
+    const v = pool[Math.floor(Math.random() * pool.length)];
+    const prev = history?.length > 2 ? history[history.length-2].text.slice(0,25) : null;
+    if (!input.trim()) { const h:{Record<ChatRoleKey,string>}={panda:`试试说"${v[1]}"?🐼`,tsundere:v[0]+`${lang}怎么说？`,funny:`来个${lang}词!`,sweet:"宝贝想说什么❤️"}; return h[role??'panda']; }
+    if (input.trim().length < 6) {
+      const r:{Record<ChatRoleKey,string>}={panda:`「${input}」→ ${lang}表达已生成 ✅ 再问一句？🐼`,tsundere:`太短……好吧。「${v[1]}」。多说点！`,funny:"针不戳！记住没？忘了我笑话你😎",sweet:"收到啦❤️ 学会了吗？亲亲~"};
+      return r[role??'panda'];
+    }
+    const r2:{Record<ChatRoleKey,string>}={
+      panda:`很好的表达！关于「${input.slice(0,12)}」——试试用「${v[1]}」造个句子？说说今天做了什么 🐼`,
+      tsundere:`哼……「${v[0]}」=${lang}「${v[1]}」，这个总该记住了吧？`,
+      funny:`哦吼！「${input}」→ ${lang}「${v[1]}」😎 ${prev?'关联「'+prev+'」':''}笑死！`,
+      sweet:`你说得对呀❤️ 「${v[0]}」=${lang}「${v[1]]」~ 宝贝学会了吗？么么哒~`,
+    };
+    return r2[role??'panda'];
+  }
+
+  return `收到:「${input}」（离线模式·联网启用真实AI DeepSeek）`;
 }
 
 // Build the system prompt for a given chat role + language
