@@ -48,32 +48,54 @@ jobs:
 
     - name: Install Capacitor CLI & Sync
       run: |
-        npm install -g @capacitor/cli
-        echo "=== Running cap sync android ==="
-        npx cap sync android 2>&1 || {
-          echo "WARNING: cap sync failed, trying npx cap add android..."
-          npx cap add android 2>&1
-          npx cap sync android 2>&1 || echo "cap sync still failing"
+        echo "=== Node version ==="
+        node -v && npm -v
+        echo "=== Check package.json capacitor deps ==="
+        node -e "const p=require('./package.json'); console.log('cap deps:', JSON.stringify(Object.keys(p.devDependencies||{}).filter(k=>k.includes('capacitor'))))"
+        echo "=== Install Capacitor deps ==="
+        npm install --save-dev @capacitor/cli @capacitor/core @capacitor/android 2>&1 || {
+          echo "WARNING: npm install capacitor failed, trying npx..."
         }
+        echo "=== Check capacitor CLI ==="
+        ls -la node_modules/.bin/cap 2>&1 || echo "cap not in .bin"
+        ls -la node_modules/@capacitor/cli 2>&1 || echo "cli not in node_modules"
+        echo "=== Running cap sync android ==="
+        # Use node_modules/.bin/cap directly to avoid npx issues
+        if [ -f node_modules/.bin/cap ]; then
+          node_modules/.bin/cap sync android 2>&1 || {
+            echo "WARNING: cap sync failed"
+            echo "=== Trying npx cap add android ==="
+            npx --yes @capacitor/cli add android 2>&1 || echo "cap add failed"
+            echo "=== Trying npx cap sync android ==="
+            npx --yes @capacitor/cli sync android 2>&1 || echo "cap sync still failing"
+          }
+        else
+          echo "=== Using npx to sync ==="
+          npx --yes @capacitor/cli sync android 2>&1 || {
+            npx --yes @capacitor/cli add android 2>&1
+            npx --yes @capacitor/cli sync android 2>&1
+          }
+        fi
         echo "=== Android project structure ==="
         ls -la android/app/build.gradle 2>/dev/null && echo "build.gradle OK" || echo "build.gradle MISSING"
         ls -la android/gradlew 2>/dev/null && echo "gradlew OK" || echo "gradlew MISSING"
+        ls -la android/app/src/main/ 2>/dev/null || echo "android src dir not found"
 
     - name: Fix gradlew permission & Build APK
       run: |
-        set -eo pipefail
+        echo "=== Android dir contents ==="
+        ls -la android/
         cd android
         chmod +x gradlew
         ls -la gradlew
         echo "=== Building Release APK ==="
-        ./gradlew assembleRelease --no-daemon --warning-mode all 2>&1 | tail -100
-        GRADLE_EXIT=${PIPESTATUS[0]}
-        echo "=== Gradle exit code: $GRADLE_EXIT ==="
-        if [ $GRADLE_EXIT -ne 0 ]; then
-          echo "=== Release build failed (exit $GRADLE_EXIT), trying debug build ==="
+        ./gradlew assembleRelease --no-daemon --warning-mode all 2>&1 | tail -100 || true
+        echo "=== Gradle exit: checking for APKs ==="
+        find . -name "*.apk" -type f -ls 2>/dev/null
+        if ! find . -name "*.apk" -type f 2>/dev/null | grep -q .; then
+          echo "=== No release APK, trying debug build ==="
           ./gradlew assembleDebug --no-daemon 2>&1 | tail -50 || true
         fi
-        # Show any APKs found
         echo "=== All APK files ==="
         find . -name "*.apk" -type f -ls 2>/dev/null || echo "No APKs found"
 

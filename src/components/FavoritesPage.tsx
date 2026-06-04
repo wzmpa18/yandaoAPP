@@ -61,7 +61,15 @@ export function FavoritesPage() {
   };
 
   const handleItemClick = (item: FavoriteItem) => {
-    console.log('Clicked favorite item:', item);
+    // Navigate to content or display it
+    const detailUrl = item.contentId ? `#/content/${encodeURIComponent(item.contentId)}` : null;
+    if (detailUrl) {
+      window.location.hash = detailUrl;
+    }
+    // Fallback: show as alert with title and content
+    if (item.title) {
+      alert(`${item.title}\n\n${item.content?.substring(0, 200) || ''}`);
+    }
   };
 
   return (

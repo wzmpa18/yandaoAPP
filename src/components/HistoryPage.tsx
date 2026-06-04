@@ -72,7 +72,15 @@ export function HistoryPage() {
   };
 
   const handleItemClick = (item: HistoryItem) => {
-    console.log('Clicked history item:', item);
+    // Navigate to content or display it
+    const detailUrl = item.id ? `#/content/${encodeURIComponent(item.id)}` : null;
+    if (detailUrl) {
+      window.location.hash = detailUrl;
+    }
+    // Fallback: show as alert
+    if (item.title) {
+      alert(`${item.title}\n\n${item.content?.substring(0, 200) || ''}`);
+    }
   };
 
   return (

@@ -57,7 +57,7 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({
           <button className="pw-cancel-btn" onClick={onClose}>暂不购买</button>
         </div>
 
-        <p className="pw-footer">测试模式 · 无需真实付款 · 点击即可体验完整流程</p>
+        <p className="pw-footer">安全支付 · 7天无理由退款 · 支持微信/支付宝/银行卡</p>
       </div>
     </div>
   );

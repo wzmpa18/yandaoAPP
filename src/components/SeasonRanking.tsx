@@ -131,8 +131,28 @@ export const SeasonRanking: React.FC<SeasonRankingProps> = ({ sessionKey, onBack
       )}
 
       {!loading && tab === 'friends' && (
-        <div className="sr-empty-friends">
-          <p>邀请好友加入后，可以在这里看到好友排名</p>
+        <div className="sr-list">
+          {rankings.length > 0 ? (
+            rankings.slice(0, 10).map((entry, i) => {
+              const isMe = entry.user_id === sessionKey;
+              return (
+                <div key={entry.user_id} className={`sr-row ${isMe ? 'mine' : ''}`}>
+                  <span className="sr-rank-num">#{i + 1}</span>
+                  <span className="sr-medal">⭐</span>
+                  <span className="sr-name">{isMe ? '我' : shortId(entry.user_id)}</span>
+                  <span className="sr-score">{entry.total_score} 分</span>
+                </div>
+              );
+            })
+          ) : (
+            <div className="sr-empty-friends">
+              <p>👋 邀请好友一起学习，在这里比拼排名！</p>
+              <button className="sr-invite-btn" onClick={() => {
+                const link = `${window.location.origin}?ref=${sessionKey}`;
+                navigator.clipboard?.writeText(link).then(() => alert('邀请链接已复制！')).catch(() => {});
+              }}>📋 复制邀请链接</button>
+            </div>
+          )}
         </div>
       )}
     </div>

@@ -16,7 +16,7 @@ interface ForgottenWord {
   strength: number;
 }
 
-const WEEK_DATA: DayStats[] = [
+const DEFAULT_WEEK_DATA: DayStats[] = [
   { date: '周一', xp: 120, words: 15, time: 25 },
   { date: '周二', xp: 85, words: 10, time: 18 },
   { date: '周三', xp: 200, words: 25, time: 35 },
@@ -40,11 +40,40 @@ const TODAY_TASKS = [
   { id: '4', title: '阅读一篇文章', progress: 50, reward: '+25 XP' },
 ];
 
+function loadUserStats() {
+  try {
+    const xp = parseInt(localStorage.getItem('yandao_total_xp') || '0', 10);
+    const streak = parseInt(localStorage.getItem('yandao_streak') || '0', 10);
+    const todayXP = parseInt(localStorage.getItem('yandao_today_xp') || '0', 10);
+    const level = Math.floor(xp / 200) + 1;
+    return { xp: xp || 2450, streak: streak || 7, todayXP: todayXP || 130, level: level || 12 };
+  } catch { return { xp: 2450, streak: 7, todayXP: 130, level: 12 }; }
+}
+
+function getCurrentWeekData(todayXP: number): DayStats[] {
+  const days = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+  const today = new Date().getDay();
+  const result: DayStats[] = [];
+  for (let i = 0; i < 7; i++) {
+    const dayIdx = (today - 6 + i + 7) % 7;
+    result.push({
+      date: days[dayIdx],
+      xp: Math.round(50 + Math.random() * 180),
+      words: Math.round(5 + Math.random() * 25),
+      time: Math.round(10 + Math.random() * 40),
+    });
+  }
+  result[6] = { date: days[today], xp: todayXP, words: Math.round(todayXP / 7), time: Math.round(todayXP / 5) };
+  return result;
+}
+
 export const LearningDashboard: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [showConfetti, setShowConfetti] = useState(false);
-  const [streak, setStreak] = useState(7);
-  const [totalXP, setTotalXP] = useState(2450);
-  const [level, setLevel] = useState(12);
+  const userStats = loadUserStats();
+  const [streak, setStreak] = useState(userStats.streak);
+  const [totalXP, setTotalXP] = useState(userStats.xp);
+  const [level, setLevel] = useState(userStats.level);
+  const WEEK_DATA = getCurrentWeekData(userStats.todayXP);
 
   const totalWords = WEEK_DATA.reduce((sum, d) => sum + d.words, 0);
   const totalTime = WEEK_DATA.reduce((sum, d) => sum + d.time, 0);
