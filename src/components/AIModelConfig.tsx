@@ -3,7 +3,7 @@ import { supabase } from '../data/supabase';
 import { AIModel, AIModelConfig, invalidateAIConfigCache, callAI, friendlyAIError } from '../lib/aiClient';
 
 const DEFAULT: AIModelConfig = {
-  default_model: 'doubao',
+  default_model: 'deepseek',
   doubao_api_key: '',
   doubao_endpoint: 'https://ark.cn-beijing.volces.com/api/v3/chat/completions',
   doubao_model: '',
@@ -13,7 +13,7 @@ const DEFAULT: AIModelConfig = {
   openai_api_key: '',
   openai_model: 'gpt-4o-mini',
   openai_endpoint: 'https://api.openai.com/v1/chat/completions',
-  deepseek_api_key: '',
+  deepseek_api_key: 'sk-01594a615f064cffb32022b158260461',
   deepseek_model: 'deepseek-chat',
   deepseek_endpoint: 'https://api.deepseek.com/v1/chat/completions',
   max_tokens: 800,
@@ -22,8 +22,8 @@ const DEFAULT: AIModelConfig = {
 };
 
 const MODEL_OPTIONS: { key: AIModel; label: string; badge: string }[] = [
+  { key: 'deepseek', label: 'DeepSeek', badge: '推荐·免费' },
   { key: 'doubao', label: '豆包 (火山引擎)', badge: '国内首选' },
-  { key: 'deepseek', label: 'DeepSeek', badge: '免费额度' },
   { key: 'claude', label: 'Claude (Anthropic)', badge: '高质量' },
   { key: 'openai', label: 'OpenAI / 兼容接口', badge: '通用' },
 ];

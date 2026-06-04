@@ -29,12 +29,13 @@ export interface AIMessage {
   content: string;
 }
 
-// 回退顺序：doubao → deepseek → openai → claude → 模拟
-const FALLBACK_ORDER: AIModel[] = ['doubao', 'deepseek', 'openai', 'claude'];
+// 回退顺序：deepseek → doubao → openai → claude → 模拟
+// DeepSeek 首选：免费额度、国内直连、响应快、质量高
+const FALLBACK_ORDER: AIModel[] = ['deepseek', 'doubao', 'openai', 'claude'];
 
 const DEFAULT_CFG: AIModelConfig = {
-  default_model: 'doubao',
-  // 豆包（火山方舟）- 需要有效的 API Key
+  default_model: 'deepseek',
+  // 豆包（火山方舟）- 有效 API Key
   doubao_api_key: (import.meta.env as Record<string, string>).VITE_DOUBAO_API_KEY || 'ark-d751d0e3-08af-4d58-80b9-1e51b6830dd7-0fd5d',
   doubao_endpoint: (import.meta.env as Record<string, string>).VITE_DOUBAO_ENDPOINT || 'https://ark.cn-beijing.volces.com/api/v3/chat/completions',
   doubao_model: (import.meta.env as Record<string, string>).VITE_DOUBAO_MODEL || 'ep-20250529145638-8v7r6',
@@ -46,8 +47,8 @@ const DEFAULT_CFG: AIModelConfig = {
   openai_api_key: '',
   openai_model: 'gpt-4o-mini',
   openai_endpoint: 'https://api.openai.com/v1/chat/completions',
-  // DeepSeek（免费额度，可靠备选）
-  deepseek_api_key: (import.meta.env as Record<string, string>).VITE_DEEPSEEK_API_KEY || '',
+  // DeepSeek（首选 - 已配置真实 API Key）
+  deepseek_api_key: (import.meta.env as Record<string, string>).VITE_DEEPSEEK_API_KEY || 'sk-01594a615f064cffb32022b158260461',
   deepseek_model: 'deepseek-chat',
   deepseek_endpoint: 'https://api.deepseek.com/v1/chat/completions',
   max_tokens: 800,
