@@ -202,6 +202,7 @@ jobs:
               *.json) ct="application/json; charset=utf-8" ;;
             esac
             aws s3 cp "$file" "s3://$BUCKET/$r2path" --content-type "$ct" \
+              --cache-control "no-cache, no-store, must-revalidate" \
               --endpoint-url "$ENDPOINT" && echo "✅ Web: $r2path" || echo "⚠️ Failed: $r2path"
           done
         fi
@@ -220,6 +221,7 @@ jobs:
               *.json) ct="application/json; charset=utf-8" ;;
             esac
             aws s3 cp "$file" "s3://$BUCKET/$r2path" --content-type "$ct" \
+              --cache-control "no-cache, no-store, must-revalidate" \
               --endpoint-url "$ENDPOINT" && echo "✅ Public: $r2path" || echo "⚠️ Failed: $r2path"
           done
         fi
@@ -477,6 +479,7 @@ jobs:
               *.json) ct="application/json; charset=utf-8" ;;
             esac
             aws s3 cp "$file" "s3://$BUCKET/$r2path" --content-type "$ct" \
+              --cache-control "no-cache, no-store, must-revalidate" \
               --endpoint-url "$ENDPOINT" && echo "iOS Web: $r2path" || echo "iOS Failed: $r2path"
           done
         fi
@@ -494,6 +497,7 @@ jobs:
               *.json) ct="application/json; charset=utf-8" ;;
             esac
             aws s3 cp "$file" "s3://$BUCKET/$r2path" --content-type "$ct" \
+              --cache-control "no-cache, no-store, must-revalidate" \
               --endpoint-url "$ENDPOINT" && echo "iOS Public: $r2path" || echo "iOS Failed: $r2path"
           done
         fi
