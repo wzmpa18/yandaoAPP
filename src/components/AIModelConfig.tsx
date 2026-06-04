@@ -13,6 +13,9 @@ const DEFAULT: AIModelConfig = {
   openai_api_key: '',
   openai_model: 'gpt-4o-mini',
   openai_endpoint: 'https://api.openai.com/v1/chat/completions',
+  deepseek_api_key: '',
+  deepseek_model: 'deepseek-chat',
+  deepseek_endpoint: 'https://api.deepseek.com/v1/chat/completions',
   max_tokens: 800,
   temperature: 0.8,
   system_prompt_prefix: '',
@@ -20,6 +23,7 @@ const DEFAULT: AIModelConfig = {
 
 const MODEL_OPTIONS: { key: AIModel; label: string; badge: string }[] = [
   { key: 'doubao', label: '豆包 (火山引擎)', badge: '国内首选' },
+  { key: 'deepseek', label: 'DeepSeek', badge: '免费额度' },
   { key: 'claude', label: 'Claude (Anthropic)', badge: '高质量' },
   { key: 'openai', label: 'OpenAI / 兼容接口', badge: '通用' },
 ];
@@ -219,6 +223,39 @@ export const AIModelConfigPanel: React.FC = () => {
         </div>
       </div>
 
+      {/* DeepSeek */}
+      <div className="aimc-section">
+        <div className="aimc-section-title aimc-provider deepseek">
+          DeepSeek · 深度求索
+          {cfg.deepseek_api_key && <span className="aimc-key-set">已配置</span>}
+        </div>
+        <div className="aimc-field">
+          <label className="aimc-label">API 密钥（<a href="https://platform.deepseek.com/api_keys" target="_blank" rel="noopener">获取密钥</a>，新用户有免费额度）</label>
+          <div className="aimc-key-row">
+            <input
+              type={revealKey.deepseek ? 'text' : 'password'}
+              className="aimc-input"
+              value={cfg.deepseek_api_key}
+              placeholder="sk-..."
+              onChange={(e) => updateCfg({ deepseek_api_key: e.target.value })}
+            />
+            <button className="aimc-reveal-btn" onClick={() => setRevealKey((r) => ({ ...r, deepseek: !r.deepseek }))}>
+              {revealKey.deepseek ? '隐藏' : '显示'}
+            </button>
+          </div>
+        </div>
+        <div className="aimc-field">
+          <label className="aimc-label">模型版本</label>
+          <input
+            type="text"
+            className="aimc-input"
+            value={cfg.deepseek_model}
+            placeholder="deepseek-chat"
+            onChange={(e) => updateCfg({ deepseek_model: e.target.value })}
+          />
+        </div>
+      </div>
+
       {/* Global params */}
       <div className="aimc-section">
         <div className="aimc-section-title">通用参数</div>
@@ -276,6 +313,7 @@ export const AIModelConfigPanel: React.FC = () => {
 
       <div className="aimc-masked-preview">
         {cfg.doubao_api_key && <span>豆包密钥：{maskKey(cfg.doubao_api_key)}</span>}
+        {cfg.deepseek_api_key && <span>DeepSeek密钥：{maskKey(cfg.deepseek_api_key)}</span>}
         {cfg.claude_api_key && <span>Claude密钥：{maskKey(cfg.claude_api_key)}</span>}
         {cfg.openai_api_key && <span>OpenAI密钥：{maskKey(cfg.openai_api_key)}</span>}
       </div>

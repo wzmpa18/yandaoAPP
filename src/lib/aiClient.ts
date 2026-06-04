@@ -3,7 +3,7 @@ import { getProviderSync } from '../providers';
 // 延迟获取 data provider，避免模块初始化时序问题
 function dp() { try { return getProviderSync().data; } catch { throw new Error('[aiClient] Provider not available'); } }
 
-export type AIModel = 'doubao' | 'claude' | 'openai';
+export type AIModel = 'doubao' | 'claude' | 'openai' | 'deepseek';
 
 export interface AIModelConfig {
   default_model: AIModel;
@@ -16,6 +16,9 @@ export interface AIModelConfig {
   openai_api_key: string;
   openai_model: string;
   openai_endpoint: string;
+  deepseek_api_key: string;
+  deepseek_model: string;
+  deepseek_endpoint: string;
   max_tokens: number;
   temperature: number;
   system_prompt_prefix: string;
@@ -26,18 +29,27 @@ export interface AIMessage {
   content: string;
 }
 
+// 回退顺序：doubao → deepseek → openai → claude → 模拟
+const FALLBACK_ORDER: AIModel[] = ['doubao', 'deepseek', 'openai', 'claude'];
+
 const DEFAULT_CFG: AIModelConfig = {
   default_model: 'doubao',
-  // 优先从 .env 环境变量读取，fallback 到硬编码值
+  // 豆包（火山方舟）- 需要有效的 API Key
   doubao_api_key: (import.meta.env as Record<string, string>).VITE_DOUBAO_API_KEY || 'ark-d751d0e3-08af-4d58-80b9-1e51b6830dd7-0fd5d',
   doubao_endpoint: (import.meta.env as Record<string, string>).VITE_DOUBAO_ENDPOINT || 'https://ark.cn-beijing.volces.com/api/v3/chat/completions',
   doubao_model: (import.meta.env as Record<string, string>).VITE_DOUBAO_MODEL || 'ep-20250529145638-8v7r6',
+  // Claude
   claude_api_key: '',
   claude_model: 'claude-3-5-sonnet-20241022',
   claude_endpoint: 'https://api.anthropic.com/v1/messages',
+  // OpenAI
   openai_api_key: '',
   openai_model: 'gpt-4o-mini',
   openai_endpoint: 'https://api.openai.com/v1/chat/completions',
+  // DeepSeek（免费额度，可靠备选）
+  deepseek_api_key: (import.meta.env as Record<string, string>).VITE_DEEPSEEK_API_KEY || '',
+  deepseek_model: 'deepseek-chat',
+  deepseek_endpoint: 'https://api.deepseek.com/v1/chat/completions',
   max_tokens: 800,
   temperature: 0.8,
   system_prompt_prefix: '你是一个专业的语言学习助手（言道Gendou），请用简洁清晰的方式回答用户的问题。根据用户选择的风格（严肃/幽默/温柔/严格）调整回复语气。',
@@ -61,7 +73,19 @@ export function invalidateAIConfigCache() {
 }
 
 /**
- * Call the configured AI model with streaming support.
+ * Check if a model is configured (has API key)
+ */
+function isModelConfigured(cfg: AIModelConfig, model: AIModel): boolean {
+  switch (model) {
+    case 'doubao': return !!cfg.doubao_api_key;
+    case 'claude': return !!cfg.claude_api_key;
+    case 'openai': return !!cfg.openai_api_key;
+    case 'deepseek': return !!cfg.deepseek_api_key;
+  }
+}
+
+/**
+ * Call the configured AI model with streaming support + auto-fallback.
  *
  * @param messages  Full message history (system + conversation)
  * @param onChunk   Called for each streamed text chunk; if absent, returns full string
@@ -74,21 +98,55 @@ export async function callAI(
   modelOverride?: AIModel,
 ): Promise<string> {
   const cfg = await getAIConfig();
-  const model = modelOverride ?? cfg.default_model;
+  const startModel = modelOverride ?? cfg.default_model;
+
+  // Build ordered fallback list: start model first, then remaining
+  const fallbackList: AIModel[] = [
+    startModel,
+    ...FALLBACK_ORDER.filter((m) => m !== startModel),
+  ];
 
   // Prepend global system prompt prefix if set
   const finalMessages: AIMessage[] = cfg.system_prompt_prefix
     ? prependSystemPrefix(messages, cfg.system_prompt_prefix)
     : messages;
 
-  if (model === 'claude') {
-    return callClaude(finalMessages, cfg, onChunk);
+  let lastError: Error | null = null;
+
+  for (const model of fallbackList) {
+    if (!isModelConfigured(cfg, model)) continue;
+
+    try {
+      if (model === 'claude') {
+        return await callClaude(finalMessages, cfg, onChunk);
+      }
+      // doubao, openai, deepseek all use OpenAI-compatible endpoints
+      return await callOpenAICompatible(finalMessages, cfg, model, onChunk);
+    } catch (err) {
+      lastError = err instanceof Error ? err : new Error(String(err));
+      console.warn(`[AI] ${model} failed, trying next fallback...`, lastError.message);
+      // Continue to next model
+    }
   }
-  // Both doubao and openai use OpenAI-compatible endpoints
-  return callOpenAICompatible(finalMessages, cfg, model, onChunk);
+
+  // All models failed
+  throw lastError || new Error('No AI model configured or all models failed');
 }
 
-// ── OpenAI-compatible (Doubao + OpenAI) ───────────────────────────────────────
+// ── OpenAI-compatible (Doubao + OpenAI + DeepSeek) ──────────────────────────────
+
+function getModelConfig(cfg: AIModelConfig, model: AIModel): { apiKey: string; endpoint: string; modelId: string } {
+  switch (model) {
+    case 'doubao':
+      return { apiKey: cfg.doubao_api_key, endpoint: cfg.doubao_endpoint, modelId: cfg.doubao_model };
+    case 'openai':
+      return { apiKey: cfg.openai_api_key, endpoint: cfg.openai_endpoint, modelId: cfg.openai_model };
+    case 'deepseek':
+      return { apiKey: cfg.deepseek_api_key, endpoint: cfg.deepseek_endpoint, modelId: cfg.deepseek_model };
+    case 'claude':
+      return { apiKey: cfg.claude_api_key, endpoint: cfg.claude_endpoint, modelId: cfg.claude_model };
+  }
+}
 
 async function callOpenAICompatible(
   messages: AIMessage[],
@@ -96,9 +154,7 @@ async function callOpenAICompatible(
   model: AIModel,
   onChunk?: (chunk: string) => void,
 ): Promise<string> {
-  const apiKey = model === 'doubao' ? cfg.doubao_api_key : cfg.openai_api_key;
-  const endpoint = model === 'doubao' ? cfg.doubao_endpoint : cfg.openai_endpoint;
-  const modelId = model === 'doubao' ? cfg.doubao_model : cfg.openai_model;
+  const { apiKey, endpoint, modelId } = getModelConfig(cfg, model);
 
   if (!apiKey) throw new Error(`${model} API key not configured`);
   if (!endpoint) throw new Error(`${model} endpoint not configured`);
@@ -243,11 +299,12 @@ function prependSystemPrefix(messages: AIMessage[], prefix: string): AIMessage[]
 /** Friendly error message for UI display */
 export function friendlyAIError(err: unknown): string {
   const msg = err instanceof Error ? err.message : String(err);
-  if (/not configured|API key/i.test(msg)) return '请先在后台配置 API 密钥';
-  if (/401|Unauthorized|invalid_api_key/i.test(msg)) return 'API 密钥无效，请检查配置';
-  if (/403|Forbidden/i.test(msg)) return 'API 访问被拒绝，请检查权限';
+  if (/not configured|API key/i.test(msg)) return '请在后台配置 AI API 密钥（支持豆包/DeepSeek/OpenAI/Claude）';
+  if (/401|Unauthorized|invalid_api_key|AuthenticationFailed/i.test(msg)) return 'API 密钥无效或已过期，请更新密钥';
+  if (/403|Forbidden/i.test(msg)) return 'API 访问被拒绝，请检查权限配置';
   if (/429|rate_limit|Too Many/i.test(msg)) return 'API 调用过于频繁，请稍后再试';
-  if (/5\d\d|server_error/i.test(msg)) return 'AI 服务暂时不可用，已切换模拟模式';
-  if (/fetch|network|Failed to fetch/i.test(msg)) return '网络连接失败，请检查网络';
+  if (/5\d\d|server_error/i.test(msg)) return 'AI 服务暂时不可用，已自动切换模拟模式';
+  if (/fetch|network|Failed to fetch|timeout/i.test(msg)) return '网络连接失败，请检查网络后重试';
+  if (/all models failed/i.test(msg)) return '所有 AI 模型均不可用，请检查 API 密钥配置';
   return 'AI 暂时不可用，已切换模拟模式';
 }

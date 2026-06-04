@@ -115,6 +115,9 @@ CREATE TABLE IF NOT EXISTS ai_model_config (
   openai_api_key TEXT,
   openai_model TEXT,
   openai_endpoint TEXT,
+  deepseek_api_key TEXT,
+  deepseek_model TEXT,
+  deepseek_endpoint TEXT,
   max_tokens INTEGER DEFAULT 800,
   temperature REAL DEFAULT 0.8,
   system_prompt_prefix TEXT,
@@ -419,12 +422,14 @@ INSERT INTO ai_model_config (
   id, default_model, doubao_api_key, doubao_endpoint, doubao_model,
   claude_api_key, claude_model, claude_endpoint,
   openai_api_key, openai_model, openai_endpoint,
+  deepseek_api_key, deepseek_model, deepseek_endpoint,
   max_tokens, temperature, system_prompt_prefix
 ) VALUES (
   1, 'doubao', 'ark-d751d0e3-08af-4d58-80b9-1e51b6830dd7-0fd5d',
   'https://ark.cn-beijing.volces.com/api/v3/chat/completions', 'ep-20250529145638-8v7r6',
   '', 'claude-3-5-sonnet-20241022', 'https://api.anthropic.com/v1/messages',
   '', 'gpt-4o-mini', 'https://api.openai.com/v1/chat/completions',
+  '', 'deepseek-chat', 'https://api.deepseek.com/v1/chat/completions',
   800, 0.8, '你是一个专业的语言学习助手，请用简洁清晰的方式回答用户的问题。'
 ) ON CONFLICT (id) DO NOTHING;
 `;
