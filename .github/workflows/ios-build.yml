@@ -28,7 +28,7 @@ jobs:
     - name: Install dependencies & Build web
       run: |
         node -v && npm -v
-        npm ci
+        npm install --no-audit --no-fund
         npm run build || npx vite build
 
     - name: Install Capacitor CLI & Sync
@@ -179,9 +179,9 @@ jobs:
         
     - name: Install dependencies & Build Web
       run: |
-        npm ci
+        npm install --no-audit --no-fund
         npm run build || npx vite build
-
+        
     - name: Install Capacitor & Sync iOS
       run: |
         npm install -g @capacitor/cli
