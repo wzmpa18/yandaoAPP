@@ -187,6 +187,15 @@ jobs:
       run: |
         BUCKET="${{ secrets.R2_BUCKET }}"
         ENDPOINT="https://${{ secrets.R2_ENDPOINT }}.r2.cloudflarestorage.com"
+        echo "=== R2 Connection Test ==="
+        echo "BUCKET=$BUCKET"
+        echo "ENDPOINT=$ENDPOINT"
+        # Test write access with a small file
+        echo "test_$(date +%s)" > /tmp/r2test.txt
+        aws s3 cp /tmp/r2test.txt "s3://$BUCKET/r2test.txt" \
+          --endpoint-url "$ENDPOINT" 2>&1 && echo "✅ R2 write test PASSED" || echo "❌ R2 write test FAILED"
+        # Test read access
+        aws s3 ls "s3://$BUCKET/" --endpoint-url "$ENDPOINT" 2>&1 | head -20 || echo "❌ R2 list FAILED"
         echo "=== Checking dist directory ==="
         ls -la dist/ 2>/dev/null || echo "dist/ NOT FOUND!"
         ls -la dist/index.html 2>/dev/null && echo "dist/index.html EXISTS" || echo "dist/index.html MISSING!"
@@ -208,7 +217,7 @@ jobs:
             esac
             aws s3 cp "$file" "s3://$BUCKET/$r2path" --content-type "$ct" \
               --cache-control "no-cache, no-store, must-revalidate" \
-              --endpoint-url "$ENDPOINT" && echo "✅ Web: $r2path" || echo "⚠️ Failed: $r2path"
+              --endpoint-url "$ENDPOINT" 2>&1 && echo "✅ Web: $r2path" || echo "❌ Failed: $r2path"
           done
         fi
         # Verify index.html was uploaded
