@@ -49,39 +49,53 @@ jobs:
     - name: Install Capacitor CLI & Sync
       run: |
         npm install -g @capacitor/cli
-        npx cap sync android || true
+        echo "=== Running cap sync android ==="
+        npx cap sync android 2>&1 || {
+          echo "WARNING: cap sync failed, trying npx cap add android..."
+          npx cap add android 2>&1
+          npx cap sync android 2>&1 || echo "cap sync still failing"
+        }
+        echo "=== Android project structure ==="
+        ls -la android/app/build.gradle 2>/dev/null && echo "build.gradle OK" || echo "build.gradle MISSING"
+        ls -la android/gradlew 2>/dev/null && echo "gradlew OK" || echo "gradlew MISSING"
 
     - name: Fix gradlew permission & Build APK
       run: |
+        set -eo pipefail
         cd android
         chmod +x gradlew
         ls -la gradlew
-        ./gradlew assembleRelease --no-daemon --warning-mode all 2>&1 | tail -50
-        echo "=== BUILD EXIT CODE: $? ==="
+        echo "=== Building Release APK ==="
+        ./gradlew assembleRelease --no-daemon --warning-mode all 2>&1 | tail -100
+        GRADLE_EXIT=${PIPESTATUS[0]}
+        echo "=== Gradle exit code: $GRADLE_EXIT ==="
+        if [ $GRADLE_EXIT -ne 0 ]; then
+          echo "=== Release build failed (exit $GRADLE_EXIT), trying debug build ==="
+          ./gradlew assembleDebug --no-daemon 2>&1 | tail -50 || true
+        fi
+        # Show any APKs found
+        echo "=== All APK files ==="
+        find . -name "*.apk" -type f -ls 2>/dev/null || echo "No APKs found"
 
     - name: Find and list APKs
       if: always()
       run: |
         echo "=== Looking for APK files ==="
-        find . -name "*.apk" -type f 2>/dev/null
-        ls -la android/app/build/outputs/apk/release/ 2>/dev/null || echo "Release dir not found"
-        ls -la android/app/build/outputs/apk/debug/ 2>/dev/null || echo "Debug dir not found"
+        echo "--- Release ---"
+        find android -path "*/release/*.apk" -type f -ls 2>/dev/null || echo "No release APK"
+        echo "--- Debug ---"
+        find android -path "*/debug/*.apk" -type f -ls 2>/dev/null || echo "No debug APK"
+        echo "--- All ---"
+        find . -name "*.apk" -type f -ls 2>/dev/null || echo "No APK found anywhere"
 
-    - name: Upload APK artifact (release)
-      if: success()
+    - name: Upload APK artifact
+      if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: yandao-android-release.apk
-        path: android/app/build/outputs/apk/release/*.apk
-        retention-days: 30
-      continue-on-error: true
-
-    - name: Upload APK artifact (debug, fallback)
-      if: failure()
-      uses: actions/upload-artifact@v4
-      with:
-        name: yandao-android-debug.apk
-        path: android/app/build/outputs/apk/debug/*.apk
+        name: yandao-android-apk
+        path: |
+          android/app/build/outputs/apk/release/*.apk
+          android/app/build/outputs/apk/debug/*.apk
         retention-days: 30
       continue-on-error: true
 
@@ -123,15 +137,25 @@ jobs:
         TIMESTAMP=$(date +%Y%m%d-%H%M%S)
         BUCKET="${{ secrets.R2_BUCKET }}"
         ENDPOINT="https://${{ secrets.R2_ENDPOINT }}.r2.cloudflarestorage.com"
+        UPLOADED=false
         for apk in $(find android -name "*.apk" -type f 2>/dev/null); do
+          SIZE=$(stat -c%s "$apk" 2>/dev/null || echo 0)
+          echo "Found APK: $apk ($SIZE bytes)"
           # 带时间戳版本
           NAME="yandao-${TIMESTAMP}-$(basename "$apk")"
           aws s3 cp "$apk" "s3://$BUCKET/android/$NAME" \
-            --endpoint-url "$ENDPOINT" && echo "✅ Uploaded $NAME" || echo "⚠️ Failed $NAME"
+            --endpoint-url "$ENDPOINT" && echo "Uploaded $NAME" || echo "Failed $NAME"
           # 固定latest版本（供下载页直接引用）
           aws s3 cp "$apk" "s3://$BUCKET/android/yandao-latest.apk" \
-            --endpoint-url "$ENDPOINT" && echo "✅ Updated yandao-latest.apk" || echo "⚠️ Failed latest"
-        done || echo "R2 upload skipped (no credentials)"
+            --endpoint-url "$ENDPOINT" && echo "Updated yandao-latest.apk" || echo "Failed latest"
+          # 同时上传到根目录（兼容旧下载页链接 /app-release.apk）
+          aws s3 cp "$apk" "s3://$BUCKET/app-release.apk" \
+            --endpoint-url "$ENDPOINT" && echo "Updated app-release.apk (root)" || echo "Failed root"
+          UPLOADED=true
+        done
+        if [ "$UPLOADED" = false ]; then
+          echo "WARNING: No APK files found to upload!"
+        fi
 
     - name: Upload web dist to Cloudflare R2
       env:
