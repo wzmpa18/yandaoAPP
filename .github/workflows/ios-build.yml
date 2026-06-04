@@ -387,11 +387,22 @@ jobs:
             CODE_SIGN_STYLE=Automatic \
             -verbose 2>&1 | tail -80 || echo "Archive also failed"
         fi
-        # 无论成功失败，标记后续步骤继续
-        echo "ARCHIVE_EXISTS=$([ -d "${{ github.workspace }}/build/App.xcarchive" ] && echo true || echo false)" >> $GITHUB_ENV
+
+    # 检查archive是否存在（用 GITHUB_OUTPUT 传递给后续步骤）
+    - name: Check archive status
+      id: archive_check
+      if: always()
+      run: |
+        if [ -d "${{ github.workspace }}/build/App.xcarchive" ]; then
+          echo "exists=true" >> $GITHUB_OUTPUT
+          echo "✅ Archive found, will proceed with IPA export"
+        else
+          echo "exists=false" >> $GITHUB_OUTPUT
+          echo "⚠️ No archive found, skipping IPA export"
+        fi
           
     - name: Export IPA
-      if: env.ARCHIVE_EXISTS == 'true'
+      if: steps.archive_check.outputs.exists == 'true'
       run: |
         # Try multiple export methods: enterprise (for in-house dist), ad-hoc, then app-store
         for METHOD in enterprise ad-hoc app-store; do

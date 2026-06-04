@@ -40,8 +40,11 @@ const App: React.FC = () => {
   const sessionKey = getSessionKey();
 
   useEffect(() => {
-    // Initialize the data provider
-    initProvider();
+    // Initialize the data provider — but don't block UI on it
+    // Components use getProviderSync() which returns LocalAdapter as fallback
+    initProvider().catch(() => {
+      setOfflineMode(true);
+    });
 
     // If Supabase is not configured, go straight to offline mode — no network wait
     if (!HAS_REAL_SUPABASE) {

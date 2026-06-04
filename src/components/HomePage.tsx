@@ -120,14 +120,24 @@ export const HomePage: React.FC<HomePageProps> = ({
 
     setLoadingScen(true);
     setRoute({ view: 'home' });
+
+    // ── 超时保护：6秒后强制使用离线数据 ──
+    const safetyTimer = setTimeout(() => {
+      setLoadingScen(false);
+      const offline = getScenarios(externalLang || 'ja') as unknown as Scenario[];
+      setScenarios(offline);
+      setCache(cacheKey, offline);
+    }, 6000);
+
     supabase
       .from('scenarios')
       .select('*')
       .eq('language_code', externalLang || 'ja')
       .order('order_index')
       .then(async ({ data }) => {
+        clearTimeout(safetyTimer);
         const rows = (data ?? []) as Scenario[];
-        // If Supabase returned empty, use offline data
+        // If Supabase returned empty or in offline mode, use offline data
         if (rows.length === 0 || isOfflineMode()) {
           const offline = getScenarios(externalLang || 'ja') as unknown as Scenario[];
           setScenarios(offline);
@@ -156,6 +166,7 @@ export const HomePage: React.FC<HomePageProps> = ({
         setLoadingScen(false);
       })
       .catch(() => {
+        clearTimeout(safetyTimer);
         // Supabase connection error — use offline data
         const offline = getScenarios(externalLang || 'ja') as unknown as Scenario[];
         setScenarios(offline);

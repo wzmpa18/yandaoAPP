@@ -20,6 +20,25 @@ function dp() {
 }
 
 /**
+ * 给 Promise 添加超时保护。
+ * 防止 Supabase 请求永远挂起导致组件 loading 状态卡住。
+ */
+function withTimeout<T>(promise: Promise<T>, ms: number = 3000, fallback: T): Promise<T> {
+  return new Promise<T>((resolve) => {
+    const timer = setTimeout(() => {
+      resolve(fallback);
+    }, ms);
+    promise.then((val) => {
+      clearTimeout(timer);
+      resolve(val);
+    }).catch(() => {
+      clearTimeout(timer);
+      resolve(fallback);
+    });
+  });
+}
+
+/**
  * 创建一个可 then-able 的代理对象。
  * 让链式调用 supabase.from().select().eq()... 的任意位置都能 .then()/.catch()
  */
@@ -43,42 +62,80 @@ export const supabase = {
     select: (columns: string = '*') => ({
       eq: (col: string, val: unknown) => makeThenable({
         neq: (col2: string, val2: unknown) => makeThenable({
-          limit: (n: number) => dp().select(table, { eq: { [col]: val }, neq: { [col2]: val2 }, limit: n }),
+          limit: (n: number) => withTimeout(
+            dp().select(table, { eq: { [col]: val }, neq: { [col2]: val2 }, limit: n }),
+            3000, [] as Record<string, unknown>[]
+          ),
         }),
         order: (col2: string, opts: { ascending: boolean }) => makeThenable({
-          range: (start: number, end: number) => dp().select(table, {
-            eq: { [col]: val },
-            order: { column: col2, ascending: opts.ascending },
+          range: (start: number, end: number) => withTimeout(
+            dp().select(table, {
+              eq: { [col]: val },
+              order: { column: col2, ascending: opts.ascending },
+              offset: start,
+              limit: end - start + 1,
+            }),
+            3000, [] as Record<string, unknown>[]
+          ),
+        }),
+        limit: (n: number) => withTimeout(
+          dp().select(table, { eq: { [col]: val }, limit: n }),
+          3000, [] as Record<string, unknown>[]
+        ),
+        single: () => withTimeout(
+          dp().selectOne(table, { eq: { [col]: val } }),
+          3000, null as Record<string, unknown> | null
+        ),
+        maybeSingle: () => withTimeout(
+          dp().selectOne(table, { eq: { [col]: val } }),
+          3000, null as Record<string, unknown> | null
+        ),
+      }),
+      order: (col: string, opts: { ascending: boolean }) => makeThenable({
+        limit: (n: number) => withTimeout(
+          dp().select(table, { order: { column: col, ascending: opts.ascending }, limit: n }),
+          3000, [] as Record<string, unknown>[]
+        ),
+        range: (start: number, end: number) => withTimeout(
+          dp().select(table, {
+            order: { column: col, ascending: opts.ascending },
             offset: start,
             limit: end - start + 1,
           }),
-        }),
-        limit: (n: number) => makeThenable(dp().select(table, { eq: { [col]: val }, limit: n })),
-        single: () => dp().selectOne(table, { eq: { [col]: val } }),
-        maybeSingle: () => dp().selectOne(table, { eq: { [col]: val } }),
+          3000, [] as Record<string, unknown>[]
+        ),
       }),
-      order: (col: string, opts: { ascending: boolean }) => makeThenable({
-        limit: (n: number) => dp().select(table, { order: { column: col, ascending: opts.ascending }, limit: n }),
-        range: (start: number, end: number) => dp().select(table, {
-          order: { column: col, ascending: opts.ascending },
-          offset: start,
-          limit: end - start + 1,
-        }),
-      }),
-      limit: (n: number) => makeThenable(dp().select(table, { limit: n })),
-      single: () => dp().selectOne(table),
-      maybeSingle: () => dp().selectOne(table),
+      limit: (n: number) => withTimeout(
+        dp().select(table, { limit: n }),
+        3000, [] as Record<string, unknown>[]
+      ),
+      single: () => withTimeout(
+        dp().selectOne(table),
+        3000, null as Record<string, unknown> | null
+      ),
+      maybeSingle: () => withTimeout(
+        dp().selectOne(table),
+        3000, null as Record<string, unknown> | null
+      ),
     }),
     insert: (rows: unknown[]) => ({
       select: () => ({
-        single: () => dp().insert(table, rows as Record<string, unknown>[]).then(result =>
-          result ? { data: result[0], error: null } : { data: null, error: new Error('Insert failed') }
+        single: () => withTimeout(
+          dp().insert(table, rows as Record<string, unknown>[]).then(result =>
+            result ? { data: result[0], error: null } : { data: null, error: new Error('Insert failed') }
+          ),
+          4000,
+          { data: null, error: new Error('Insert timeout') }
         ),
       }),
     }),
     update: (updates: Record<string, unknown>) => ({
       eq: (col: string, val: unknown) =>
-        dp().update(table, updates, { eq: { [col]: val } }).then(() => ({ error: null })),
+        withTimeout(
+          dp().update(table, updates, { eq: { [col]: val } }).then(() => ({ error: null })),
+          4000,
+          { error: new Error('Update timeout') }
+        ),
     }),
   }),
   rpc: (fn: string, params?: Record<string, unknown>) =>

@@ -49,48 +49,62 @@ const DailyCheckin: React.FC<DailyCheckinProps> = ({ sessionKey, languageCode, o
       return;
     }
 
-    // Check today's checkin
-    const { data: todayRow } = await supabase
-      .from('user_learning_daily')
-      .select('id')
-      .eq('session_key', sessionKey)
-      .eq('checkin_date', today)
-      .maybeSingle();
+    // ── 网络超时保护：5秒内不返回则强制结束loading ──
+    const safetyTimer = setTimeout(() => {
+      setLoading(false);
+    }, 5000);
 
-    setCheckedInToday(!!todayRow);
+    try {
+      // Check today's checkin
+      const { data: todayRow } = await supabase
+        .from('user_learning_daily')
+        .select('id')
+        .eq('session_key', sessionKey)
+        .eq('checkin_date', today)
+        .maybeSingle();
 
-    // Count distinct checkin dates for streak
-    const { data: allDates } = await supabase
-      .from('user_learning_daily')
-      .select('checkin_date')
-      .eq('session_key', sessionKey);
+      setCheckedInToday(!!todayRow);
 
-    const distinctDates = allDates
-      ? [...new Set(allDates.map((r: { checkin_date: string }) => r.checkin_date))]
-      : [];
-    setStreak(distinctDates.length);
+      // Count distinct checkin dates for streak
+      const { data: allDates } = await supabase
+        .from('user_learning_daily')
+        .select('checkin_date')
+        .eq('session_key', sessionKey);
 
-    // Load frozen referral earnings where this user is the invitee
-    const { data: frozenRows } = await supabase
-      .from('referral_earnings')
-      .select('id, invitee_key, invitee_checkin_days, is_frozen')
-      .eq('invitee_key', sessionKey)
-      .eq('is_frozen', true);
+      const distinctDates = allDates
+        ? [...new Set(allDates.map((r: { checkin_date: string }) => r.checkin_date))]
+        : [];
+      setStreak(distinctDates.length);
 
-    if (frozenRows && frozenRows.length > 0) {
-      await thawEligibleEarnings(frozenRows as FrozenEarning[]);
+      // Load frozen referral earnings where this user is the invitee
+      const { data: frozenRows } = await supabase
+        .from('referral_earnings')
+        .select('id, invitee_key, invitee_checkin_days, is_frozen')
+        .eq('invitee_key', sessionKey)
+        .eq('is_frozen', true);
+
+      if (frozenRows && frozenRows.length > 0) {
+        await thawEligibleEarnings(frozenRows as FrozenEarning[]);
+      }
+
+      // Count still-frozen earnings for this user as referrer
+      const { data: referrerFrozen } = await supabase
+        .from('referral_earnings')
+        .select('id')
+        .eq('referrer_key', sessionKey)
+        .eq('is_frozen', true);
+
+      setFrozenCount(referrerFrozen?.length ?? 0);
+    } catch {
+      // 网络错误时使用离线数据降级
+      const todayRow = getTodayCheckin(sessionKey);
+      setCheckedInToday(!!todayRow);
+      setStreak(getStreakCount(sessionKey));
+      setFrozenCount(getReferralFrozenCount());
+    } finally {
+      clearTimeout(safetyTimer);
+      setLoading(false);
     }
-
-    // Count still-frozen earnings for this user as referrer
-    const { data: referrerFrozen } = await supabase
-      .from('referral_earnings')
-      .select('id')
-      .eq('referrer_key', sessionKey)
-      .eq('is_frozen', true);
-
-    setFrozenCount(referrerFrozen?.length ?? 0);
-
-    setLoading(false);
   }, [sessionKey, today, thawEligibleEarnings]);
 
   useEffect(() => {
@@ -101,54 +115,69 @@ const DailyCheckin: React.FC<DailyCheckinProps> = ({ sessionKey, languageCode, o
     if (checkedInToday || checking) return;
     setChecking(true);
 
-    const { error: insertError } = await supabase
-      .from('user_learning_daily')
-      .insert({
-        session_key: sessionKey,
-        checkin_date: today,
-        lang_code: languageCode,
-        xp_earned: 10,
-      });
-
-    if (insertError) {
+    // ── 超时保护：8秒后强制结束checking状态 ──
+    const safetyTimer = setTimeout(() => {
       setChecking(false);
-      return;
-    }
+    }, 8000);
 
-    // Increment invitee_checkin_days on any referral_earnings rows where this user is the invitee
-    const { data: inviteeRows } = await supabase
-      .from('referral_earnings')
-      .select('id, invitee_checkin_days, is_frozen')
-      .eq('invitee_key', sessionKey);
+    try {
+      const { error: insertError } = await supabase
+        .from('user_learning_daily')
+        .insert([{
+          session_key: sessionKey,
+          checkin_date: today,
+          lang_code: languageCode,
+          xp_earned: 10,
+        }]);
 
-    if (inviteeRows && inviteeRows.length > 0) {
-      for (const row of inviteeRows as { id: string; invitee_checkin_days: number; is_frozen: boolean }[]) {
-        const newDays = (row.invitee_checkin_days ?? 0) + 1;
-        const shouldUnfreeze = row.is_frozen && newDays >= 3;
-        await supabase
-          .from('referral_earnings')
-          .update({
-            invitee_checkin_days: newDays,
-            ...(shouldUnfreeze
-              ? { is_frozen: false, unfreeze_at: new Date().toISOString() }
-              : {}),
-          })
-          .eq('id', row.id);
+      if (insertError) {
+        clearTimeout(safetyTimer);
+        setChecking(false);
+        return;
       }
+
+      // Increment invitee_checkin_days on any referral_earnings rows where this user is the invitee
+      const { data: inviteeRows } = await supabase
+        .from('referral_earnings')
+        .select('id, invitee_checkin_days, is_frozen')
+        .eq('invitee_key', sessionKey);
+
+      if (inviteeRows && inviteeRows.length > 0) {
+        for (const row of inviteeRows as { id: string; invitee_checkin_days: number; is_frozen: boolean }[]) {
+          const newDays = (row.invitee_checkin_days ?? 0) + 1;
+          const shouldUnfreeze = row.is_frozen && newDays >= 3;
+          await supabase
+            .from('referral_earnings')
+            .update({
+              invitee_checkin_days: newDays,
+              ...(shouldUnfreeze
+                ? { is_frozen: false, unfreeze_at: new Date().toISOString() }
+                : {}),
+            })
+            .eq('id', row.id);
+        }
+      }
+
+      onCheckin(10);
+      setCheckedInToday(true);
+      setStreak((prev) => prev + 1);
+
+      // Refresh frozen count after checkin
+      const { data: referrerFrozen } = await supabase
+        .from('referral_earnings')
+        .select('id')
+        .eq('referrer_key', sessionKey)
+        .eq('is_frozen', true);
+      setFrozenCount(referrerFrozen?.length ?? 0);
+    } catch {
+      // 即使网络出错，本地仍然标记打卡成功
+      onCheckin(10);
+      setCheckedInToday(true);
+      setStreak((prev) => prev + 1);
+    } finally {
+      clearTimeout(safetyTimer);
+      setChecking(false);
     }
-
-    onCheckin(10);
-    setCheckedInToday(true);
-    setStreak((prev) => prev + 1);
-    setChecking(false);
-
-    // Refresh frozen count after checkin
-    const { data: referrerFrozen } = await supabase
-      .from('referral_earnings')
-      .select('id')
-      .eq('referrer_key', sessionKey)
-      .eq('is_frozen', true);
-    setFrozenCount(referrerFrozen?.length ?? 0);
   };
 
   if (loading) {
