@@ -28,15 +28,23 @@ jobs:
     - name: Install dependencies
       run: |
         node -v && npm -v
-        npm install --legacy-peer-deps 2>&1
+        npm install 2>&1
         echo "=== Install exit code: $? ==="
+        ls node_modules/.bin/vite 2>&1 || echo "vite NOT in .bin"
+        ls node_modules/vite 2>&1 || echo "vite NOT in node_modules"
 
     - name: Build web
       run: |
-        npx vite build 2>&1
-        echo "=== Vite build exit code: $? ==="
-        # Try bundle script (may fail in ESM mode), don't block build
-        node scripts/bundle-offline-assets.js 2>&1 || echo "Bundle script skipped (non-critical)"
+        set +e
+        echo "=== Trying npm run build ==="
+        npm run build 2>&1
+        RC=$?
+        echo "=== npm run build exit: $RC ==="
+        if [ $RC -ne 0 ]; then
+          echo "=== Falling back to npx vite build ==="
+          npx --yes vite build 2>&1
+          echo "=== npx vite build exit: $? ==="
+        fi
 
     - name: Install Capacitor CLI & Sync
       run: |
@@ -186,14 +194,22 @@ jobs:
         
     - name: Install dependencies
       run: |
-        npm install --legacy-peer-deps 2>&1
+        npm install 2>&1
         echo "=== Install exit code: $? ==="
+        ls node_modules/.bin/vite 2>&1 || echo "vite NOT found"
 
     - name: Build Web
       run: |
-        npx vite build 2>&1
-        echo "=== Vite build exit code: $? ==="
-        node scripts/bundle-offline-assets.js 2>&1 || echo "Bundle script skipped (non-critical)"
+        set +e
+        echo "=== Trying npm run build ==="
+        npm run build 2>&1
+        RC=$?
+        echo "=== npm run build exit: $RC ==="
+        if [ $RC -ne 0 ]; then
+          echo "=== Falling back to npx vite build ==="
+          npx --yes vite build 2>&1
+          echo "=== npx vite build exit: $? ==="
+        fi
         
     - name: Install Capacitor & Sync iOS
       run: |
