@@ -25,11 +25,18 @@ jobs:
       with:
         node-version: '20'
 
-    - name: Install dependencies & Build web
+    - name: Install dependencies
       run: |
         node -v && npm -v
-        npm install --no-audit --no-fund
-        npm run build || npx vite build
+        npm install --legacy-peer-deps 2>&1
+        echo "=== Install exit code: $? ==="
+
+    - name: Build web
+      run: |
+        npx vite build 2>&1
+        echo "=== Vite build exit code: $? ==="
+        # Try bundle script (may fail in ESM mode), don't block build
+        node scripts/bundle-offline-assets.js 2>&1 || echo "Bundle script skipped (non-critical)"
 
     - name: Install Capacitor CLI & Sync
       run: |
@@ -177,10 +184,16 @@ jobs:
       with:
         node-version: '20'
         
-    - name: Install dependencies & Build Web
+    - name: Install dependencies
       run: |
-        npm install --no-audit --no-fund
-        npm run build || npx vite build
+        npm install --legacy-peer-deps 2>&1
+        echo "=== Install exit code: $? ==="
+
+    - name: Build Web
+      run: |
+        npx vite build 2>&1
+        echo "=== Vite build exit code: $? ==="
+        node scripts/bundle-offline-assets.js 2>&1 || echo "Bundle script skipped (non-critical)"
         
     - name: Install Capacitor & Sync iOS
       run: |
