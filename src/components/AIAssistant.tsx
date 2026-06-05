@@ -236,7 +236,7 @@ function simulateAIResponse(
     return `[查询] 「${input}」已加入学习列表。\n学习路径: 含义→发音→例句→场景运用 → 联网AI获取完整释义`;
   }
   if (mode === 'translate') {
-    const quick:{Record<string,string>}={ja:'りんご=日语',ko:'사과=韩语',fr:'pomme=法语',es:'manzana=西语',de:'Apfel=德语',it:'mela=意语',en:'apple=英语'};
+    const quick: Record<string,string> = {ja:'りんご=日语',ko:'사과=韩语',fr:'pomme=法语',es:'manzana=西语',de:'Apfel=德语',it:'mela=意语',en:'apple=英语'};
     return `[翻译] ${input} → ${lang}译文参考已生成。\n💡 联网DeepSeek AI精准翻译+文化注释+口语化改写`;
   }
   if (mode === 'correct') {
