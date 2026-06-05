@@ -726,12 +726,359 @@ function genGrammarGuide(lang){
   return guide;
 }
 
+// ========== 7. 趣味内容（笑话/段子/童谣/绕口令/冷知识）==========
+console.log('\n😂 生成趣味内容（笑话/段子/童谣/绕口令）...');
+
+function genFunContent(lang) {
+  const jokes = {
+    ja: [
+      {text:'「パンはパンでも食べられないパンはなーんだ？」→「フライパン！」',trans:'"面包(pan)中不能吃的pan是什么？"→"平底锅(frying pan)！"',type:'joke',level:'N5',tags:['dad_joke','food']},
+      {text:'「布団が吹っ飛んだ！」',trans:'"被子(futon)被吹飞了(futtonda)！"',type:'tongue_twister',level:'N4',tags:['puns','daily']},
+      {text:'「すもももももももものうち」',trans:'"李子(su-momo)和桃子(momo)都是桃类" - 经典日语绕口令',type:'tongue_twister',level:'N3',tags:['classic','pronunciation']},
+      {text:'「となりの客はよく柿食う客だ」',trans:'"隔壁的客人是经常吃柿子的客人" - 练习"ka-ki-ku"发音',type:'tongue_twister',level:'N3',tags:['pronunciation']},
+      {text:'ニワトリとタマゴ、どっちが先？',trans:'先有鸡还是先有蛋？日语版哲学笑话',type:'joke',level:'N5',tags:['philosophy']},
+    ],
+    en: [
+      {text:'Why did the English teacher go to jail? Because she got caught in a comma splice!',trans:'英语老师为什么进监狱？因为逗号拼接被抓了！',type:'joke',level:'B1',tags:['grammar','pun']},
+      {text:'I before E except after C... and also in "weird" and "science" and "their"...',trans:'I在E前，除了C后...但weird、science、their也是例外',type:'joke',level:'B1',tags:['spelling','rant']},
+      {text:'She sells seashells by the seashore. The shells she sells are surely seashells.',trans:'她在海边卖贝壳。她卖的贝壳确实是海贝壳。（经典绕口令）',type:'tongue_twister',level:'A2',tags:['classic','pronunciation']},
+      {text:'Peter Piper picked a peck of pickled peppers.',trans:'彼得·派珀摘了一配克的腌辣椒。（经典绕口令）',type:'tongue_twister',level:'A2',tags:['classic','pronunciation']},
+      {text:'Why did the dictionary go to therapy? It had too many issues.',trans:'字典为什么去看心理医生？问题/issues太多了（双关：issues=问题/期号）',type:'joke',level:'B2',tags:['pun','wordplay']},
+      {text:'How do you organize a space party? You planet!',trans:'怎么组织太空派对？你/行星/计划好了！(planet=plan it的双关)',type:'joke',level:'A2',tags:['pun']},
+      {text:'To the guy who invented zero: thanks for nothing!',trans:'致发明了零的人：感谢你给了我"无"！(thanks for nothing=双关)',type:'joke',level:'B1',tags:['pun','math']},
+      {text:`Humpty Dumpty sat on a wall, Humpty Dumpty had a great fall...`,trans:'蛋头先生墙上坐，蛋头先生摔大跤...（经典英文童谣）',type:'nursery_rhyme',level:'A1',tags:['children','classic']},
+      {text:`Twinkle twinkle little star, how I wonder what you are...`,trans:'一闪一闪小星星，我多想知道你是什么...（经典英文童谣）',type:'nursery_rhyme',level:'A1',tags:['children','classic']},
+      {text:`Row row row your boat, gently down the stream...`,trans:'划呀划呀划小船，轻轻顺流而下...（经典英文童谣）',type:'nursery_rhyme',level:'A1',tags:['children','song']},
+    ],
+    ko: [
+      {text:'간장공장 공장장은 강 공장장이고, 된장공장 공장장은 장 공장장이다.',trans:'酱油工厂厂长是姜厂长，大酱工厂厂长是张厂长。（经典韩语绕口令）',type:'tongue_twister',level:'T3',tags:['classic','pronunciation']},
+      {text:'"김"씨네 김밥이 "김이" 모락모락',trans:'"金"家的紫菜包饭冒着"热气"（同音词游戏）',type:'joke',level:'T2',tags:['pun','food']},
+    ],
+    fr: [
+      {text:'Pourquoi les français mangent-ils des escargots? Parce qu\'ils n\'aiment pas le fast-food!',trans:'为什么法国人吃蜗牛？因为他们不喜欢快餐！（蜗牛=慢食）',type:'joke',level:'A2',tags:['food','culture']},
+      {text:'Un chasseur sachant chasser sait chasser sans son chien.',trans:'会打猎的猎人知道不带狗也能打猎。（经典法语绕口令）',type:'tongue_twister',level:'B1',tags:['classic','pronunciation']},
+    ],
+    es: [
+      {text:'Tres tristes tigres tragan trigo en un trigal.',trans:'三只悲伤的老虎在麦田里吞食小麦。（经典西班牙语绕口令）',type:'tongue_twister',level:'A2',tags:['classic','pronunciation']},
+      {text:'¿Por qué los españoles duermen la siesta? ¡Porque el sol trabaja por ellos!',trans:'为什么西班牙人午睡？因为太阳替他们工作！',type:'joke',level:'A2',tags:['culture']},
+    ],
+    de: [
+      {text:'Fischers Fritz fischt frische Fische, frische Fische fischt Fischers Fritz.',trans:'费舍尔家的弗里茨捕捞鲜鱼，鲜鱼是费舍尔家的弗里茨捕捞的。（经典德语绕口令）',type:'tongue_twister',level:'A2',tags:['classic','pronunciation']},
+      {text:'Warum können Geister so schlecht lügen? Weil man durch sie hindurchsehen kann!',trans:'为什么鬼不擅长撒谎？因为人们能看穿他们！(双关：看穿/透过)',type:'joke',level:'B1',tags:['pun']},
+    ],
+    it: [
+      {text:'Sopra la panca la capra campa, sotto la panca la capra crepa.',trans:'长凳上山羊活着，长凳下山羊死了。（经典意大利语绕口令）',type:'tongue_twister',level:'A2',tags:['classic','pronunciation']},
+      {text:'Perché gli italiani parlano con le mani? Perché la bocca non basta!',trans:'为什么意大利人用手说话？因为嘴巴不够用！',type:'joke',level:'A2',tags:['culture']},
+    ],
+    pt: [
+      {text:'O rato roeu a roupa do rei de Roma.',trans:'老鼠啃了罗马国王的衣服。（经典葡萄牙语绕口令）',type:'tongue_twister',level:'A2',tags:['classic','pronunciation']},
+    ],
+    ar: [
+      {text:'خيط حرير على حيط خليل',trans:'丝绸线在哈利勒的墙上（经典阿拉伯语绕口令）',type:'tongue_twister',level:'T2',tags:['classic','pronunciation']},
+    ],
+    zh: [
+      {text:'四是四，十是十，十四是十四，四十是四十。',trans:'经典平翘舌绕口令',type:'tongue_twister',level:'T1',tags:['classic','pronunciation']},
+      {text:'吃葡萄不吐葡萄皮，不吃葡萄倒吐葡萄皮。',trans:'经典绕口令',type:'tongue_twister',level:'T1',tags:['classic','pronunciation']},
+      {text:'黑化肥发灰，灰化肥发黑。',trans:'经典声调绕口令',type:'tongue_twister',level:'T2',tags:['pronunciation']},
+      {text:`小兔子乖乖，把门儿开开，快点儿开开，我要进来。`,trans:'经典中文童谣',type:'nursery_rhyme',level:'T1',tags:['children','classic']},
+      {text:`小老鼠，上灯台，偷油吃，下不来。`,trans:'经典中文童谣',type:'nursery_rhyme',level:'T1',tags:['children','classic']},
+    ],
+  };
+
+  const data = jokes[lang] || jokes.en.map(j => ({...j, text:`[${LN[lang]}] ${j.text}`, trans: j.trans, type:'joke', level:'T1', tags:['generic']}));
+  return data.map((item, i) => ({
+    id: `${lang}_fun_${i + 1}`,
+    ...item,
+    language: lang,
+    tip: getFunLearningTip(item.type),
+  }));
+}
+
+function getFunLearningTip(type) {
+  const tips = {
+    joke: '💡 笑话帮记忆：笑点=记忆点！大脑对好笑的事记得更牢。试着用自己的话复述这个笑话。',
+    tongue_twister: '💡 绕口令练发音：慢速→中速→快速，每天练3遍，口腔肌肉形成记忆。',
+    nursery_rhyme: '💡 童谣学语感：跟着唱，不用理解每个词。节奏和韵律帮你自然掌握语感。',
+    pun: '💡 双关学词义：一词多义是语言的魅力，理解双关=掌握了深层含义。',
+    meme: '💡 表情包记文化：梗是文化的浓缩，了解梗=了解当地人的笑点和思维方式。',
+  };
+  return tips[type] || '💡 开心学语言：快乐时大脑释放多巴胺，学习效率翻倍！';
+}
+
+// ========== 8. 记忆法工具箱 ==========
+console.log('\n🧠 生成记忆法工具箱...');
+
+function genMemoryToolkit(lang) {
+  const methods = [
+    {
+      id: 'memory_palace',
+      title: '🏰 记忆宫殿法',
+      desc: '想象你熟悉的房间/路线，把要记的单词"放"在不同位置。回忆时在脑中"走一遍"。',
+      example: `记${LN[lang]}单词时：书桌=书(benkyou)、门=走(iku)、床=睡(nemuru)`,
+      steps: ['1.选一个你非常熟悉的空间（你家/教室）','2.把5-10个新词放到不同位置','3.闭上眼睛在脑中走一遍','4.第二天复习：走一遍还能记住多少？'],
+      language: lang,
+      difficulty: 'beginner',
+      tags: ['visual','spatial','advanced_technique'],
+    },
+    {
+      id: 'link_story',
+      title: '🔗 联想串联法',
+      desc: '把要背的词编成一个离奇搞笑的故事。越荒诞越容易记住！',
+      example: `记"猫(neko)→吃(taberu)→鱼(sakana)→高兴(ureshii)"→编成："一只巨大的猫穿着围裙在吃比自己还大的鱼，吃得开心极了！"`,
+      steps: ['1.列出5-10个新词','2.按任意顺序编故事，用上所有词','3.故事要夸张、搞笑、荒诞','4.讲给朋友听，讲出来记忆更深'],
+      language: lang,
+      difficulty: 'beginner',
+      tags: ['story','creative','fun'],
+    },
+    {
+      id: 'spaced_repetition',
+      title: '⏰ 间隔复习法（艾宾浩斯曲线）',
+      desc: '学后1天→3天→7天→14天→30天复习，用最少的次数达到永久记忆。',
+      example: `今天学了10个${LN[lang]}单词→明天复习→3天后复习→7天后复习→14天后复习→30天后复习`,
+      steps: ['1.每天只学5-15个新词','2.按照间隔表复习','3.记不住的标记出来重点复习','4.APP会自动提醒你复习'],
+      language: lang,
+      difficulty: 'beginner',
+      tags: ['scientific','repetition','core'],
+    },
+    {
+      id: 'mnemonic',
+      title: '🎨 谐音联想法',
+      desc: '用母语谐音+画面联想外语单词，好玩又好记。',
+      example: `${lang==='en'?'英语ambulance（救护车）→谐音"俺不能死"→画面：有人在救护车上喊"俺不能死啊！"':'用你母语的谐音来联想外语单词的发音'}>>`,
+      steps: ['1.听单词发音，找母语谐音','2.把谐音和词义编成一句话或画面','3.画面越夸张越好记'],
+      language: lang,
+      difficulty: 'beginner',
+      tags: ['creative','fun','phonetic'],
+    },
+    {
+      id: 'chunking',
+      title: '📦 组块记忆法',
+      desc: '把长词拆成小块，把相关词打包成组，一次记一块。',
+      example: 'unbelievable → un + believ(e) + able（不+相信+能的=难以置信）',
+      steps: ['1.长词先拆词根/前缀/后缀','2.相关词归为一组（如水果组/颜色组）','3.一次只记一个组块'],
+      language: lang,
+      difficulty: 'intermediate',
+      tags: ['structural','logical'],
+    },
+    {
+      id: 'music_rhythm',
+      title: '🎵 音乐节奏法',
+      desc: '把单词配上节奏/RAP/旋律，用音乐记忆。大脑对旋律的记忆远超文字。',
+      example: `把${LN[lang]}的星期词汇配上"小星星"的旋律唱出来`,
+      steps: ['1.选一首你熟悉的旋律','2.把单词替换歌词','3.跟着唱3遍','4.用APP的节奏模式练习'],
+      language: lang,
+      difficulty: 'beginner',
+      tags: ['music','fun','rhythm'],
+    },
+  ];
+  return methods;
+}
+
+// ========== 9. 名人学习方法库 ==========
+console.log('\n🌟 生成名人学习方法库...');
+
+function genCelebrityTips(lang) {
+  const tips = [
+    {
+      celebrity: '史蒂夫·考夫曼 (Steve Kaufmann)',
+      title: '多语言大神（会说20种语言）',
+      method: '大量输入法：大量阅读和听力，不刻意背单词，通过上下文自然习得。',
+      quote: '"语言不是学的，是泡出来的。每天大量听和读你感兴趣的内容。"',
+      actionable: `找3篇你感兴趣的${LN[lang]}短文，不查字典，先通读一遍猜大意，再精读查生词。`,
+      tags: ['input','natural','reading'],
+    },
+    {
+      celebrity: '卢卡·兰帕里 (Luca Lampariello)',
+      title: '意大利多语达人',
+      method: '翻译对照法：用双语材料对比学习，理解语言的表达逻辑而非死记硬背。',
+      quote: '"学语言不是翻译单词，而是学习用那种语言思考。"',
+      actionable: `找一段${LN[lang]}短文和其中文翻译，逐句对比，标注不同的表达方式。`,
+      tags: ['translation','logic','comparison'],
+    },
+    {
+      celebrity: '本尼·刘易斯 (Benny Lewis)',
+      title: '"三个月流利说"创始人',
+      method: '大胆开口法：从Day1就开始说，不管语法对错，先建立交流信心。',
+      quote: '"语法正确不是交流的前提，敢说才是。"',
+      actionable: `今天就用${LN[lang]}说一句完整的话，发到朋友圈或群里，不管对错！`,
+      tags: ['speaking','confidence','practice'],
+    },
+    {
+      celebrity: '加布里埃尔·怀纳 (Gabriel Wyner)',
+      title: '"永远流利"作者',
+      method: '图像联想法：不用翻译，直接用图片+场景+发音建立"外语→画面"的直接连接。',
+      quote: '"最好的记忆是不经过母语翻译的直接记忆。"',
+      actionable: `找5个${LN[lang]}名词，不看中文翻译，直接搜Google图片，建立词→图的直连。`,
+      tags: ['visual','no_translation','image'],
+    },
+    {
+      celebrity: '奥利·理查兹 (Olly Richards)',
+      title: '"故事学习法"创始人',
+      method: '故事沉浸法：阅读和你水平匹配的有趣故事，在情节中自然习得语言。',
+      quote: '"当你沉浸在故事中，你忘了自己在学语言——这才是最佳状态。"',
+      actionable: `打开APP的"分级阅读"功能，选一篇${LN[lang]}故事，享受阅读！`,
+      tags: ['story','reading','immersion'],
+    },
+    {
+      celebrity: '理查德·西姆科特 (Richard Simcott)',
+      title: '会用16种语言的多语者',
+      method: '每日微习惯法：每天只学15分钟，但365天不间断。坚持比强度更重要。',
+      quote: '"不是每天学几小时，而是每天学一点。微小的坚持胜过偶尔的冲刺。"',
+      actionable: `设定每日${LN[lang]}学习闹钟，只学15分钟，打卡365天！`,
+      tags: ['habit','consistency','daily'],
+    },
+  ];
+  
+  return tips.map((t, i) => ({
+    id: `${lang}_celebrity_${i + 1}`,
+    ...t,
+    language: lang,
+    languageName: LN[lang],
+  }));
+}
+
+// ========== 10. AI 陪聊陪练数据 ==========
+console.log('\n🤖 生成 AI 陪聊陪练场景...');
+
+function genAIChatData(lang) {
+  const scenarios = [
+    {
+      id: 'daily_chat',
+      title: '日常闲聊',
+      icon: '💬',
+      levels: {
+        beginner: {prompt:`你是一个耐心的${LN[lang]}老师，请用最简单的词汇和我聊天。如果我用中文回复，请帮我翻译成${LN[lang]}。`,topics:['自我介绍','天气','爱好','家庭']},
+        intermediate: {prompt:`你是一个${LN[lang]}母语者朋友，用自然语速和我聊天，遇到我不懂的词用简单方式解释。`,topics:['旅行','美食','工作','电影']},
+        advanced: {prompt:`你是一个${LN[lang]}本地人，用日常口语和我聊天，可以开开玩笑、聊时事新闻。`,topics:['社会话题','哲学讨论','科技','文化差异']},
+      },
+    },
+    {
+      id: 'interview_practice',
+      title: '求职面试',
+      icon: '💼',
+      levels: {
+        beginner: {prompt:`你是一个温和的面试官，用${LN[lang]}面试我，用简单的词汇提问。`,topics:['基本信息','简单经历','为什么选择这个工作']},
+        intermediate: {prompt:`你是一个专业的${LN[lang]}面试官，进行标准面试，纠正我的语法但不要打断对话。`,topics:['工作经验','技能介绍','职业规划']},
+        advanced: {prompt:`你是一个严格的${LN[lang]}面试官，用正式商务用语进行面试，考察专业表达能力。`,topics:['行业分析','领导力','案例处理']},
+      },
+    },
+    {
+      id: 'travel_convo',
+      title: '旅行场景',
+      icon: '✈️',
+      levels: {
+        beginner: {prompt:`我是游客，你是${LN[lang]}当地人，请用简单词语帮我完成旅行中的对话。`,topics:['问路','点餐','购物','酒店入住']},
+        intermediate: {prompt:`我们在${LN[lang]}旅行，你是当地导游，用自然的口语介绍景点和推荐美食。`,topics:['景点介绍','地道美食','交通建议']},
+        advanced: {prompt:`我们在深度体验当地文化，用丰富的${LN[lang]}表达分享风土人情和历史故事。`,topics:['历史人文','当地习俗','社会观察']},
+      },
+    },
+    {
+      id: 'debate',
+      title: '辩论讨论',
+      icon: '🎯',
+      levels: {
+        intermediate: {prompt:`我们用${LN[lang]}进行一场轻松的辩论，你可以选择立场，我会友好地反驳和提问。`,topics:['手机vs书本','猫vs狗','城市vs乡村']},
+        advanced: {prompt:`我们用${LN[lang]}进行深度辩论，注意逻辑结构、论据和说服技巧。`,topics:['AI的未来','环保议题','教育方式']},
+      },
+    },
+    {
+      id: 'role_play',
+      title: '角色扮演',
+      icon: '🎭',
+      levels: {
+        beginner: {prompt:`我们来玩角色扮演！你可以选一个简单场景（咖啡厅/超市/出租车上），我们用${LN[lang]}对话。`,topics:['在咖啡厅','在超市','打车','在药店']},
+        intermediate: {prompt:`角色扮演时间！选一个复杂场景（商务会议/医院/中介看房），我们用${LN[lang]}自然对话。`,topics:['商务会议','看病','租房','银行办事']},
+      },
+    },
+  ];
+
+  return scenarios.map((s, i) => ({
+    id: `${lang}_aichat_${i + 1}`,
+    ...s,
+    language: lang,
+    languageName: LN[lang],
+  }));
+}
+
+// ========== 11. 模拟考试数据 ==========
+console.log('\n📝 生成模拟考试数据...');
+
+function genMockExamData(lang) {
+  const examTypes = {
+    ja: ['JLPT N5', 'JLPT N4', 'JLPT N3', 'JLPT N2', 'JLPT N1'],
+    en: ['TOEFL', 'IELTS', 'TOEIC', 'CET-4', 'CET-6'],
+    ko: ['TOPIK I', 'TOPIK II'],
+    fr: ['DELF A1', 'DELF A2', 'DELF B1', 'DELF B2', 'DALF C1'],
+    es: ['DELE A1', 'DELE A2', 'DELE B1', 'DELE B2', 'DELE C1'],
+    de: ['Goethe A1', 'Goethe A2', 'Goethe B1', 'Goethe B2', 'TestDaF'],
+    it: ['CELI 1', 'CELI 2', 'CELI 3', 'CELI 4', 'CELI 5'],
+    pt: ['CAPLE A1', 'CAPLE A2', 'CAPLE B1', 'CAPLE B2', 'CAPLE C1'],
+    ar: ['ALPT A1', 'ALPT A2', 'ALPT B1', 'ALPT B2'],
+    zh: ['HSK 1', 'HSK 2', 'HSK 3', 'HSK 4', 'HSK 5', 'HSK 6'],
+  };
+
+  const exams = (examTypes[lang] || examTypes.en).map((examName, idx) => {
+    const sections = ['听力理解', '阅读理解', '语法词汇', '写作表达', '口语'];
+    const totalQuestions = 20 + idx * 10;
+    const timeMinutes = 30 + idx * 20;
+    
+    return {
+      id: `${lang}_exam_${idx + 1}`,
+      name: examName,
+      level: idx + 1,
+      sections: sections.map((sec, si) => ({
+        name: sec,
+        questionCount: Math.floor(totalQuestions / sections.length),
+        timeMinutes: Math.floor(timeMinutes / sections.length),
+        description: `${LN[lang]} ${examName} ${sec}部分`,
+      })),
+      passingScore: 60,
+      totalQuestions,
+      totalTime: timeMinutes,
+      tips: [
+        `考前熟悉${examName}的题型和答题卡格式`,
+        `听力部分：提前浏览题目，预测内容`,
+        `阅读部分：先看题目再读文章，带着问题找答案`,
+        `写作部分：列提纲→写正文→检查语法`,
+        `口语部分：大声练习，录音回听找问题`,
+      ],
+      language: lang,
+    };
+  });
+
+  return exams;
+}
+
+// ========== 12. 每日趣味挑战 ==========
+console.log('\n🎯 生成每日趣味挑战数据...');
+
+function genDailyChallenges(lang) {
+  const challengeTypes = [
+    {type:'word_of_the_day', title:'今日一词', desc:'学一个超有用/超好笑的词，用它造一个句子发朋友圈', icon:'📖'},
+    {type:'tongue_twister', title:'今日绕口令', desc:'跟读3遍绕口令，录下来听听自己的发音', icon:'👅'},
+    {type:'cultural_fact', title:'今日冷知识', desc:`了解一个关于${LN[lang]}文化的有趣冷知识`, icon:'💡'},
+    {type:'song_challenge', title:'今日唱歌', desc:`学唱一首${LN[lang]}歌曲的副歌部分`, icon:'🎤'},
+    {type:'translate_meme', title:'今日表情包', desc:'翻译一个网络热梗/表情包，看你能不能get到笑点', icon:'😂'},
+    {type:'shadow_speaking', title:'今日跟读', desc:'选一段台词/演讲，跟着原声同步朗读，模仿语调和节奏', icon:'🗣️'},
+    {type:'word_chain', title:'今日接龙', desc:`用${LN[lang]}玩词语接龙，前一个词的尾字母=下一个词的首字母`, icon:'🔗'},
+    {type:'describe_picture', title:'今日看图说话', desc:'看一张图片，用3句话描述你看到了什么', icon:'🖼️'},
+  ];
+
+  return challengeTypes.map((c, i) => ({
+    id: `${lang}_challenge_${i + 1}`,
+    ...c,
+    language: lang,
+    languageName: LN[lang],
+  }));
+}
+
 // ============================================
 // 主流程：生成所有语言的所有数据并写入文件
 // ============================================
 console.log('\n⚙️ 开始生成所有语言的数据...');
 
 const vocabData={}, phraseData={}, quizData={}, radioData={}, storyData={}, grammarData={};
+const funData={}, memoryData={}, celebrityData={}, aichatData={}, examData={}, challengeData={};
 const TARGET_COUNTS={ja:4000,en:4000,ko:2500,fr:2000,es:2000,de:2000,it:1500,pt:1500,ar:1000,zh:1000};
 
 LANGUAGES.forEach(lang=>{
@@ -746,8 +1093,14 @@ LANGUAGES.forEach(lang=>{
   radioData[lang]=genRadioData(lang,20);
   storyData[lang]=genStoryData(lang,50);
   grammarData[lang]=genGrammarGuide(lang);
+  funData[lang]=genFunContent(lang);
+  memoryData[lang]=genMemoryToolkit(lang);
+  celebrityData[lang]=genCelebrityTips(lang);
+  aichatData[lang]=genAIChatData(lang);
+  examData[lang]=genMockExamData(lang);
+  challengeData[lang]=genDailyChallenges(lang);
 
-  console.log(`  ✅ ${lang}: ${Object.keys(phraseData[lang]).length} 场景, ${quizData[lang].length} 题, ${radioData[lang].length} 电台, ${storyData[lang].length} 故事`);
+  console.log(`  ✅ ${lang}: ${Object.keys(phraseData[lang]).length} 场景, ${quizData[lang].length} 题, ${radioData[lang].length} 电台, ${storyData[lang].length} 故事, ${funData[lang].length} 趣味, ${aichatData[lang].length} AI场景, ${examData[lang].length} 考试`);
 });
 
 // 写入文件
@@ -759,6 +1112,12 @@ const files=[
   ['radio_packs.json',radioData],
   ['story_packs.json',storyData],
   ['grammar_guide.json',grammarData],
+  ['fun_content.json',funData],
+  ['memory_toolkit.json',memoryData],
+  ['celebrity_tips.json',celebrityData],
+  ['ai_chat_scenarios.json',aichatData],
+  ['mock_exams.json',examData],
+  ['daily_challenges.json',challengeData],
 ];
 
 files.forEach(([name,data])=>{
@@ -770,9 +1129,27 @@ files.forEach(([name,data])=>{
 
 // 清单文件
 const manifest={
-  version:'2.0',buildDate:new Date().toISOString(),languages:LANGUAGES,
-  files:{vocab:'data/vocab_packs.json',phrases:'data/scenario_phrases.json',quiz:'data/quiz_packs.json',radio:'data/radio_packs.json',stories:'data/story_packs.json',grammar:'data/grammar_guide.json'},
-  stats:LANGUAGES.reduce((acc,lang)=>{acc[lang]={vocab:vocabData[lang]?.length||0,phrases:Object.values(phraseData[lang]||{}).reduce((s,a)=>s+a.length,0),quiz:quizData[lang]?.length||0,radio:radioData[lang]?.length||0,stories:storyData[lang]?.length||0};return acc;},{}),
+  version:'3.0',buildDate:new Date().toISOString(),languages:LANGUAGES,
+  files:{
+    vocab:'data/vocab_packs.json',phrases:'data/scenario_phrases.json',quiz:'data/quiz_packs.json',
+    radio:'data/radio_packs.json',stories:'data/story_packs.json',grammar:'data/grammar_guide.json',
+    fun:'data/fun_content.json',memory:'data/memory_toolkit.json',celebrity:'data/celebrity_tips.json',
+    aichat:'data/ai_chat_scenarios.json',exam:'data/mock_exams.json',challenge:'data/daily_challenges.json',
+  },
+  stats:LANGUAGES.reduce((acc,lang)=>{
+    acc[lang]={
+      vocab:vocabData[lang]?.length||0,
+      phrases:Object.values(phraseData[lang]||{}).reduce((s,a)=>s+a.length,0),
+      quiz:quizData[lang]?.length||0,
+      radio:radioData[lang]?.length||0,
+      stories:storyData[lang]?.length||0,
+      fun:funData[lang]?.length||0,
+      aichat:aichatData[lang]?.length||0,
+      exams:examData[lang]?.length||0,
+      challenges:challengeData[lang]?.length||0,
+    };
+    return acc;
+  },{}},
 };
 
 fs.writeFileSync(path.join(DATA_DIR,'content_manifest.json'),JSON.stringify(manifest,null,2));
@@ -790,11 +1167,17 @@ let totalBytes=0;
 files.forEach(([name])=>{
   totalBytes+=fs.statSync(path.join(DATA_DIR,name)).size;
 });
-console.log('\n'+ '='.repeat(60));
-console.log('✅ 离线资源打包完成！v2.0 Massive Edition');
+console.log('\n'+'='.repeat(60));
+console.log('✅ 离线资源打包完成！v3.0 趣味学习版');
 console.log('='.repeat(60));
 console.log(`\n📊 总数据大小: ${(totalBytes/1024/1024).toFixed(2)} MB`);
 console.log(`📊 预计APK增加体积: ~${(totalBytes/1024/1024).toFixed(0)} MB (数据)`);
 console.log(`\n🎯 包含内容:`);
-LANGUAGES.forEach(lang=>console.log(`   ${LN[lang]}: ${vocabData[lang]?.length||0} 词 / ${quizData[lang]?.length||0} 题 / ${radioData[lang]?.length||0} 电台 / ${storyData[lang]?.length||0} 故事`));
-console.log('\n🎉 用户首次安装即可使用完整离线学习内容！');
+LANGUAGES.forEach(lang=>console.log(`   ${LN[lang]}: ${vocabData[lang]?.length||0}词 / ${quizData[lang]?.length||0}题 / ${funData[lang]?.length||0}趣味 / ${aichatData[lang]?.length||0}AI场景 / ${examData[lang]?.length||0}考试`));
+console.log('\n😂 趣味学习模块: 笑话 · 段子 · 绕口令 · 童谣 · 冷知识');
+console.log('🧠 记忆法工具箱: 宫殿记忆 · 联想串联 · 间隔复习 · 谐音法 · 组块法 · 音乐节奏');
+console.log('🌟 名人方法: 6位多语大咖的学习秘诀');
+console.log('🤖 AI陪练: 日常闲聊 · 求职面试 · 旅行 · 辩论 · 角色扮演');
+console.log('📝 模拟考试: JLPT/TOEFL/IELTS/TOPIK/DELF/DELE/HSK等全面覆盖');
+console.log('🎯 每日挑战: 8种趣味任务，让学语言充满乐趣');
+console.log('\n🎉 开心学语言，学得哈哈笑！首次安装即可使用完整离线内容！');
