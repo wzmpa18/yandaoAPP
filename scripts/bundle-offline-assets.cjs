@@ -501,7 +501,7 @@ const SCENARIOS=[
   {id:'party',desc:'聚会社交'},
   {id:'campus',desc:'校园生活'},
   {id:'airport',desc:'机场出行'},
-  {id:'bank',desc':'银行办事'},
+  {id:'bank',desc:'银行办事'},
   {id:'post_office',desc:'邮局寄件'},
   {id:'library',desc:'图书馆'},
   {id:'gym', desc:'健身房'},
@@ -675,7 +675,7 @@ function generateStoryTitle(lang,genre,i){
 }
 function generateStoryContent(lang,genre,level,targetWords){
   let s='';
-  const opener={`[${LN[lang]} Story - ${genre}]\n\n`;
+  const opener='['+LN[lang]+' Story - '+genre+']\n\n';
   const body=[
     `Once upon a time, in a world where ${LN[lang]} was spoken by everyone, there lived someone who loved ${genre} stories.\n\n`,
     `Every morning, they would practice their ${LN[lang]} vocabulary, hoping to one day master the language completely.\n\n`,
@@ -1149,7 +1149,7 @@ const manifest={
       challenges:challengeData[lang]?.length||0,
     };
     return acc;
-  },{}},
+  },{}),
 };
 
 fs.writeFileSync(path.join(DATA_DIR,'content_manifest.json'),JSON.stringify(manifest,null,2));
