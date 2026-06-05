@@ -36,14 +36,14 @@ jobs:
     - name: Build web
       run: |
         set +e
-        echo "=== Trying npm run build ==="
+        echo "=== Running npm run build (includes offline data bundling) ==="
         npm run build 2>&1
         RC=$?
         echo "=== npm run build exit: $RC ==="
         if [ $RC -ne 0 ]; then
-          echo "=== Falling back to npx vite build ==="
-          npx --yes vite build 2>&1
-          echo "=== npx vite build exit: $? ==="
+          echo "!!! BUILD FAILED !!!"
+          echo "Offline data bundle is CRITICAL - cannot fallback to bare vite build"
+          exit 1
         fi
 
     - name: Install Capacitor CLI & Sync
@@ -232,14 +232,14 @@ jobs:
     - name: Build Web
       run: |
         set +e
-        echo "=== Trying npm run build ==="
+        echo "=== Running npm run build (includes offline data bundling) ==="
         npm run build 2>&1
         RC=$?
         echo "=== npm run build exit: $RC ==="
         if [ $RC -ne 0 ]; then
-          echo "=== Falling back to npx vite build ==="
-          npx --yes vite build 2>&1
-          echo "=== npx vite build exit: $? ==="
+          echo "!!! BUILD FAILED !!!"
+          echo "Offline data bundle is CRITICAL - cannot fallback"
+          exit 1
         fi
         
     - name: Install Capacitor & Sync iOS
