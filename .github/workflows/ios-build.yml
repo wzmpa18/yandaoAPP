@@ -33,18 +33,35 @@ jobs:
         ls node_modules/.bin/vite 2>&1 || echo "vite NOT in .bin"
         ls node_modules/vite 2>&1 || echo "vite NOT in node_modules"
 
-    - name: Build web
+    - name: Vite build
+      id: vite_build
       run: |
-        set +e
-        echo "=== Running npm run build (includes offline data bundling) ==="
-        npm run build 2>&1
+        echo "=== Running vite build ==="
+        node -v && npm -v
+        npx --yes vite build 2>&1
         RC=$?
-        echo "=== npm run build exit: $RC ==="
+        echo "=== vite build exit: $RC ==="
         if [ $RC -ne 0 ]; then
-          echo "!!! BUILD FAILED !!!"
-          echo "Offline data bundle is CRITICAL - cannot fallback to bare vite build"
+          echo "!!! VITE BUILD FAILED !!!"
           exit 1
         fi
+        echo "=== dist/ contents after vite build ==="
+        ls -la dist/ 2>/dev/null | head -10 || echo "dist/ not found"
+        echo "vite_build_ok=true" >> $GITHUB_OUTPUT
+
+    - name: Bundle offline assets
+      if: steps.vite_build.outputs.vite_build_ok == 'true'
+      run: |
+        echo "=== Running offline asset bundler ==="
+        node scripts/bundle-offline-assets.cjs 2>&1
+        RC=$?
+        echo "=== bundle script exit: $RC ==="
+        if [ $RC -ne 0 ]; then
+          echo "!!! BUNDLE SCRIPT FAILED !!!"
+          exit 1
+        fi
+        echo "=== dist/ total size after bundle ==="
+        du -sh dist/ 2>/dev/null || ls -la dist/
 
     - name: Install Capacitor CLI & Sync
       run: |
@@ -229,18 +246,35 @@ jobs:
         echo "=== Install exit code: $? ==="
         ls node_modules/.bin/vite 2>&1 || echo "vite NOT found"
 
-    - name: Build Web
+    - name: Vite build (iOS)
+      id: vite_build_ios
       run: |
-        set +e
-        echo "=== Running npm run build (includes offline data bundling) ==="
-        npm run build 2>&1
+        echo "=== Running vite build ==="
+        node -v && npm -v
+        npx --yes vite build 2>&1
         RC=$?
-        echo "=== npm run build exit: $RC ==="
+        echo "=== vite build exit: $RC ==="
         if [ $RC -ne 0 ]; then
-          echo "!!! BUILD FAILED !!!"
-          echo "Offline data bundle is CRITICAL - cannot fallback"
+          echo "!!! VITE BUILD FAILED !!!"
           exit 1
         fi
+        echo "=== dist/ contents ==="
+        ls -la dist/ 2>/dev/null | head -10 || echo "dist/ not found"
+        echo "vite_build_ok=true" >> $GITHUB_OUTPUT
+
+    - name: Bundle offline assets (iOS)
+      if: steps.vite_build_ios.outputs.vite_build_ok == 'true'
+      run: |
+        echo "=== Running offline asset bundler ==="
+        node scripts/bundle-offline-assets.cjs 2>&1
+        RC=$?
+        echo "=== bundle script exit: $RC ==="
+        if [ $RC -ne 0 ]; then
+          echo "!!! BUNDLE SCRIPT FAILED !!!"
+          exit 1
+        fi
+        echo "=== dist/ total size ==="
+        du -sh dist/ 2>/dev/null || ls -la dist/
         
     - name: Install Capacitor & Sync iOS
       run: |
