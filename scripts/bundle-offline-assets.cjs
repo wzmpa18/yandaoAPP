@@ -19,7 +19,7 @@ const PUBLIC_DIR = path.join(__dirname, '..', 'public');
 [DATA_DIR].forEach(dir => { if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true }); });
 
 console.log('📦 言道离线资源打包器 v2.0 Massive Edition');
-console.log('=' .repeat(60));
+console.log('='.repeat(60));
 
 const LANGUAGES = ['ja', 'en', 'ko', 'fr', 'es', 'de', 'it', 'pt', 'ar', 'zh'];
 const LN = { ja:'日语', en:'英语', ko:'韩语', fr:'法语', es:'西班牙语', de:'德语', it:'意大利语', pt:'葡萄牙语', ar:'阿拉伯语', zh:'中文' };
@@ -578,7 +578,7 @@ function genQuizData(lang,count){
 function generateQuizQuestion(lang,type,idx){
   const templates={
     choice:`What does "${LN[lang]}_word_${idx}" mean in ${LN[lang]}? Select the best answer.`,
-    fill_blank:`Fill in the blank: "私は___に行きます。" (${LN[grammar question #${idx}]})`,
+    fill_blank:`Fill in the blank: "私は___に行きます。" (${LN[lang]} grammar question #${idx})`,
     matching:`Match the following ${LN[lang]} expressions with their meanings. (#${idx})`,
     true_false:`True or False: This statement about ${LN[lang]} grammar is correct. (#${idx})`,
     listening:`Listen to the audio and answer: ${LN[lang]} comprehension question #${idx}`,
@@ -701,25 +701,25 @@ function genGrammarGuide(lang){
   const guide={language:lang, sections:[]};
   const topics=[
     {title:'基本语序',rules:[
-      {pattern:'SVO',example:'主语+谓语+宾语',note:${LN[lang]}的基本语序结构。`},
-      {pattern:'疑问句',example:'助词倒装/疑问词前置',note:${LN[lang]}中构成疑问句的方式。`},
-      {pattern:'否定形式',example:'否定副词/否定助动词',note:${LN[lang]}中表达否定的语法手段。`},
+      {pattern:'SVO',example:'主语+谓语+宾语',note:`${LN[lang]}的基本语序结构。`},
+      {pattern:'疑问句',example:'助词倒装/疑问词前置',note:`${LN[lang]}中构成疑问句的方式。`},
+      {pattern:'否定形式',example:'否定副词/否定助动词',note:`${LN[lang]}中表达否定的语法手段。`},
     ]},
     {title:'时态系统',rules:[
-      {pattern:'现在时',example:'当前状态/习惯动作',note:${LN[lang]}表达现在的各种方式。`},
-      {pattern:'过去时',example:'已完成动作/过去状态',note:${LN[lang]}中标记过去的语法。`},
-      {pattern:'将来时',example:'将要发生的动作',note:${LN[lang]}表达未来的结构。`},
+      {pattern:'现在时',example:'当前状态/习惯动作',note:`${LN[lang]}表达现在的各种方式。`},
+      {pattern:'过去时',example:'已完成动作/过去状态',note:`${LN[lang]}中标记过去的语法。`},
+      {pattern:'将来时',example:'将要发生的动作',note:`${LN[lang]}表达未来的结构。`},
       {pattern:'完成时',example:'与现在相关的过去',note:`${LN[lang]}的完成体/完成时用法。`},
     ]},
     {title:'名词短语',rules:[
-      {pattern:'数与格的一致',example:'单复数/冠词配合',note:${LN[lang]}中名词短语的结构规则。`},
-      {pattern:'所有格/属格',example:'所属关系的表达',note:${LN[lang]}中表示所属的方式。`},
+      {pattern:'数与格的一致',example:'单复数/冠词配合',note:`${LN[lang]}中名词短语的结构规则。`},
+      {pattern:'所有格/属格',example:'所属关系的表达',note:`${LN[lang]}中表示所属的方式。`},
       {pattern:'指示限定词',example:'这/那/这些/那些',note:`${LN[lang]}的指示词系统。`},
     ]},
     {title:'从句结构',rules:[
-      {pattern:'关系从句',example:'修饰名词的从句',note:${LN[lang]}中关系从句的构造。`},
-      {pattern:'状语从句',example:'时间/原因/条件/让步',note:${LN[lang]}各类状语从句。`},
-      {pattern:'名词性从句',example:'主语/宾语/表语/同位语从句',note:${LN[lang]}的名词从句。`},
+      {pattern:'关系从句',example:'修饰名词的从句',note:`${LN[lang]}中关系从句的构造。`},
+      {pattern:'状语从句',example:'时间/原因/条件/让步',note:`${LN[lang]}各类状语从句。`},
+      {pattern:'名词性从句',example:'主语/宾语/表语/同位语从句',note:`${LN[lang]}的名词从句。`},
     ]},
   ];
   guide.sections=topics;
@@ -792,7 +792,7 @@ files.forEach(([name])=>{
 });
 console.log('\n'+ '='.repeat(60));
 console.log('✅ 离线资源打包完成！v2.0 Massive Edition');
-console.log('=' .repeat(60));
+console.log('='.repeat(60));
 console.log(`\n📊 总数据大小: ${(totalBytes/1024/1024).toFixed(2)} MB`);
 console.log(`📊 预计APK增加体积: ~${(totalBytes/1024/1024).toFixed(0)} MB (数据)`);
 console.log(`\n🎯 包含内容:`);
