@@ -154,7 +154,37 @@ jobs:
         GITHUB_SHA: ${{ github.sha }}
       run: |
         set +e
+
+        # === CHECK REQUIRED SECRETS ===
+        echo "=========================================="
+        echo "  CHECKING SECRETS"
+        echo "=========================================="
         
+        MISSING=0
+        
+        if [ -z "$R2_API_TOKEN" ]; then
+          echo "[ERROR] R2_API_TOKEN is NOT SET!"
+          echo "  → Go to GitHub Settings → Secrets → Add: name=R2_API_TOKEN"
+          echo "  → Value: Create at Cloudflare Dashboard → R2 API Tokens"
+          MISSING=1
+        else
+          echo "R2_API_TOKEN: OK (length=${#R2_API_TOKEN})"
+        fi
+
+        if [ -z "$CF_API_TOKEN" ]; then
+          echo "[WARN] CF_API_TOKEN not set - cache purge will be skipped"
+        fi
+
+        if [ -z "$CF_ZONE_ID" ]; then
+          echo "[WARN] CF_ZONE_ID not set - cache purge will be skipped"
+        fi
+
+        if [ $MISSING -eq 1 ]; then
+          echo ""
+          echo "❌ Cannot proceed without R2_API_TOKEN"
+          exit 0
+        fi
+
         # Write build verifier with timestamp
         TIMESTAMP=$(date -u +%Y%m%d-%H%M%S)
         if [ -d "dist" ]; then
@@ -190,44 +220,39 @@ jobs:
         ZONE="${CF_ZONE_ID}"
 
         if [ -z "$CF_T" ] || [ -z "$ZONE" ]; then
-          echo "[ERROR] Missing credentials:"
-          echo "  CF_API_TOKEN: $([ -n '$CF_T' ] && echo 'SET' || echo 'MISSING')"
-          echo "  CF_ZONE_ID: $([ -n '$ZONE' ] && echo 'SET' || echo 'MISSING')"
-          exit 0
-        fi
-
-        echo "Zone ID: $ZONE"
-        PURGE_RESP=$(curl -s -X POST \
-          "https://api.cloudflare.com/client/v4/zones/${ZONE}/purge_cache" \
-          -H "Authorization: Bearer ${CF_T}" \
-          -H "Content-Type: application/json" \
-          -d '{"purge_everything":true}' 2>&1)
-
-        echo "Purge API response: $PURGE_RESP"
-
-        if echo "$PURGE_RESP" | grep -q '"success":true'; then
-          echo "✅✅✅ Cloudflare cache purged SUCCESSFULLY! ✅✅✅"
+          echo "[SKIP] Cache purge needs CF_API_TOKEN + CF_ZONE_ID"
         else
-          echo "⚠️ Cache purge response did not confirm success"
+          echo "Zone ID: $ZONE"
+          PURGE_RESP=$(curl -s -X POST \
+            "https://api.cloudflare.com/client/v4/zones/${ZONE}/purge_cache" \
+            -H "Authorization: Bearer ${CF_T}" \
+            -H "Content-Type: application/json" \
+            -d '{"purge_everything":true}' 2>&1)
+
+          echo "Purge response: $PURGE_RESP"
+
+          if echo "$PURGE_RESP" | grep -q '"success":true'; then
+            echo "✅✅✅ Cloudflare cache purged! ✅✅✅"
+          else
+            echo "⚠️ Cache purge may have failed"
+          fi
+
+          # Wait for CDN propagation
+          sleep 5
+
+          # === VERIFICATION ===
+          echo ""
+          echo "=========================================="
+          echo "  VERIFYING yandao.vip"
+          echo "=========================================="
+          VERIFIER=$(curl -s -H "Cache-Control: no-cache" "https://yandao.vip/build-verifier.txt" 2>&1)
+          echo "build-verifier.txt:"
+          echo "${VERIFIER:-[EMPTY / 404]}"
+          INDEX_HDR=$(curl -sI -H "Cache-Control: no-cache" "https://yandao.vip/" 2>&1)
+          echo "index.html: $(echo "$INDEX_HDR" | grep -i last-modified | head -1)"
         fi
-
-        # Wait for CDN propagation
-        echo ""
-        echo "Waiting 8s for CDN propagation..."
-        sleep 8
-
-        # === VERIFICATION ===
-        echo ""
         echo "=========================================="
-        echo "  VERIFICATION - yandao.vip"
-        echo "=========================================="
-        VERIFIER=$(curl -s -H "Cache-Control: no-cache" "https://yandao.vip/build-verifier.txt" 2>&1)
-        echo "build-verifier.txt from yandao.vip:"
-        echo "${VERIFIER:-[EMPTY / 404 / NOT FOUND]}"
-        
-        INDEX_HDR=$(curl -sI -H "Cache-Control: no-cache" "https://yandao.vip/" 2>&1)
-        INDEX_MOD=$(echo "$INDEX_HDR" | grep -i last-modified | head -1)
-        echo "index.html header: ${INDEX_MOD}"
+        echo "  DEPLOYMENT COMPLETE"
         echo "=========================================="
 
     - name: Save R2 upload log
