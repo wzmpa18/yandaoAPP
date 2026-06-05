@@ -60,7 +60,6 @@ jobs:
         ls -la node_modules/.bin/cap 2>&1 || echo "cap not in .bin"
         ls -la node_modules/@capacitor/cli 2>&1 || echo "cli not in node_modules"
         echo "=== Running cap sync android ==="
-        # Use node_modules/.bin/cap directly to avoid npx issues
         if [ -f node_modules/.bin/cap ]; then
           node_modules/.bin/cap sync android 2>&1 || {
             echo "WARNING: cap sync failed"
@@ -121,136 +120,122 @@ jobs:
         retention-days: 30
       continue-on-error: true
 
-    - name: Enable R2 Public Access (via CF API)
+    # ============================================================
+    # R2 UPLOAD & CACHE PURGE (Cloudflare REST API version)
+    # Uses R2_API_TOKEN instead of S3 credentials
+    # ============================================================
+    
+    - name: Upload APK to R2 via REST API
       if: success()
       env:
-        CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        R2_API_TOKEN: ${{ secrets.R2_API_TOKEN }}
+        R2_ACCOUNT_ID: ${{ secrets.R2_ENDPOINT }}
       run: |
-        # Enable R2 public access so users can download APK/IPA via r2.dev domain
-        echo "=== Enabling R2 Public Access ==="
-        ACCOUNT_ID="${{ secrets.R2_ENDPOINT }}"
-        BUCKET="${{ secrets.R2_BUCKET }}"
-
-        # Try to enable managed domain for public access
-        curl -s -X PUT \
-          "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/r2/buckets/$BUCKET/domains/managed" \
-          -H "Authorization: Bearer $CF_API_TOKEN" \
-          -H "Content-Type: application/json" \
-          -d '{"enabled": true}' | head -c 500 || true
-
-        # Also try the public-access endpoint
-        curl -s -X POST \
-          "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/r2/buckets/$BUCKET/public-access" \
-          -H "Authorization: Bearer $CF_API_TOKEN" \
-          -H "Content-Type: application/json" \
-          -d '{"enabled": true}' | head -c 500 || true
-
-        echo "R2 public access configuration attempted."
-        echo "Download URL will be: https://$BUCKET.$ACCOUNT_ID.r2.dev/android/yandao-latest.apk"
-      continue-on-error: true
-
-    - name: Upload to Cloudflare R2
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_KEY }}
-        AWS_DEFAULT_REGION: auto
-      run: |
-        pip3 install awscli --quiet --break-system-packages 2>/dev/null || pip3 install awscli --quiet
+        set +e
         TIMESTAMP=$(date +%Y%m%d-%H%M%S)
-        BUCKET="${{ secrets.R2_BUCKET }}"
-        R2_EP="${{ secrets.R2_ENDPOINT }}"
-        if echo "$R2_EP" | grep -q '^https\?://'; then
-          ENDPOINT="$R2_EP"
-        else
-          ENDPOINT="https://$R2_EP.r2.cloudflarestorage.com"
-        fi
-        echo "APK Upload: BUCKET=$BUCKET ENDPOINT=$ENDPOINT"
-        UPLOADED=false
+        echo "=== Uploading APKs to R2 (REST API mode) ==="
         for apk in $(find android -name "*.apk" -type f 2>/dev/null); do
           SIZE=$(stat -c%s "$apk" 2>/dev/null || echo 0)
-          echo "Found APK: $apk ($SIZE bytes)"
-          # 带时间戳版本
           NAME="yandao-${TIMESTAMP}-$(basename "$apk")"
-          aws s3 cp "$apk" "s3://$BUCKET/android/$NAME" \
-            --endpoint-url "$ENDPOINT" && echo "Uploaded $NAME" || echo "Failed $NAME"
-          # 固定latest版本（供下载页直接引用）
-          aws s3 cp "$apk" "s3://$BUCKET/android/yandao-latest.apk" \
-            --endpoint-url "$ENDPOINT" && echo "Updated yandao-latest.apk" || echo "Failed latest"
-          # 同时上传到根目录（兼容旧下载页链接 /app-release.apk）
-          aws s3 cp "$apk" "s3://$BUCKET/app-release.apk" \
-            --endpoint-url "$ENDPOINT" && echo "Updated app-release.apk (root)" || echo "Failed root"
-          UPLOADED=true
-        done
-        if [ "$UPLOADED" = false ]; then
-          echo "WARNING: No APK files found to upload!"
-        fi
+          echo "Found APK: $apk ($SIZE bytes)"
+          python3 r2_upload.py "$apk" "android/$NAME" 2>&1
+          python3 r2_upload.py "$apk" "android/yandao-latest.apk" 2>&1
+          python3 r2_upload.py "$apk" "app-release.apk" 2>&1
+        done || echo "[WARN] No APK files found"
 
-    - name: Upload web dist to Cloudflare R2
+    - name: Upload web dist to R2 & Purge Cache
+      if: success()
       env:
-        R2_ACCESS_KEY: ${{ secrets.R2_ACCESS_KEY }}
-        R2_SECRET_KEY: ${{ secrets.R2_SECRET_KEY }}
-        R2_BUCKET: ${{ secrets.R2_BUCKET }}
-        R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+        R2_API_TOKEN: ${{ secrets.R2_API_TOKEN }}
+        R2_ACCOUNT_ID: ${{ secrets.R2_ENDPOINT }}
         CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
         CF_ZONE_ID: ${{ secrets.CF_ZONE_ID }}
         GITHUB_RUN_ID: ${{ github.run_id }}
         GITHUB_SHA: ${{ github.sha }}
       run: |
         set +e
-        # Write build verifier
+        
+        # Write build verifier with timestamp
         TIMESTAMP=$(date -u +%Y%m%d-%H%M%S)
         if [ -d "dist" ]; then
           echo "${TIMESTAMP} - Build ${GITHUB_RUN_ID} - SHA ${GITHUB_SHA}" > dist/build-verifier.txt
           echo "dist/ contents:"
-          ls -la dist/ 2>/dev/null
-        fi
-        # Run CF API diagnostics
-        echo "=== Running r2_diag.py ==="
-        python3 r2_diag.py 2>&1 | tee r2_diag_log.txt
-        # Use Python boto3 for verbose R2 upload
-        pip3 install boto3 --quiet --break-system-packages 2>/dev/null || pip3 install boto3 --quiet
-        echo "=== Running r2_upload.py ==="
-        python3 r2_upload.py "${R2_BUCKET}" "${R2_ENDPOINT}" "${R2_ACCESS_KEY}" "${R2_SECRET_KEY}" "dist" 2>&1 | tee r2_upload_log.txt
-        echo "=== r2_upload.py exit code: $? ==="
-        # Also upload public/ if exists
-        if [ -d "public" ]; then
-          python3 r2_upload.py "${R2_BUCKET}" "${R2_ENDPOINT}" "${R2_ACCESS_KEY}" "${R2_SECRET_KEY}" "public" 2>&1 | tee -a r2_upload_log.txt
-        fi
-        # Purge Cloudflare cache if token available
-        CF_TOKEN="${CF_API_TOKEN}"
-        ZONE_ID="${CF_ZONE_ID}"
-        if [ -n "$CF_TOKEN" ] && [ -n "$ZONE_ID" ]; then
-          echo "Purging Cloudflare cache..."
-          curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${ZONE_ID}/purge_cache" \
-            -H "Authorization: Bearer ${CF_TOKEN}" \
-            -H "Content-Type: application/json" \
-            -d '{"purge_everything":true}' 2>&1 | head -c 500 || true
-          sleep 10
-          echo "Verifying yandao.vip..."
-          curl -s -H "Cache-Control: no-cache" "https://yandao.vip/build-verifier.txt" 2>&1 | head -5 || true
-        elif [ -n "$CF_TOKEN" ]; then
-          ZONES=$(curl -s -H "Authorization: Bearer ${CF_TOKEN}" "https://api.cloudflare.com/client/v4/zones?name=yandao.vip" 2>&1)
-          FOUND_ZONE=$(echo "$ZONES" | grep -o '"id":"[^"]*"' | head -1 | cut -d'"' -f4)
-          if [ -n "$FOUND_ZONE" ]; then
-            curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${FOUND_ZONE}/purge_cache" \
-              -H "Authorization: Bearer ${CF_TOKEN}" \
-              -H "Content-Type: application/json" \
-              -d '{"purge_everything":true}' 2>&1 | head -c 500 || true
-            sleep 10
-            curl -s -H "Cache-Control: no-cache" "https://yandao.vip/build-verifier.txt" 2>&1 | head -5 || true
-          fi
+          ls -la dist/ 2>/dev/null | head -20
         else
-          echo "CF_API_TOKEN not set - cannot purge cache"
+          echo "[ERROR] dist/ directory NOT FOUND!"
+          ls -la . 2>/dev/null
         fi
 
-    - name: Upload R2 diagnostic log
+        # Upload web files to R2 via REST API (no boto3 needed!)
+        echo ""
+        echo "=========================================="
+        echo "  UPLOADING dist/ TO R2 (REST API)"
+        echo "=========================================="
+        python3 r2_upload.py dist 2>&1 | tee r2_upload_log.txt
+        RC=$?
+        echo "r2_upload.py exit code: $RC"
+
+        # Also upload public/ if exists
+        if [ -d "public" ]; then
+          echo "=== Uploading public/ to R2 ==="
+          python3 r2_upload.py public 2>&1 | tee -a r2_upload_log.txt
+        fi
+
+        # === PURGE CLOUDFLARE CACHE ===
+        echo ""
+        echo "=========================================="
+        echo "  CLOUDFLARE CACHE PURGE"
+        echo "=========================================="
+        CF_T="${CF_API_TOKEN}"
+        ZONE="${CF_ZONE_ID}"
+
+        if [ -z "$CF_T" ] || [ -z "$ZONE" ]; then
+          echo "[ERROR] Missing credentials:"
+          echo "  CF_API_TOKEN: $([ -n '$CF_T' ] && echo 'SET' || echo 'MISSING')"
+          echo "  CF_ZONE_ID: $([ -n '$ZONE' ] && echo 'SET' || echo 'MISSING')"
+          exit 0
+        fi
+
+        echo "Zone ID: $ZONE"
+        PURGE_RESP=$(curl -s -X POST \
+          "https://api.cloudflare.com/client/v4/zones/${ZONE}/purge_cache" \
+          -H "Authorization: Bearer ${CF_T}" \
+          -H "Content-Type: application/json" \
+          -d '{"purge_everything":true}' 2>&1)
+
+        echo "Purge API response: $PURGE_RESP"
+
+        if echo "$PURGE_RESP" | grep -q '"success":true'; then
+          echo "✅✅✅ Cloudflare cache purged SUCCESSFULLY! ✅✅✅"
+        else
+          echo "⚠️ Cache purge response did not confirm success"
+        fi
+
+        # Wait for CDN propagation
+        echo ""
+        echo "Waiting 8s for CDN propagation..."
+        sleep 8
+
+        # === VERIFICATION ===
+        echo ""
+        echo "=========================================="
+        echo "  VERIFICATION - yandao.vip"
+        echo "=========================================="
+        VERIFIER=$(curl -s -H "Cache-Control: no-cache" "https://yandao.vip/build-verifier.txt" 2>&1)
+        echo "build-verifier.txt from yandao.vip:"
+        echo "${VERIFIER:-[EMPTY / 404 / NOT FOUND]}"
+        
+        INDEX_HDR=$(curl -sI -H "Cache-Control: no-cache" "https://yandao.vip/" 2>&1)
+        INDEX_MOD=$(echo "$INDEX_HDR" | grep -i last-modified | head -1)
+        echo "index.html header: ${INDEX_MOD}"
+        echo "=========================================="
+
+    - name: Save R2 upload log
       if: always()
       uses: actions/upload-artifact@v4
       with:
         name: r2-upload-log
-        path: |
-          r2_upload_log.txt
-          r2_diag_log.txt
+        path: r2_upload_log.txt
         retention-days: 7
       continue-on-error: true
 
@@ -307,7 +292,6 @@ jobs:
         HAS_P12=false
         HAS_P8=false
         if [ -n "${{ secrets.APPLE_PB_PRIVATE_KEY }}" ]; then
-          # 检测是 p12 还是 p8
           FIRST_LINE=$(echo "${{ secrets.APPLE_PB_PRIVATE_KEY }}" | base64 -d 2>/dev/null | head -1 || echo "")
           if echo "$FIRST_LINE" | grep -q "BEGIN PRIVATE KEY"; then
             echo "Detected p8 private key format"
@@ -333,26 +317,21 @@ jobs:
         KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
         KEYCHAIN_PW="${{ secrets.KEYCHAIN_PASSWORD }}"
         
-        # Decode p12
         echo "${{ secrets.APPLE_PB_PRIVATE_KEY }}" | base64 -d -o $RUNNER_TEMP/certificate.p12
         ls -la $RUNNER_TEMP/certificate.p12
         echo "P12 file decoded: $(wc -c < $RUNNER_TEMP/certificate.p12) bytes"
         
-        # Also verify with openssl
         openssl pkcs12 -in $RUNNER_TEMP/certificate.p12 -passin pass:"$KEYCHAIN_PW" -nokeys -info 2>&1 | head -5 || true
         
-        # Create temp keychain
         security create-keychain -p "$KEYCHAIN_PW" $KEYCHAIN_PATH || true
         security default-keychain -s $KEYCHAIN_PATH 2>/dev/null || true
         security unlock-keychain -p "$KEYCHAIN_PW" $KEYCHAIN_PATH || true
         
-        # Import p12
         security import $RUNNER_TEMP/certificate.p12 -k $KEYCHAIN_PATH -P "$KEYCHAIN_PW" -A || {
           echo "WARNING: p12 import failed, trying alternative method..."
           security import $RUNNER_TEMP/certificate.p12 -k login.keychain -P "$KEYCHAIN_PW" -A || true
         }
         
-        # Allow access
         security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PW" $KEYCHAIN_PATH 2>/dev/null || true
         
         echo "=== Installed identities ==="
@@ -364,15 +343,14 @@ jobs:
         mkdir -p ~/private_keys
         echo "${{ secrets.APPLE_PB_PRIVATE_KEY }}" | base64 -d > ~/private_keys/AuthKey_${{ secrets.APPLE_KEY_ID }}.p8
         chmod 600 ~/private_keys/AuthKey_${{ secrets.APPLE_KEY_ID }}.p8
-        echo "✅ App Store Connect API key installed"
+        echo "App Store Connect API key installed"
 
     - name: Set up Xcode project for signing
       run: |
         cd ios/App/App
-        # 设置为自动签名
         /usr/libexec/PlistBuddy -c "Set :objects:00C302D0204A61630053085B:buildSettings:CODE_SIGN_STYLE Automatic" App.xcodeproj/project.pbxproj 2>/dev/null || true
         /usr/libexec/PlistBuddy -c "Set :objects:00C302D0204A61630053085B:buildSettings:DEVELOPMENT_TEAM ${{ secrets.APPLE_TEAM_ID }}" App.xcodeproj/project.pbxproj 2>/dev/null || true
-        echo "✅ Signing configured with team: ${{ secrets.APPLE_TEAM_ID }}"
+        echo "Signing configured with team: ${{ secrets.APPLE_TEAM_ID }}"
         
     - name: Archive iOS App
       run: |
@@ -392,7 +370,7 @@ jobs:
         EXIT_CODE=$?
         echo "Archive exit code: $EXIT_CODE"
         if [ $EXIT_CODE -ne 0 ]; then
-          echo "⚠️ Archive failed, trying without provisioning updates..."
+          echo "Archive failed, trying without provisioning updates..."
           xcodebuild archive \
             -workspace App.xcworkspace \
             -scheme App \
@@ -405,45 +383,43 @@ jobs:
             -verbose 2>&1 | tail -80 || echo "Archive also failed"
         fi
 
-    # 检查archive是否存在（用 GITHUB_OUTPUT 传递给后续步骤）
     - name: Check archive status
       id: archive_check
       if: always()
       run: |
         if [ -d "${{ github.workspace }}/build/App.xcarchive" ]; then
           echo "exists=true" >> $GITHUB_OUTPUT
-          echo "✅ Archive found, will proceed with IPA export"
+          echo "Archive found, will proceed with IPA export"
         else
           echo "exists=false" >> $GITHUB_OUTPUT
-          echo "⚠️ No archive found, skipping IPA export"
+          echo "No archive found, skipping IPA export"
         fi
           
     - name: Export IPA
       if: steps.archive_check.outputs.exists == 'true'
       run: |
-        # Try multiple export methods: enterprise (for in-house dist), ad-hoc, then app-store
         for METHOD in enterprise ad-hoc app-store; do
           echo "=== Trying export method: $METHOD ==="
-          cat > "${{ github.workspace }}/exportOptions.plist" << PLISTEOF
-        <?xml version="1.0" encoding="UTF-8"?>
-        <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-        <plist version="1.0"><dict>
-          <key>method</key><string>$METHOD</string>
-          <key>teamID</key><string>${{ secrets.APPLE_TEAM_ID }}</string>
-          <key>signingStyle</key><string>automatic</string>
-          <key>uploadSymbols</key><false/>
-        </dict></plist>
-        PLISTEOF
+          printf '%s\n' \
+            '<?xml version="1.0" encoding="UTF-8"?>' \
+            '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">' \
+            "<plist version=\"1.0\"><dict>" \
+            "  <key>method</key><string>$METHOD</string>" \
+            "  <key>teamID</key><string>${{ secrets.APPLE_TEAM_ID }}</string>" \
+            "  <key>signingStyle</key><string>automatic</string>" \
+            "  <key>uploadSymbols</key><false/>" \
+            "</dict></plist>" \
+            > "${{ github.workspace }}/exportOptions.plist"
           xcodebuild -exportArchive \
             -archivePath "${{ github.workspace }}/build/App.xcarchive" \
             -exportPath "${{ github.workspace }}/build/ipa" \
             -exportOptionsPlist "${{ github.workspace }}/exportOptions.plist" \
             -allowProvisioningUpdates 2>&1 | tail -20
           if [ -d "${{ github.workspace }}/build/ipa" ] && ls "${{ github.workspace }}/build/ipa/"*.ipa 2>/dev/null; then
-            echo "✅ IPA exported successfully with method: $METHOD"
+            echo "IPA exported successfully with method: $METHOD"
             break
           else
-            echo "⚠️ Export failed with method: $METHOD, trying next..."
+            echo "Export failed with method: $METHOD, trying next..."
           fi
         done
         
@@ -466,37 +442,26 @@ jobs:
         retention-days: 30
       continue-on-error: true
       
-    - name: Upload iOS build to Cloudflare R2
+    - name: Upload IPA to R2 via REST API
+      if: success()
       env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_KEY }}
-        AWS_DEFAULT_REGION: auto
+        R2_API_TOKEN: ${{ secrets.R2_API_TOKEN }}
+        R2_ACCOUNT_ID: ${{ secrets.R2_ENDPOINT }}
       run: |
-        pip3 install awscli --quiet --break-system-packages 2>/dev/null || pip3 install awscli --quiet
+        set +e
         TIMESTAMP=$(date +%Y%m%d-%H%M%S)
-        BUCKET="${{ secrets.R2_BUCKET }}"
-        R2_EP="${{ secrets.R2_ENDPOINT }}"
-        if echo "$R2_EP" | grep -q '^https\?://'; then
-          ENDPOINT="$R2_EP"
-        else
-          ENDPOINT="https://$R2_EP.r2.cloudflarestorage.com"
-        fi
-        echo "iOS Upload: BUCKET=$BUCKET ENDPOINT=$ENDPOINT"
+        echo "=== Uploading IPAs to R2 (REST API mode) ==="
         for ipa in $(find build -name "*.ipa" -type f 2>/dev/null); do
           NAME="yandao-${TIMESTAMP}-$(basename "$ipa")"
-          aws s3 cp "$ipa" "s3://$BUCKET/ios/$NAME" \
-            --endpoint-url "$ENDPOINT" && echo "✅ Uploaded $NAME" || echo "⚠️ Failed $NAME"
-          # 固定latest版本
-          aws s3 cp "$ipa" "s3://$BUCKET/ios/yandao-latest.ipa" \
-            --endpoint-url "$ENDPOINT" && echo "✅ Updated yandao-latest.ipa" || echo "⚠️ Failed latest"
-        done || echo "R2 upload skipped"
+          python3 r2_upload.py "$ipa" "ios/$NAME" 2>&1
+          python3 r2_upload.py "$ipa" "ios/yandao-latest.ipa" 2>&1
+        done || echo "[WARN] No IPA files found"
 
-    - name: Upload web dist to Cloudflare R2 (iOS job)
+    - name: Upload web dist to R2 & Purge Cache (iOS job)
+      if: success()
       env:
-        R2_ACCESS_KEY: ${{ secrets.R2_ACCESS_KEY }}
-        R2_SECRET_KEY: ${{ secrets.R2_SECRET_KEY }}
-        R2_BUCKET: ${{ secrets.R2_BUCKET }}
-        R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+        R2_API_TOKEN: ${{ secrets.R2_API_TOKEN }}
+        R2_ACCOUNT_ID: ${{ secrets.R2_ENDPOINT }}
         CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
         CF_ZONE_ID: ${{ secrets.CF_ZONE_ID }}
         GITHUB_RUN_ID: ${{ github.run_id }}
@@ -506,39 +471,27 @@ jobs:
         TIMESTAMP=$(date -u +%Y%m%d-%H%M%S)
         if [ -d "dist" ]; then
           echo "${TIMESTAMP} - iOS Build ${GITHUB_RUN_ID} - SHA ${GITHUB_SHA}" > dist/build-verifier.txt
-          echo "iOS dist/ contents:"
-          ls -la dist/ 2>/dev/null
+          echo "iOS dist/:"
+          ls -la dist/ 2>/dev/null | head -10
         fi
-        pip3 install boto3 --quiet --break-system-packages 2>/dev/null || pip3 install boto3 --quiet
-        echo "=== iOS: Running r2_upload.py ==="
-        python3 r2_upload.py "${R2_BUCKET}" "${R2_ENDPOINT}" "${R2_ACCESS_KEY}" "${R2_SECRET_KEY}" "dist"
-        echo "=== r2_upload.py exit code: $? ==="
+        echo "=== iOS: Uploading web files to R2 via REST API ==="
+        python3 r2_upload.py dist 2>&1
         if [ -d "public" ]; then
-          python3 r2_upload.py "${R2_BUCKET}" "${R2_ENDPOINT}" "${R2_ACCESS_KEY}" "${R2_SECRET_KEY}" "public"
+          python3 r2_upload.py public 2>&1
         fi
-        CF_TOKEN="${CF_API_TOKEN}"
-        ZONE_ID="${CF_ZONE_ID}"
-        if [ -n "$CF_TOKEN" ] && [ -n "$ZONE_ID" ]; then
-          echo "iOS: Purging Cloudflare cache..."
-          curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${ZONE_ID}/purge_cache" \
-            -H "Authorization: Bearer ${CF_TOKEN}" \
+        # Purge Cloudflare Cache
+        CF_T="${CF_API_TOKEN}"
+        ZONE="${CF_ZONE_ID}"
+        if [ -n "$CF_T" ] && [ -n "$ZONE" ]; then
+          echo "iOS: Purging Cloudflare cache for zone $ZONE..."
+          RESP=$(curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${ZONE}/purge_cache" \
+            -H "Authorization: Bearer ${CF_T}" \
             -H "Content-Type: application/json" \
-            -d '{"purge_everything":true}' 2>&1 | head -c 500 || true
-          sleep 10
-          curl -s -H "Cache-Control: no-cache" "https://yandao.vip/build-verifier.txt" 2>&1 | head -5 || true
-        elif [ -n "$CF_TOKEN" ]; then
-          ZONES=$(curl -s -H "Authorization: Bearer ${CF_TOKEN}" "https://api.cloudflare.com/client/v4/zones?name=yandao.vip" 2>&1)
-          FOUND_ZONE=$(echo "$ZONES" | grep -o '"id":"[^"]*"' | head -1 | cut -d'"' -f4)
-          if [ -n "$FOUND_ZONE" ]; then
-            curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${FOUND_ZONE}/purge_cache" \
-              -H "Authorization: Bearer ${CF_TOKEN}" \
-              -H "Content-Type: application/json" \
-              -d '{"purge_everything":true}' 2>&1 | head -c 500 || true
-            sleep 10
-            curl -s -H "Cache-Control: no-cache" "https://yandao.vip/build-verifier.txt" 2>&1 | head -5 || true
-          fi
+            -d '{"purge_everything":true}' 2>&1)
+          echo "Purge response: $RESP"
+          sleep 5
+          VERIFIER=$(curl -s -H "Cache-Control: no-cache" "https://yandao.vip/build-verifier.txt" 2>&1 | head -3)
+          echo "Verification: ${VERIFIER:-NOT FOUND}"
         else
-          echo "iOS: CF_API_TOKEN not set - cannot purge cache"
+          echo "iOS: CF_API_TOKEN or CF_ZONE_ID missing, skipping purge"
         fi
-
-
