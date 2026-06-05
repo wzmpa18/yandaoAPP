@@ -121,71 +121,57 @@ jobs:
       continue-on-error: true
 
     # ============================================================
-    # R2 UPLOAD & CACHE PURGE (Cloudflare REST API version)
-    # Uses R2_API_TOKEN instead of S3 credentials
+    # TENCENT COS UPLOAD (Android builds)
+    # Upload APK + web dist to COS bucket yandao-1300262413
     # ============================================================
     
-    - name: Upload APK to R2 via REST API
+    - name: Upload APK to Tencent COS
       if: success()
       env:
-        R2_API_TOKEN: ${{ secrets.R2_API_TOKEN }}
-        R2_ACCOUNT_ID: ${{ secrets.R2_ENDPOINT }}
+        COS_SECRET_ID: ${{ secrets.COS_SECRET_ID }}
+        COS_SECRET_KEY: ${{ secrets.COS_SECRET_KEY }}
+        COS_BUCKET: ${{ secrets.COS_BUCKET }}
+        COS_REGION: ${{ secrets.COS_REGION }}
       run: |
         set +e
         TIMESTAMP=$(date +%Y%m%d-%H%M%S)
-        echo "=== Uploading APKs to R2 (REST API mode) ==="
+        echo "=== Uploading APKs to Tencent COS ==="
         for apk in $(find android -name "*.apk" -type f 2>/dev/null); do
           SIZE=$(stat -c%s "$apk" 2>/dev/null || echo 0)
           NAME="yandao-${TIMESTAMP}-$(basename "$apk")"
           echo "Found APK: $apk ($SIZE bytes)"
-          python3 r2_upload.py "$apk" "android/$NAME" 2>&1
-          python3 r2_upload.py "$apk" "android/yandao-latest.apk" 2>&1
-          python3 r2_upload.py "$apk" "app-release.apk" 2>&1
+          python3 cos_upload.py "$apk" "android/$NAME" 2>&1
+          python3 cos_upload.py "$apk" "android/yandao-latest.apk" 2>&1
+          python3 cos_upload.py "$apk" "app-release.apk" 2>&1
         done || echo "[WARN] No APK files found"
 
-    - name: Upload web dist to R2 & Purge Cache
+    - name: Upload web dist to Tencent COS
       if: success()
       env:
-        R2_API_TOKEN: ${{ secrets.R2_API_TOKEN }}
-        R2_ACCOUNT_ID: ${{ secrets.R2_ENDPOINT }}
-        CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
-        CF_ZONE_ID: ${{ secrets.CF_ZONE_ID }}
+        COS_SECRET_ID: ${{ secrets.COS_SECRET_ID }}
+        COS_SECRET_KEY: ${{ secrets.COS_SECRET_KEY }}
+        COS_BUCKET: ${{ secrets.COS_BUCKET }}
+        COS_REGION: ${{ secrets.COS_REGION }}
         GITHUB_RUN_ID: ${{ github.run_id }}
         GITHUB_SHA: ${{ github.sha }}
       run: |
         set +e
 
-        # === CHECK REQUIRED SECRETS ===
         echo "=========================================="
-        echo "  CHECKING SECRETS"
+        echo "  DEPLOYING TO TENCENT COS"
         echo "=========================================="
-        
-        MISSING=0
-        
-        if [ -z "$R2_API_TOKEN" ]; then
-          echo "[ERROR] R2_API_TOKEN is NOT SET!"
-          echo "  → Go to GitHub Settings → Secrets → Add: name=R2_API_TOKEN"
-          echo "  → Value: Create at Cloudflare Dashboard → R2 API Tokens"
-          MISSING=1
-        else
-          echo "R2_API_TOKEN: OK (length=${#R2_API_TOKEN})"
-        fi
 
-        if [ -z "$CF_API_TOKEN" ]; then
-          echo "[WARN] CF_API_TOKEN not set - cache purge will be skipped"
-        fi
-
-        if [ -z "$CF_ZONE_ID" ]; then
-          echo "[WARN] CF_ZONE_ID not set - cache purge will be skipped"
-        fi
-
-        if [ $MISSING -eq 1 ]; then
-          echo ""
-          echo "❌ Cannot proceed without R2_API_TOKEN"
+        # Check credentials
+        if [ -z "$COS_SECRET_ID" ] || [ -z "$COS_SECRET_KEY" ]; then
+          echo "[WARN] COS credentials not set, skipping upload"
+          echo "  → Add COS_SECRET_ID + COS_SECRET_KEY to GitHub Secrets"
           exit 0
         fi
+        echo "COS_SECRET_ID: OK (length=${#COS_SECRET_ID})"
+        echo "COS_BUCKET: ${COS_BUCKET:-yandao-1300262413}"
+        echo "COS_REGION: ${COS_REGION:-ap-guangzhou}"
 
-        # Write build verifier with timestamp
+        # Write build verifier
         TIMESTAMP=$(date -u +%Y%m%d-%H%M%S)
         if [ -d "dist" ]; then
           echo "${TIMESTAMP} - Build ${GITHUB_RUN_ID} - SHA ${GITHUB_SHA}" > dist/build-verifier.txt
@@ -194,73 +180,33 @@ jobs:
         else
           echo "[ERROR] dist/ directory NOT FOUND!"
           ls -la . 2>/dev/null
+          exit 0
         fi
 
-        # Upload web files to R2 via REST API (no boto3 needed!)
+        # Upload web files to COS
         echo ""
-        echo "=========================================="
-        echo "  UPLOADING dist/ TO R2 (REST API)"
-        echo "=========================================="
-        python3 r2_upload.py dist 2>&1 | tee r2_upload_log.txt
+        echo "=== Uploading dist/ to COS ==="
+        python3 cos_upload.py dist 2>&1 | tee cos_upload_log.txt
         RC=$?
-        echo "r2_upload.py exit code: $RC"
+        echo "cos_upload.py exit code: $RC"
 
         # Also upload public/ if exists
         if [ -d "public" ]; then
-          echo "=== Uploading public/ to R2 ==="
-          python3 r2_upload.py public 2>&1 | tee -a r2_upload_log.txt
+          echo "=== Uploading public/ to COS ==="
+          python3 cos_upload.py public 2>&1 | tee -a cos_upload_log.txt
         fi
 
-        # === PURGE CLOUDFLARE CACHE ===
-        echo ""
-        echo "=========================================="
-        echo "  CLOUDFLARE CACHE PURGE"
-        echo "=========================================="
-        CF_T="${CF_API_TOKEN}"
-        ZONE="${CF_ZONE_ID}"
-
-        if [ -z "$CF_T" ] || [ -z "$ZONE" ]; then
-          echo "[SKIP] Cache purge needs CF_API_TOKEN + CF_ZONE_ID"
-        else
-          echo "Zone ID: $ZONE"
-          PURGE_RESP=$(curl -s -X POST \
-            "https://api.cloudflare.com/client/v4/zones/${ZONE}/purge_cache" \
-            -H "Authorization: Bearer ${CF_T}" \
-            -H "Content-Type: application/json" \
-            -d '{"purge_everything":true}' 2>&1)
-
-          echo "Purge response: $PURGE_RESP"
-
-          if echo "$PURGE_RESP" | grep -q '"success":true'; then
-            echo "✅✅✅ Cloudflare cache purged! ✅✅✅"
-          else
-            echo "⚠️ Cache purge may have failed"
-          fi
-
-          # Wait for CDN propagation
-          sleep 5
-
-          # === VERIFICATION ===
-          echo ""
-          echo "=========================================="
-          echo "  VERIFYING yandao.vip"
-          echo "=========================================="
-          VERIFIER=$(curl -s -H "Cache-Control: no-cache" "https://yandao.vip/build-verifier.txt" 2>&1)
-          echo "build-verifier.txt:"
-          echo "${VERIFIER:-[EMPTY / 404]}"
-          INDEX_HDR=$(curl -sI -H "Cache-Control: no-cache" "https://yandao.vip/" 2>&1)
-          echo "index.html: $(echo "$INDEX_HDR" | grep -i last-modified | head -1)"
-        fi
         echo "=========================================="
         echo "  DEPLOYMENT COMPLETE"
+        echo "  COS: https://${COS_BUCKET:-yandao-1300262413}.cos.${COS_REGION:-ap-guangzhou}.myqcloud.com/"
         echo "=========================================="
 
-    - name: Save R2 upload log
+    - name: Save COS upload log
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: r2-upload-log
-        path: r2_upload_log.txt
+        name: cos-upload-log
+        path: cos_upload_log.txt
         retention-days: 7
       continue-on-error: true
 
@@ -467,56 +413,47 @@ jobs:
         retention-days: 30
       continue-on-error: true
       
-    - name: Upload IPA to R2 via REST API
+    - name: Upload IPA to Tencent COS
       if: success()
       env:
-        R2_API_TOKEN: ${{ secrets.R2_API_TOKEN }}
-        R2_ACCOUNT_ID: ${{ secrets.R2_ENDPOINT }}
+        COS_SECRET_ID: ${{ secrets.COS_SECRET_ID }}
+        COS_SECRET_KEY: ${{ secrets.COS_SECRET_KEY }}
+        COS_BUCKET: ${{ secrets.COS_BUCKET }}
+        COS_REGION: ${{ secrets.COS_REGION }}
       run: |
         set +e
         TIMESTAMP=$(date +%Y%m%d-%H%M%S)
-        echo "=== Uploading IPAs to R2 (REST API mode) ==="
+        echo "=== Uploading IPAs to Tencent COS ==="
         for ipa in $(find build -name "*.ipa" -type f 2>/dev/null); do
           NAME="yandao-${TIMESTAMP}-$(basename "$ipa")"
-          python3 r2_upload.py "$ipa" "ios/$NAME" 2>&1
-          python3 r2_upload.py "$ipa" "ios/yandao-latest.ipa" 2>&1
+          python3 cos_upload.py "$ipa" "ios/$NAME" 2>&1
+          python3 cos_upload.py "$ipa" "ios/yandao-latest.ipa" 2>&1
         done || echo "[WARN] No IPA files found"
 
-    - name: Upload web dist to R2 & Purge Cache (iOS job)
+    - name: Upload web dist to Tencent COS (iOS job)
       if: success()
       env:
-        R2_API_TOKEN: ${{ secrets.R2_API_TOKEN }}
-        R2_ACCOUNT_ID: ${{ secrets.R2_ENDPOINT }}
-        CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
-        CF_ZONE_ID: ${{ secrets.CF_ZONE_ID }}
+        COS_SECRET_ID: ${{ secrets.COS_SECRET_ID }}
+        COS_SECRET_KEY: ${{ secrets.COS_SECRET_KEY }}
+        COS_BUCKET: ${{ secrets.COS_BUCKET }}
+        COS_REGION: ${{ secrets.COS_REGION }}
         GITHUB_RUN_ID: ${{ github.run_id }}
         GITHUB_SHA: ${{ github.sha }}
       run: |
         set +e
+        if [ -z "$COS_SECRET_ID" ] || [ -z "$COS_SECRET_KEY" ]; then
+          echo "[SKIP] COS credentials not set"
+          exit 0
+        fi
         TIMESTAMP=$(date -u +%Y%m%d-%H%M%S)
         if [ -d "dist" ]; then
           echo "${TIMESTAMP} - iOS Build ${GITHUB_RUN_ID} - SHA ${GITHUB_SHA}" > dist/build-verifier.txt
           echo "iOS dist/:"
           ls -la dist/ 2>/dev/null | head -10
         fi
-        echo "=== iOS: Uploading web files to R2 via REST API ==="
-        python3 r2_upload.py dist 2>&1
+        echo "=== iOS: Uploading web files to Tencent COS ==="
+        python3 cos_upload.py dist 2>&1
         if [ -d "public" ]; then
-          python3 r2_upload.py public 2>&1
+          python3 cos_upload.py public 2>&1
         fi
-        # Purge Cloudflare Cache
-        CF_T="${CF_API_TOKEN}"
-        ZONE="${CF_ZONE_ID}"
-        if [ -n "$CF_T" ] && [ -n "$ZONE" ]; then
-          echo "iOS: Purging Cloudflare cache for zone $ZONE..."
-          RESP=$(curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${ZONE}/purge_cache" \
-            -H "Authorization: Bearer ${CF_T}" \
-            -H "Content-Type: application/json" \
-            -d '{"purge_everything":true}' 2>&1)
-          echo "Purge response: $RESP"
-          sleep 5
-          VERIFIER=$(curl -s -H "Cache-Control: no-cache" "https://yandao.vip/build-verifier.txt" 2>&1 | head -3)
-          echo "Verification: ${VERIFIER:-NOT FOUND}"
-        else
-          echo "iOS: CF_API_TOKEN or CF_ZONE_ID missing, skipping purge"
-        fi
+        echo "=== iOS deploy complete ==="
