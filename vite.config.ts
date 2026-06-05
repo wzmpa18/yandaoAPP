@@ -5,7 +5,6 @@ export default defineConfig({
   plugins: [react()],
   publicDir: 'public',
   optimizeDeps: {
-    exclude: ['lucide-react'],
     cacheDir: './node_modules/.vite-cache',
   },
   build: {
@@ -14,7 +13,6 @@ export default defineConfig({
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom', '@supabase/supabase-js'],
-          lucide: ['lucide-react'],
         },
       },
     },

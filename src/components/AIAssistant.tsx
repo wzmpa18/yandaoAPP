@@ -256,7 +256,7 @@ function simulateAIResponse(
       panda:`很好的表达！关于「${input.slice(0,12)}」——试试用「${v[1]}」造个句子？说说今天做了什么 🐼`,
       tsundere:`哼……「${v[0]}」=${lang}「${v[1]}」，这个总该记住了吧？`,
       funny:`哦吼！「${input}」→ ${lang}「${v[1]}」😎 ${prev?'关联「'+prev+'」':''}笑死！`,
-      sweet:`你说得对呀❤️ 「${v[0]}」=${lang}「${v[1]]」~ 宝贝学会了吗？么么哒~`,
+      sweet:`你说得对呀❤️ 「${v[0]}」=${lang}「${v[1]}」~ 宝贝学会了吗？么么哒~`,
     };
     return r2[role??'panda'];
   }
