@@ -247,12 +247,12 @@ function simulateAIResponse(
     const pool = VOCAB_TIPS[langCode] || VOCAB_TIPS.en;
     const v = pool[Math.floor(Math.random() * pool.length)];
     const prev = history?.length > 2 ? history[history.length-2].text.slice(0,25) : null;
-    if (!input.trim()) { const h:{Record<ChatRoleKey,string>}={panda:`试试说"${v[1]}"?🐼`,tsundere:v[0]+`${lang}怎么说？`,funny:`来个${lang}词!`,sweet:"宝贝想说什么❤️"}; return h[role??'panda']; }
+    if (!input.trim()) { const h: Record<ChatRoleKey,string> = {panda:`试试说"${v[1]}"?🐼`,tsundere:v[0]+`${lang}怎么说？`,funny:`来个${lang}词!`,sweet:"宝贝想说什么❤️"}; return h[role??'panda']; }
     if (input.trim().length < 6) {
-      const r:{Record<ChatRoleKey,string>}={panda:`「${input}」→ ${lang}表达已生成 ✅ 再问一句？🐼`,tsundere:`太短……好吧。「${v[1]}」。多说点！`,funny:"针不戳！记住没？忘了我笑话你😎",sweet:"收到啦❤️ 学会了吗？亲亲~"};
+      const r: Record<ChatRoleKey,string> = {panda:`「${input}」→ ${lang}表达已生成 ✅ 再问一句？🐼`,tsundere:`太短……好吧。「${v[1]}」。多说点！`,funny:"针不戳！记住没？忘了我笑话你😎",sweet:"收到啦❤️ 学会了吗？亲亲~"};
       return r[role??'panda'];
     }
-    const r2:{Record<ChatRoleKey,string>}={
+    const r2: Record<ChatRoleKey,string> = {
       panda:`很好的表达！关于「${input.slice(0,12)}」——试试用「${v[1]}」造个句子？说说今天做了什么 🐼`,
       tsundere:`哼……「${v[0]}」=${lang}「${v[1]}」，这个总该记住了吧？`,
       funny:`哦吼！「${input}」→ ${lang}「${v[1]}」😎 ${prev?'关联「'+prev+'」':''}笑死！`,
