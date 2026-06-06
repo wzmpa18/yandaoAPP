@@ -245,23 +245,40 @@ function genJaVocab(count) {
     });
   });
 
-  // 扩展到目标数量
-  while (result.length < count) {
-    const base = pick(allWords);
-    const suffices = ['〜的', '〜化', '〜性', '〜度', '〜者', '〜用', '〜法', '〜型', '〜式', '〜類',
+  // 扩展到目标数量 - Set去重 O(n)复杂度
+  const existingWords = new Set(allWords.map(w => w[0]));
+  const staticSuffixes = ['〜的', '〜化', '〜性', '〜度', '〜者', '〜用', '〜法', '〜型', '〜式', '〜類'];
+  let idx = 0, maxAttempts = Math.max(count * 3, allWords.length * 20);
+  while (result.length < count && idx < maxAttempts) {
+    const base = allWords[idx % allWords.length];
+    const dynamicSuffixes = [
       '再' + base[0], '最' + base[0], '未' + base[0], '非' + base[0], '超' + base[0],
       base[0] + '可能', base[0] + '不可', base[0] + '関連', base[0] + '対応',
     ];
-    const newWord = pick(suffices);
-    if (!result.find(r => r.word === newWord)) {
-      result.push({
-        id: `ja_vocab_${result.length + 1}`,
-        word: newWord, reading: '', meaning: `${base[2]}の派生形`,
-        pos: '派生語', level: 'N2-N1',
-        example: `「${newWord}」は「${base[0]}」から派生した表現です。`,
-        frequency: rnd(1, 1000), tags: ['派生語', 'N2'],
-      });
+    for (const suffix of [...staticSuffixes, ...dynamicSuffixes]) {
+      if (result.length >= count) break;
+      if (!existingWords.has(suffix)) {
+        existingWords.add(suffix);
+        result.push({
+          id: `ja_vocab_${result.length + 1}`,
+          word: suffix, reading: '', meaning: `${base[2]}の派生形`,
+          pos: '派生語', level: 'N2-N1',
+          example: `「${suffix}」は「${base[0]}」から派生した表現です。`,
+          frequency: rnd(1, 1000), tags: ['派生語', 'N2'],
+        });
+      }
     }
+    idx++;
+  }
+  // 如果还不够，用模板填充
+  while (result.length < count) {
+    result.push({
+      id: `ja_vocab_${result.length + 1}`,
+      word: `日本語_拡張語彙_${result.length + 1}`,
+      reading: '', meaning: `扩展日语词汇 #${result.length + 1}`,
+      pos: '名詞', level: 'N2',
+      example: `日本語の拡張語彙です。`, frequency: rnd(1, 500), tags: ['拡張', 'N2'],
+    });
   }
   return result.slice(0, count);
 }
@@ -394,17 +411,33 @@ function genEnVocab(count) {
     });
   });
 
-  while(result.length < count){
-    const b=pick(core);
-    const vars=[b[0]+'ing',b[0]+'s',b[0]+'ed',b[0]+'ly','re-'+b[0],'un-'+b[0],
-      'over-'+b[0],'under-'+b[0],b[0]+'-ness',b[0]+'-ment',b[0]+'-tion',b[0]+'-ity'];
-    const nw=pick(vars);
-    if(!result.find(r=>r.word===nw)){
-      result.push({id:`en_vocab_${result.length+1}`,word:nw,phonetic:'',
-        meaning:b[2]+'(变形)',pos:'derived form',level:'B1',
-        example:`The ${nw} is a derived form of "${b[0]}" meaning ${b[2]}.`,
-        frequency:rnd(1,1000),tags:['derived','B1']});
+  // 扩展到目标数量 - Set去重 O(n)
+  const enWords = new Set(core.map(w => w[0].toString().split('/')[0]));
+  let ei = 0, enMax = Math.max(count * 2, core.length * 15);
+  while(result.length < count && ei < enMax){
+    const b = core[ei % core.length];
+    const baseWord = b[0].toString().split('/')[0];
+    const vars = [baseWord+'ing', baseWord+'s', baseWord+'ed', baseWord+'ly',
+      're-'+baseWord, 'un-'+baseWord, 'over-'+baseWord, 'under-'+baseWord,
+      baseWord+'-ness', baseWord+'-ment', baseWord+'-tion', baseWord+'-ity'];
+    for (const nw of vars) {
+      if (result.length >= count) break;
+      if(!enWords.has(nw)){
+        enWords.add(nw);
+        result.push({id:`en_vocab_${result.length+1}`,word:nw,phonetic:'',
+          meaning:b[2]+'(变形)',pos:'derived form',level:'B1',
+          example:`The ${nw} is a derived form of "${baseWord}" meaning ${b[2]}.`,
+          frequency:rnd(1,1000),tags:['derived','B1']});
+      }
     }
+    ei++;
+  }
+  while (result.length < count) {
+    result.push({id:`en_vocab_${result.length+1}`,
+      word:`English_extended_vocab_${result.length+1}`,phonetic:'',
+      meaning:`扩展英语词汇 #${result.length+1}`,pos:'noun',level:'B1',
+      example:`This is an extended English vocabulary item.`,
+      frequency:rnd(1,500),tags:['extended','B1']});
   }
   return result.slice(0,count);
 }
@@ -454,13 +487,29 @@ function genOtherVocab(lang,count,sampleSize){
       frequency:Math.min(100,tmpl.length-i),tags:[w[2]]});
   });
 
-  while(result.length<count){
-    const b=pick(tmpl);
-    const nw=b[0]+String.fromCharCode(97+rnd(0,25));
-    if(!result.find(r=>r.word===nw))
-      result.push({id:`${lang}_vocab_${result.length+1}`,word:nw,
-        meaning:b[1]+'(派生)',level:'T2',
-        example:`Derived from "${b[0]}" in ${LN[lang]}.`,frequency:rnd(1,500),tags:['T2']});
+  // 扩展到目标数量 - Set去重 O(n)
+  const otherWords = new Set(tmpl.map(w => w[0]));
+  let oi = 0, oMax = Math.max(count * 3, tmpl.length * 30);
+  while(result.length < count && oi < oMax){
+    const b = tmpl[oi % tmpl.length];
+    // 生成26个字母变体一次性尝试
+    for (let c = 97; c <= 122; c++) {
+      if (result.length >= count) break;
+      const nw = b[0] + String.fromCharCode(c);
+      if (!otherWords.has(nw)) {
+        otherWords.add(nw);
+        result.push({id:`${lang}_vocab_${result.length+1}`,word:nw,
+          meaning:b[1]+'(派生)',level:'T2',
+          example:`Derived from "${b[0]}" in ${LN[lang]}.`,frequency:rnd(1,500),tags:['T2']});
+      }
+    }
+    oi++;
+  }
+  while (result.length < count) {
+    result.push({id:`${lang}_vocab_${result.length+1}`,
+      word:`${LN[lang]}_ext_vocab_${result.length+1}`,
+      meaning:`扩展${LN[lang]}词汇 #${result.length+1}`,level:'T2',
+      example:`Extended ${LN[lang]} vocabulary item.`,frequency:rnd(1,500),tags:['T2']});
   }
   return result.slice(0,count);
 }
