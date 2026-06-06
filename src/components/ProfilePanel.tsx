@@ -8,6 +8,8 @@ import { AICostDashboard } from './AICostDashboard';
 import { AIModelConfigPanel } from './AIModelConfig';
 import { VoicePicker } from './VoicePicker';
 import { VoicePreset, loadVoicePreset } from '../lib/voiceProfile';
+import { SharePoster } from './SharePoster';
+import { AILearningReport } from './AILearningReport';
 import { supabase } from '../data/supabase';
 import { useUI } from '../lib/UILanguageContext';
 import { UILang, UI_LANG_OPTIONS } from '../lib/i18n';
@@ -93,6 +95,8 @@ export const ProfilePanel: React.FC<ProfilePanelProps> = ({
   const [showPromoCenter, setShowPromoCenter] = useState(false);
   const [showTeamManagement, setShowTeamManagement] = useState(false);
   const [showQrCode, setShowQrCode] = useState(false);
+  const [showSharePoster, setShowSharePoster] = useState(false);
+  const [showAIReport, setShowAIReport] = useState(false);
 
   interface ReferralUser {
     id: string;
@@ -683,7 +687,7 @@ export const ProfilePanel: React.FC<ProfilePanelProps> = ({
           <button className={`pp-copy-btn ${copied ? 'copied' : ''}`} onClick={copyLink}>
             {copied ? '✓ 已复制' : '复制专属推荐链接'}
           </button>
-          <button className="pp-share-btn" onClick={simulateReferral} title="分享（演示+1邀请）">
+          <button className="pp-share-btn" onClick={() => setShowSharePoster(true)} title="分享海报">
             分享海报
           </button>
         </div>
@@ -936,6 +940,29 @@ export const ProfilePanel: React.FC<ProfilePanelProps> = ({
             <button className="pp-reset-no" onClick={() => setShowResetConfirm(false)}>{s.btn_cancel}</button>
           </div>
         )}
+      </div>
+
+      {/* Share Poster Modal */}
+      {showSharePoster && (
+        <SharePoster
+          code={code}
+          referralLink={referralLink}
+          onClose={() => setShowSharePoster(false)}
+        />
+      )}
+
+      {/* AI Learning Report Modal */}
+      {showAIReport && (
+        <AILearningReport onClose={() => setShowAIReport(false)} />
+      )}
+
+      {/* AI Report button in quick links */}
+      <div className="pp-quick-links" style={{ paddingTop: 0 }}>
+        <button className="pp-quick-btn" onClick={() => setShowAIReport(true)}>
+          <span className="pp-quick-icon">📊</span>
+          <span className="pp-quick-label">AI 学习报告</span>
+          <span className="pp-quick-arrow">›</span>
+        </button>
       </div>
 
       {/* Version (secret tap zone) */}

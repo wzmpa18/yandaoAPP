@@ -9,6 +9,9 @@ import { GrammarCube } from './games/GrammarCube';
 import { EscapeRoom } from './games/EscapeRoom';
 import { GrammarPlanet } from './games/GrammarPlanet';
 import { BuddyChat } from './games/BuddyChat';
+import { WordChain } from './games/WordChain';
+import { SpeedMatch } from './games/SpeedMatch';
+import { SentenceBuilder } from './games/SentenceBuilder';
 import { SeasonRanking } from './SeasonRanking';
 import { InfiniteGameGenerator } from '../lib/InfiniteGameGenerator';
 
@@ -561,7 +564,7 @@ const ComboFlash: React.FC<{ combo: number }> = ({ combo }) => {
 };
 
 /* ── Main Arena ── */
-type ArenaMode = 'menu' | 'match' | 'puzzle' | 'matchDone' | 'puzzleDone' | 'wordHunter' | 'grammarCube' | 'escapeRoom' | 'grammarPlanet' | 'buddyChat' | 'season';
+type ArenaMode = 'menu' | 'match' | 'puzzle' | 'matchDone' | 'puzzleDone' | 'wordHunter' | 'grammarCube' | 'escapeRoom' | 'grammarPlanet' | 'buddyChat' | 'wordChain' | 'speedMatch' | 'sentenceBuilder' | 'season';
 
 interface DailyChallenge {
   id: string;
@@ -577,6 +580,9 @@ const GAME_CARDS = [
   { key: 'escapeRoom', icon: '🚪', title: '密室逃脱', desc: '语言解谜，逃出密室', xp: '+50 XP', color: '#C9553D' },
   { key: 'grammarPlanet', icon: '🚀', title: '语法星球', desc: '射击星球，答题得分', xp: '+40 XP', color: '#8B5CF6' },
   { key: 'buddyChat', icon: '💬', title: '语伴对话', desc: 'AI陪练 · 真人匹配', xp: '+20 XP', color: '#C9A574' },
+  { key: 'wordChain', icon: '🔗', title: '词语接龙', desc: '首尾接龙，无限关卡', xp: '+35 XP', color: '#E040FB' },
+  { key: 'speedMatch', icon: '⚡', title: '速度匹配', desc: '单词翻译速配挑战', xp: '+25 XP', color: '#FF6F00' },
+  { key: 'sentenceBuilder', icon: '🧩', title: '句子构建', desc: '拼出正确语句顺序', xp: '+30 XP', color: '#00BFA5' },
 ];
 
 export const GameArena: React.FC<GameArenaProps> = ({
@@ -902,6 +908,33 @@ export const GameArena: React.FC<GameArenaProps> = ({
           sessionKey={sessionKey}
           userLevel="beginner"
           onXP={(d) => { onXP(d); setXpGained((x) => x + d); }}
+          onBack={() => setMode('menu')}
+        />
+      )}
+      {mode === 'wordChain' && (
+        <WordChain
+          langCode={languageCode}
+          langName={languageName}
+          onXP={(d) => { onXP(d); setXpGained((x) => x + d); }}
+          onHeartLost={onHeartLost}
+          onBack={() => setMode('menu')}
+        />
+      )}
+      {mode === 'speedMatch' && (
+        <SpeedMatch
+          langCode={languageCode}
+          langName={languageName}
+          onXP={(d) => { onXP(d); setXpGained((x) => x + d); }}
+          onHeartLost={onHeartLost}
+          onBack={() => setMode('menu')}
+        />
+      )}
+      {mode === 'sentenceBuilder' && (
+        <SentenceBuilder
+          langCode={languageCode}
+          langName={languageName}
+          onXP={(d) => { onXP(d); setXpGained((x) => x + d); }}
+          onHeartLost={onHeartLost}
           onBack={() => setMode('menu')}
         />
       )}

@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { supabase } from '../data/supabase';
 import { getTodayCheckin, getStreakCount, getReferralFrozenCount, isOfflineMode } from '../lib/offlineData';
+import { trackLearningEvent } from '../lib/AIMonitor';
 
 interface DailyCheckinProps {
   sessionKey: string;
@@ -161,6 +162,8 @@ const DailyCheckin: React.FC<DailyCheckinProps> = ({ sessionKey, languageCode, o
       onCheckin(10);
       setCheckedInToday(true);
       setStreak((prev) => prev + 1);
+      // Track learning event for AI monitor
+      trackLearningEvent({ type: 'checkin', langCode: languageCode, score: 10 });
 
       // Refresh frozen count after checkin
       const { data: referrerFrozen } = await supabase
@@ -174,6 +177,7 @@ const DailyCheckin: React.FC<DailyCheckinProps> = ({ sessionKey, languageCode, o
       onCheckin(10);
       setCheckedInToday(true);
       setStreak((prev) => prev + 1);
+      trackLearningEvent({ type: 'checkin', langCode: languageCode, score: 10 });
     } finally {
       clearTimeout(safetyTimer);
       setChecking(false);
