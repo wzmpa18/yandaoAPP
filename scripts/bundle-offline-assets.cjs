@@ -1116,7 +1116,7 @@ console.log('\n⚙️ 开始生成所有语言的数据...');
 
 const vocabData={}, phraseData={}, quizData={}, radioData={}, storyData={}, grammarData={};
 const funData={}, memoryData={}, celebrityData={}, aichatData={}, examData={}, challengeData={};
-const TARGET_COUNTS={ja:4000,en:4000,ko:2500,fr:2000,es:2000,de:2000,it:1500,pt:1500,ar:1000,zh:1000};
+const TARGET_COUNTS={ja:1000,en:1000,ko:600,fr:500,es:500,de:500,it:400,pt:400,ar:300,zh:300};
 
 LANGUAGES.forEach(lang=>{
   console.log(`\n  📝 ${LN[lang]} (${TARGET_COUNTS[lang]} 词)...`);
