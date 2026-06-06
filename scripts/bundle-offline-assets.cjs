@@ -247,10 +247,9 @@ function genJaVocab(count) {
     });
   });
 
-  // 扩展到目标数量 (Set生成派生词+for填充)
+  // 扩展到目标数量 (Set去重优化)
   const jaWordSet = new Set(allWords.map(w => w[0]));
-  const MAX_TRIES = 5000;
-  for (let t = 0; t < MAX_TRIES && result.length < count; t++) {
+  while (result.length < count) {
     const base = pick(allWords);
     const suffices = ['〜的', '〜化', '〜性', '〜度', '〜者', '〜用', '〜法', '〜型', '〜式', '〜類',
       '再' + base[0], '最' + base[0], '未' + base[0], '非' + base[0], '超' + base[0],
@@ -267,8 +266,8 @@ function genJaVocab(count) {
         frequency: rnd(1, 1000), tags: ['派生語', 'N2'],
       });
     }
+    if (result.length >= allWords.length + 5000) break;
   }
-  // 用for填充剩余
   for (let i = result.length; i < count; i++) {
     result.push({
       id: `ja_vocab_${i + 1}`,
@@ -408,10 +407,9 @@ function genEnVocab(count) {
     });
   });
 
-  // Set生成派生词+for填充
+  // Set去重优化（英语派生词有限，达到1500组后自动停止）
   const enWordSet = new Set(core.map(w => w[0].toString().split('/')[0]));
-  const MAX_TRIES = 5000;
-  for (let t = 0; t < MAX_TRIES && result.length < count; t++) {
+  while(result.length < count){
     const b=pick(core);
     const bw=b[0].toString().split('/')[0];
     const vars=[bw+'ing',bw+'s',bw+'ed',bw+'ly','re-'+bw,'un-'+bw,
@@ -424,6 +422,7 @@ function genEnVocab(count) {
         example:`The ${nw} is a derived form of "${bw}" meaning ${b[2]}.`,
         frequency:rnd(1,1000),tags:['derived','B1']});
     }
+    if (result.length >= 1500) break;
   }
   for (let i = result.length; i < count; i++) {
     result.push({id:`en_vocab_${i+1}`,
@@ -480,10 +479,10 @@ function genOtherVocab(lang,count,sampleSize){
       frequency:Math.min(100,tmpl.length-i),tags:[w[2]]});
   });
 
-  // Set生成派生词+for填充
+  // Set去重优化（模板派生词有限，自动停止并填充）
   const otherWordSet = new Set(tmpl.map(w => w[0]));
-  const MAX_TRIES = 5000;
-  for (let t = 0; t < MAX_TRIES && result.length < count; t++) {
+  const MAX_DERIVED = tmpl.length * 26;
+  while(result.length<count){
     const b=pick(tmpl);
     const nw=b[0]+String.fromCharCode(97+rnd(0,25));
     if(!otherWordSet.has(nw)){
@@ -492,6 +491,7 @@ function genOtherVocab(lang,count,sampleSize){
         meaning:b[1]+'(派生)',level:'T2',
         example:`Derived from "${b[0]}" in ${LN[lang]}.`,frequency:rnd(1,500),tags:['T2']});
     }
+    if (result.length >= tmpl.length + MAX_DERIVED) break;
   }
   for (let i = result.length; i < count; i++) {
     result.push({id:`${lang}_vocab_${i+1}`,
