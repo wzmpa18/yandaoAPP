@@ -247,10 +247,10 @@ function genJaVocab(count) {
     });
   });
 
-  // 扩展到目标数量 (Set去重+fallback)
+  // 扩展到目标数量 (Set生成派生词+for填充)
   const jaWordSet = new Set(allWords.map(w => w[0]));
-  let att = 0;
-  while (result.length < count) {
+  const MAX_TRIES = 5000;
+  for (let t = 0; t < MAX_TRIES && result.length < count; t++) {
     const base = pick(allWords);
     const suffices = ['〜的', '〜化', '〜性', '〜度', '〜者', '〜用', '〜法', '〜型', '〜式', '〜類',
       '再' + base[0], '最' + base[0], '未' + base[0], '非' + base[0], '超' + base[0],
@@ -267,13 +267,13 @@ function genJaVocab(count) {
         frequency: rnd(1, 1000), tags: ['派生語', 'N2'],
       });
     }
-    if (++att > count * 10) break; // 电路断点，防止死循环
   }
-  while (result.length < count) {
+  // 用for填充剩余
+  for (let i = result.length; i < count; i++) {
     result.push({
-      id: `ja_vocab_${result.length + 1}`,
-      word: `日本語_拡張語彙_${result.length}`, reading: '',
-      meaning: `扩展日语词汇 #${result.length}`, pos: '名詞', level: 'N1',
+      id: `ja_vocab_${i + 1}`,
+      word: `日本語_拡張語彙_${i}`, reading: '',
+      meaning: `扩展日语词汇 #${i}`, pos: '名詞', level: 'N1',
       example: `日本語の拡張語彙です。`, frequency: rnd(1, 500), tags: ['拡張', 'N1'],
     });
   }
@@ -408,10 +408,10 @@ function genEnVocab(count) {
     });
   });
 
-  // Set去重+fallback模板
+  // Set生成派生词+for填充
   const enWordSet = new Set(core.map(w => w[0].toString().split('/')[0]));
-  let att = 0;
-  while(result.length < count){
+  const MAX_TRIES = 5000;
+  for (let t = 0; t < MAX_TRIES && result.length < count; t++) {
     const b=pick(core);
     const bw=b[0].toString().split('/')[0];
     const vars=[bw+'ing',bw+'s',bw+'ed',bw+'ly','re-'+bw,'un-'+bw,
@@ -424,12 +424,11 @@ function genEnVocab(count) {
         example:`The ${nw} is a derived form of "${bw}" meaning ${b[2]}.`,
         frequency:rnd(1,1000),tags:['derived','B1']});
     }
-    if (++att > count * 10) break;
   }
-  while (result.length < count) {
-    result.push({id:`en_vocab_${result.length+1}`,
-      word:`English_ext_vocab_${result.length}`,phonetic:'',
-      meaning:`扩展英语词汇 #${result.length}`,pos:'noun',level:'B1',
+  for (let i = result.length; i < count; i++) {
+    result.push({id:`en_vocab_${i+1}`,
+      word:`English_ext_vocab_${i}`,phonetic:'',
+      meaning:`扩展英语词汇 #${i}`,pos:'noun',level:'B1',
       example:`This is an extended English vocabulary item.`,
       frequency:rnd(1,500),tags:['extended','B1']});
   }
@@ -481,10 +480,10 @@ function genOtherVocab(lang,count,sampleSize){
       frequency:Math.min(100,tmpl.length-i),tags:[w[2]]});
   });
 
-  // Set去重+fallback模板
+  // Set生成派生词+for填充
   const otherWordSet = new Set(tmpl.map(w => w[0]));
-  let att = 0;
-  while(result.length<count){
+  const MAX_TRIES = 5000;
+  for (let t = 0; t < MAX_TRIES && result.length < count; t++) {
     const b=pick(tmpl);
     const nw=b[0]+String.fromCharCode(97+rnd(0,25));
     if(!otherWordSet.has(nw)){
@@ -493,12 +492,11 @@ function genOtherVocab(lang,count,sampleSize){
         meaning:b[1]+'(派生)',level:'T2',
         example:`Derived from "${b[0]}" in ${LN[lang]}.`,frequency:rnd(1,500),tags:['T2']});
     }
-    if (++att > count * 10) break;
   }
-  while (result.length < count) {
-    result.push({id:`${lang}_vocab_${result.length+1}`,
-      word:`${LN[lang]}_ext_vocab_${result.length}`,
-      meaning:`扩展${LN[lang]}词汇 #${result.length}`,level:'T2',
+  for (let i = result.length; i < count; i++) {
+    result.push({id:`${lang}_vocab_${i+1}`,
+      word:`${LN[lang]}_ext_vocab_${i}`,
+      meaning:`扩展${LN[lang]}词汇 #${i}`,level:'T2',
       example:`Extended ${LN[lang]} vocabulary item.`,frequency:rnd(1,500),tags:['T2']});
   }
   return result.slice(0,count);
