@@ -1,5 +1,5 @@
 name: iOS & Android Build
-# Retry: CI transient failure check (build #65)
+# Retry: #68 - bundle fix with circuit breaker + fallback (retry after #67 transient failure)
 
 on:
   push:
