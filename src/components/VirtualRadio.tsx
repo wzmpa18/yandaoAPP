@@ -89,9 +89,21 @@ function useSpeechSynthesis() {
   const speak = useCallback((text: string, langCode: string, rate: number, onEnd?: () => void) => {
     if (!window.speechSynthesis) return;
     window.speechSynthesis.cancel();
+
+    // 尝试匹配自然语音
+    const voices = window.speechSynthesis.getVoices();
+    const langTag = LANG_SR_CODE[langCode] ?? 'en-US';
+    const langPrefix = langTag.split('-')[0];
+    const naturalVoice = voices.find((v) =>
+      v.lang.startsWith(langPrefix) && /Natural|Neural|Premium|Enhanced|Wavenet/i.test(v.name)
+    );
+
     const utt = new SpeechSynthesisUtterance(text);
-    utt.lang = LANG_SR_CODE[langCode] ?? 'en-US';
+    utt.lang = langTag;
     utt.rate = rate;
+    utt.pitch = 1.0;
+    utt.volume = 1.0;
+    if (naturalVoice) utt.voice = naturalVoice;
     utt.onend = onEnd ?? null;
     utteranceRef.current = utt;
     window.speechSynthesis.speak(utt);

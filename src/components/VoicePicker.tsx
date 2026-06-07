@@ -8,19 +8,19 @@ interface VoicePickerProps {
 }
 
 const GROUP_LABELS: Record<string, string> = {
-  child: '儿童（3–12岁）',
-  student: '学生（13–22岁）',
-  adult: '青年/成人（23–50岁）',
+  kid: '🧒 儿童组 · 可爱治愈',
+  teen: '💖 少女组 · 甜美治愈',
+  adult: '🌸 成人组 · 知性治愈',
 };
 const GROUP_ICONS: Record<string, string> = {
-  child: '🧒', student: '🎓', adult: '👤',
+  kid: '🧒', teen: '💖', adult: '🌸',
 };
-const GROUP_ORDER: Array<'child' | 'student' | 'adult'> = ['child', 'student', 'adult'];
+const GROUP_ORDER: Array<'kid' | 'teen' | 'adult'> = ['kid', 'teen', 'adult'];
 
 const DEMO_TEXT: Record<string, string> = {
-  zh: '你好！我是你的语言学习伙伴。',
-  ja: 'こんにちは！私はあなたの言語学習の仲間です。',
-  en: 'Hello! I am your language learning companion.',
+  zh: '你好！我是你的语言学习伙伴～一起加油吧！',
+  ja: 'こんにちは！一緒に頑張りましょう～',
+  en: 'Hello! I am your language learning companion. Let us learn together!',
 };
 
 export const VoicePicker: React.FC<VoicePickerProps> = ({ currentId, onSelect, onClose }) => {
@@ -76,9 +76,7 @@ export const VoicePicker: React.FC<VoicePickerProps> = ({ currentId, onSelect, o
                       <span className="vp-option-num">{preset.id}</span>
                       <div className="vp-option-info">
                         <span className="vp-option-name">{preset.name}</span>
-                        <span className="vp-option-params">
-                          音调 {preset.pitch.toFixed(1)} · 语速 {preset.rate.toFixed(2)}x
-                        </span>
+                        <span className="vp-option-persona">{preset.persona}</span>
                       </div>
                     </div>
                     <div className="vp-option-right">
@@ -100,7 +98,7 @@ export const VoicePicker: React.FC<VoicePickerProps> = ({ currentId, onSelect, o
 
         <div className="vp-footer">
           <p className="vp-note">
-            声音效果取决于设备支持的语音引擎。点击 ▶ 可试听效果。
+            🎙️ 采用微软自然语音引擎 · 治愈系美少女/磁性男声/萌娃童声 · 点击 ▶ 试听
           </p>
           <button className="vp-done" onClick={onClose}>完成</button>
         </div>

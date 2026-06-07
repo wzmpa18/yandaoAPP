@@ -9,6 +9,7 @@ import { setOfflineMode } from './lib/offlineData';
 import { initProvider } from './providers';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { initContentPreloader, preloadVoiceEngine } from './lib/contentPreloader';
+import { preInitEdgeTTS } from './lib/voiceProfile';
 import { ToastProvider } from './components/GlobalToast';
 
 const SESSION_KEY = 'yandao_session_v5';
@@ -128,6 +129,7 @@ const App: React.FC = () => {
       initContentPreloader(p.language_code);
       // 预热语音引擎
       preloadVoiceEngine(p.language_code);
+      preInitEdgeTTS();
     }
 
     if (!localStorage.getItem(PHONE_VERIFIED_KEY)) {

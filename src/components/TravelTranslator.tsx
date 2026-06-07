@@ -140,9 +140,18 @@ export const TravelTranslator: React.FC<TravelTranslatorProps> = ({ languageCode
     if (!window.speechSynthesis) return;
     setSpeaking(true);
     window.speechSynthesis.cancel();
+    const voices = window.speechSynthesis.getVoices();
+    const langTag = LANG_BCP[lang] || 'en-US';
+    const langPrefix = langTag.split('-')[0];
+    const naturalVoice = voices.find((v) =>
+      v.lang.startsWith(langPrefix) && /Natural|Neural|Premium|Enhanced|Wavenet/i.test(v.name)
+    );
     const utt = new SpeechSynthesisUtterance(text);
-    utt.lang = LANG_BCP[lang] || 'en-US';
+    utt.lang = langTag;
     utt.rate = 0.85;
+    utt.pitch = 1.0;
+    utt.volume = 1.0;
+    if (naturalVoice) utt.voice = naturalVoice;
     utt.onend = () => setSpeaking(false);
     utt.onerror = () => setSpeaking(false);
     window.speechSynthesis.speak(utt);
