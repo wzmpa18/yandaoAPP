@@ -9,7 +9,7 @@ on:
 jobs:
   android-build:
     runs-on: ubuntu-22.04
-    timeout-minutes: 180
+    timeout-minutes: 360
     
     steps:
     - name: Checkout code
@@ -239,7 +239,7 @@ jobs:
 
   ios-build:
     runs-on: macos-14
-    timeout-minutes: 180
+    timeout-minutes: 360
     
     steps:
     - name: Checkout code

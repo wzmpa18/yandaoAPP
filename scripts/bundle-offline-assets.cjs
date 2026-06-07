@@ -604,9 +604,9 @@ function genQuizData(lang,count){
     quiz.push({
       id:`${lang}_quiz_${i+1}`, type, level,
       question:generateQuizQuestion(lang,type,i),
-      options:type==='true_false'?['True','False']:Array.from({length:4},(_,j)=>`Option ${String.fromCharCode(65+j)}: ${generateQuizOption(lang,type,i,j)}`),
+      options:type==='true_false'?['True','False']:['A: Correct answer','B: Common mistake','C: Similar but wrong','D: Clearly wrong'],
       correct:rnd(0,type==='true_false'?1:3),
-      explanation:`This ${type} question tests your ${level} level ${LN[lang]} skills. Question #${i+1}. ${generateDetailedExplanation(lang,type,level,i)}`,
+      explanation:`${LN[lang]} ${level} ${type} #${i+1}. ${generateDetailedExplanation(lang,type,level,i)}`,
       hint:`Think about the ${LN[lang]} grammar/vocabulary rules. Hint for Q${i+1}: focus on ${pick(['verb conjugation','particle usage','word order','tense agreement','honorifics','register','collocation','idiomatic expression','context clues','pronunciation patterns'])}.`,
       timeLimit: type==='reading'?120:type==='listening'?90:type==='writing'?180:45,
       points:level==='advanced'?25:level==='intermediate'?18:12,
@@ -667,38 +667,38 @@ function genRadioData(lang,count){
       date:new Date(Date.now()-rnd(0,86400000*30)).toISOString().split('T')[0],
       tags:[topic,level, lang],
       transcriptAvailable:true,
-      vocabularyNotes:Array.from({length:rnd(20,50)},(_,j)=>({word:`${lang}_vocab_${(i*13+j)%50000+1}`, definition:`Detailed definition and usage example for vocabulary word #${j} in this ${LN[lang]} ${topic} radio program episode.`, exampleSentence:`Example sentence showing how native speakers use this word in context related to ${topic}.`, difficulty:pick(['easy','medium','hard']), frequency:rnd(1,100)})),
+      vocabularyNotes:Array.from({length:rnd(8,15)},(_,j)=>({w:`${lang}_v${(i*13+j)%50000+1}`,d:`Vocab ${j} for ${LN[lang]} ${topic} radio.`,e:`Example usage in context of ${topic}.`,lvl:pick(['easy','medium','hard'])})),
     });
   }
   return radio;
 }
 
 function generateRadioContent(lang,topic,level,idx){
-  // 大幅增加文本长度: beginner 800→3000字, intermediate 800→6000字, advanced 1500→12000字
-  const len=level==='beginner'?3000+rnd(0,2000):level==='intermediate'?6000+rnd(0,4000):12000+rnd(0,6000);
-  let content=`[${LN[lang]} Radio Program - Episode #${idx+1}]\n`;
-  content+=`Topic: ${topic}\nLevel: ${level}\nDate: ${new Date(Date.now()-rnd(0,86400000*90)).toISOString().split('T')[0]}\n\n`;
-  content+=`Welcome to today's ${LN[lang]} ${topic} program! This is episode #${idx+1} in our comprehensive series about ${topic} in the context of ${LN[lang]} language learning.\n\n`;
+  const len=level==='beginner'?2000+rnd(0,1000):level==='intermediate'?4000+rnd(0,2000):8000+rnd(0,3000);
+  const header=`[${LN[lang]} Radio Program - Episode #${idx+1}]\nTopic: ${topic}\nLevel: ${level}\n\n`;
   
-  const paragraphs=[`${LN[lang]} language has incredibly rich and nuanced expressions when discussing ${topic}. In today's episode, we will explore fascinating aspects of ${topic} that are essential for anyone serious about mastering ${LN[lang]}. Understanding how native speakers discuss ${topic} in various contexts — from casual conversations among friends to formal academic discussions — will dramatically improve your fluency.\n\n`,
-    `When learning ${LN[lang]}, understanding the cultural context around ${topic} is absolutely essential. Language and culture are inseparable, and ${topic} represents one of the most culturally significant areas of ${LN[lang]} expression. Today we'll examine how ${topic} appears in daily conversations, media broadcasts, literature, social media, and even in advertising and entertainment.\n\n`,
-    `Research from leading language acquisition institutions consistently shows that immersion in authentic ${topic}-related content significantly improves both vocabulary retention and grammatical accuracy. We recommend practicing with real-world examples of ${topic} discussions found in ${LN[lang]} newspapers, podcasts, television programs, and online forums.\n\n`,
-    `Let's look at some common sentences and expressions related to ${topic}:\n1. Basic everyday expressions about ${topic} used by native speakers\n2. Intermediate usage patterns in formal and informal contexts\n3. Advanced nuance discussions showing deep cultural understanding\n4. Idiomatic expressions and metaphors involving ${topic}\n5. Slang and colloquialisms that younger speakers use when discussing ${topic}\n\n`,
-    `For our listeners at the beginner level: focus on the key vocabulary words highlighted in each section. Don't worry if you don't understand everything — repeated exposure is the key to natural language acquisition. Your brain is constantly processing patterns, even when you're not consciously aware of it.\n\n`,
-    `Intermediate learners should pay attention to the sentence structures and grammar patterns we use. Notice how particles, verb conjugations, and word order change based on the formality level and the relationship between speakers. Try to identify at least five new grammar points in this episode.\n\n`,
-    `Advanced listeners: challenge yourself to understand not just what is being said, but also the subtext, cultural implications, and stylistic choices. Why did the speaker choose this particular expression over alternatives? What does it reveal about their attitude, background, or relationship with the listener?\n\n`,
-    `Let's dive deeper into specific examples. Here are some authentic dialogues featuring ${topic}: [Dialogue segment A] Speaker 1 asks about ${topic} in a casual setting... Speaker 2 responds with detailed information, using natural fillers and discourse markers typical of spoken ${LN[lang]}. Notice the back-channeling sounds and agreement markers.\n\n`,
-    `[Dialogue segment B] A more formal discussion about ${topic}, perhaps in an educational or professional context. The register shift is evident in vocabulary choice, sentence length, and politeness levels. Advanced students should note the honorifics or formal structures being employed here.\n\n`,
-    `Remember: consistent practice with ${topic}-related vocabulary and contexts will build your confidence in ${LN[lang]} exponentially. Try using these expressions in your own conversations, writing exercises, or even when thinking to yourself in ${LN[lang]}. The goal is to make these expressions feel natural and automatic.\n\n`,
-    `We also want to highlight some common mistakes that learners make when discussing ${topic}. Mistake #1: direct translation from your native language often produces unnatural phrasing. Mistake #2: using the wrong register (too formal for casual situations or vice versa). Mistake #3: missing cultural nuances that can change the meaning entirely.\n\n`,
-    `Before we wrap up, let's review the key vocabulary from today's episode. We covered over 30 essential terms related to ${topic}, ranging from basic nouns and verbs to advanced idioms and technical terminology. Make sure to add these to your spaced repetition system for optimal retention.\n\n`,
-    `That's all for today's ${topic} episode (#${idx+1}). Stay tuned for our next program where we'll explore another fascinating aspect of ${LN[lang]} language and culture. And don't forget — practice every day, even just for a few minutes. Consistency beats intensity every single time! Until next time, happy learning!\n`,
+  const paras=[`${LN[lang]} has rich expressions about ${topic}. Understanding how native speakers discuss ${topic} in various contexts improves fluency.\n\n`,
+    `Cultural context around ${topic} is essential in ${LN[lang]}. This area appears in daily conversations, media, literature, social media, and entertainment.\n\n`,
+    `Research shows immersion in authentic ${topic}-related content improves vocabulary and grammar. Practice with real ${LN[lang]} newspapers, podcasts, and forums.\n\n`,
+    `Common expressions about ${topic}: basic everyday usage, intermediate formal/informal patterns, advanced cultural nuance, idiomatic metaphors, slang used by younger speakers.\n\n`,
+    `Beginners: focus on key vocabulary. Intermediate: study sentence structures and grammar. Advanced: understand subtext and cultural implications.\n\n`,
+    `Authentic ${topic} dialogue examples: [Casual] Speaker asks about ${topic}... [Formal] Professional discussion... Notice how register and vocabulary shift.\n\n`,
+    `Consistent practice with ${topic} vocabulary builds confidence. Use these expressions in conversations, writing, and thinking in ${LN[lang]}.\n\n`,
+    `Common mistakes: direct translation producing unnatural phrasing, wrong register choice, missing cultural nuances that change meaning entirely.\n\n`,
+    `Key vocabulary review: essential terms from basic nouns to technical terminology. Add to your spaced repetition system for optimal retention.\n\n`,
+    `Episode #${idx+1} wrap-up: practice daily! Stay tuned for more ${LN[lang]} content. Consistency beats intensity every time.\n\n`,
   ];
   
-  while(content.length<len){
-    content+=paragraphs[idx%paragraphs.length];
+  const parts=[header];
+  let built=header.length;
+  let pi=0;
+  while(built<len){
+    const p=paras[pi%paras.length];
+    parts.push(p);
+    built+=p.length;
+    pi++;
   }
-  return content.slice(0,len);}
+  return parts.join('').slice(0,len);}
 
 // ========== 5. 故事（分级阅读）==========
 console.log('\n📖 生成故事内容...');
@@ -709,7 +709,7 @@ function genStoryData(lang,count){
     const genre=genres[i%genres.length];
     const level=i<count*0.35?'beginner':i<count*0.65?'intermediate':'advanced';
     // 大幅增加故事字数: beginner 200-500→800-1500, intermediate 500-1000→2000-4000, advanced 1000-2000→5000-10000
-    const wc=level==='beginner'?800+rnd(0,700):level==='intermediate'?2000+rnd(0,2000):5000+rnd(0,5000);
+    const wc=level==='beginner'?600+rnd(0,400):level==='intermediate'?1500+rnd(0,1000):3000+rnd(0,2000);
     stories.push({
       id:`${lang}_story_${i+1}`,
       title:generateStoryTitle(lang,genre,i),
@@ -719,13 +719,13 @@ function genStoryData(lang,count){
       readingTimeMinutes:Math.ceil(wc/200),
       difficultyScore:level==='beginner'?1:level==='intermediate'?3:5,
       vocabularyLevel:level,
-      keyVocabulary:Array.from({length:rnd(30,80)},(_,j)=>({word:`${lang}_vocab_${(i*17+j)%50000+1}`, definition:`Key vocabulary item #${j} for this ${LN[lang]} ${genre} story.`, context:`How this word is used within the context of the story's narrative arc.`})),
-      comprehensionQuestions:Array.from({length:rnd(5,10)},(_,j)=>({
-        q:`Comprehension question ${j+1} for ${LN[lang]} story #${i+1}: This question tests your understanding of the ${pick(['plot development','character motivation','thematic elements','cultural references','symbolic meaning','narrative perspective','emotional subtext','linguistic nuance','vocabulary in context','inference from text'])} aspect of this ${genre} story.`,
-        options:['A) Correct answer demonstrating thorough understanding','B) Partially correct but missing a key detail','C) Plausible but incorrect based on evidence in the text','D) Completely unrelated or contradictory to the story content'],
+      keyVocabulary:Array.from({length:rnd(10,20)},(_,j)=>({w:`${lang}_v${(i*17+j)%50000+1}`,d:`Key vocab ${j} for this ${LN[lang]} ${genre} story.`})),
+      comprehensionQuestions:Array.from({length:rnd(3,5)},(_,j)=>({
+        q:`Q${j+1}: Tests your understanding of this ${genre} story in ${LN[lang]}.`,
+        options:['A) Correct answer','B) Plausible distracter','C) Wrong but related','D) Completely wrong'],
         correct:j%4,
-        explanation:`Detailed explanation of why this answer is correct and why other options are wrong, with specific references to the story text.`,
-        skillTested:pick(['literal_comprehension','inferential_reading','vocabulary_context','grammar_analysis','cultural_understanding']),
+        explanation:`Explanation for Q${j+1} with story evidence.`,
+        skill:pick(['literal','inference','vocab','grammar','cultural']),
       })),
       moral:generateMoral(genre),
       culturalNotes:`Cultural context note for this ${LN[lang]} ${genre} story.`,
@@ -756,8 +756,16 @@ function generateStoryContent(lang,genre,level,targetWords){
     `The end of this chapter was truly just the beginning of a much grander adventure...\n\n`,
   ];
   s+=opener;
-  while(s.length<targetWords) s+=body[rnd(0,body.length-1)];
-  return s.slice(0,targetWords);
+  const parts=[s];
+  let built=s.length;
+  let ii=0;
+  while(built<targetWords){
+    const bp=body[ii%body.length];
+    parts.push(bp);
+    built+=bp.length;
+    ii++;
+  }
+  return parts.join('').slice(0,targetWords);
 }
 function generateMoral(genre){return `Every ${genre} teaches us something valuable about life, love, and perseverance.`;}
 
