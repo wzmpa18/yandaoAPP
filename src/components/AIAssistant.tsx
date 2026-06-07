@@ -798,9 +798,13 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ languageCode, language
       setSimpleListening(false);
       if (finalText.trim()) {
         setThinking(true);
-        await new Promise((r) => setTimeout(r, 700));
-        const ans = simulateAIResponse(finalText, languageCode, 'chat', 'panda');
-        setVoiceAnswer(ans);
+        try {
+          const ans = await callRealAI(finalText, 'chat', chatRole);
+          setVoiceAnswer(ans || simulateAIResponse(finalText, languageCode, 'chat', chatRole));
+        } catch {
+          // AI不可用时降级到模拟回复
+          setVoiceAnswer(simulateAIResponse(finalText, languageCode, 'chat', chatRole));
+        }
         setThinking(false);
       }
     };

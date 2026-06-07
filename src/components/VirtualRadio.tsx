@@ -237,7 +237,7 @@ export const VirtualRadio: React.FC<VirtualRadioProps> = ({
             setElapsed(0);
             setTimeout(() => setPlaying(true), 400);
           }
-        });
+        }, volume);
       } else {
         resume();
       }
@@ -250,8 +250,13 @@ export const VirtualRadio: React.FC<VirtualRadioProps> = ({
     setElapsed(newElapsed);
     if (playing) {
       cancel();
-      setElapsed(0);
-      speak(current.content_text, languageCode, speed);
+      // Calculate approximate character position for seek
+      const totalChars = current.content_text.length;
+      const startChar = Math.floor((pct * totalChars));
+      const seekText = current.content_text.slice(startChar);
+      if (seekText.length > 0) {
+        speak(seekText, languageCode, speed, volume);
+      }
     }
   }
 

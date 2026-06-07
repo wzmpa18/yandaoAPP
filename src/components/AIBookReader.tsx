@@ -394,7 +394,7 @@ export const AIBookReader: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       const response = await callAI([
         {
           role: 'system',
-          content: `你是一个专业的语言学习阅读助手。请对用户提供的英语文章进行智能分析，生成详细的中文学习总结。
+          content: `你是一个专业的语言学习阅读助手。请对用户提供的${languageName || ''}文章进行智能分析，生成详细的中文学习总结。
 
 请严格按照以下 JSON 格式返回：
 {

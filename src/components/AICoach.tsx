@@ -200,20 +200,22 @@ const ROLE_SYSTEM_PROMPTS: Record<RoleKey, string> = {
 };
 
 async function aiGenerateResponse(role: RoleKey, input: string, langCode: string, level: string): Promise<string> {
-  if (!input.trim()) return ROLES.find(r => r.key === role)!.greet;
+  if (!input.trim()) return ROLES.find(r => r.key === role)?.greet || '你好！';
   
   try {
     const systemPrompt = ROLE_SYSTEM_PROMPTS[role];
     const levelLabel = level === 'beginner' ? '初级' : level === 'intermediate' ? '中级' : '高级';
-    const response = await callAI(
-      `[角色]: ${systemPrompt}\n[用户语言]: ${langCode}\n[用户水平]: ${levelLabel}\n[用户说]: ${input}\n\n请用中文简短回复（2-3句），保持角色风格。`,
-      { max_tokens: 200 }
-    );
+    const response = await callAI([
+      { role: 'system', content: `${systemPrompt}\n[用户语言]: ${langCode}\n[用户水平]: ${levelLabel}` },
+      { role: 'user', content: input }
+    ], { max_tokens: 200 });
     if (response && response.trim()) return response.trim();
-  } catch {
+  } catch (e) {
     // AI 不可用，降级到模板
+    console.warn('AICoach: AI调用失败，使用模板回复', e);
   }
-  return pickTemplate(ROLES.find(r => r.key === role)!, input);
+  const roleData = ROLES.find(r => r.key === role);
+  return roleData ? pickTemplate(roleData, input) : '抱歉，我暂时无法回答。';
 }
 
 export const AICoach: React.FC<AICoachProps> = ({ langCode, langName, userLevel, onBack }) => {

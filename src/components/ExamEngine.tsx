@@ -216,11 +216,27 @@ function makeListeningQ(lang: string, level: string, seed: number): Question {
 }
 
 // Generate a batch of N synthesized questions from templates
-function generateQuestions(lang: string, level: string, startSeed: number, count: number): Question[] {
+function generateQuestions(lang: string, level: string, startSeed: number, count: number, etype?: string): Question[] {
   const out: Question[] = [];
   for (let i = 0; i < count; i++) {
     const seed = startSeed + i;
-    out.push(seed % 2 === 0 ? makeGrammarQ(lang, level, seed) : makeListeningQ(lang, level, seed));
+    // 根据考试类型调整出题策略
+    if (etype === 'jlpt' || etype === 'hsk') {
+      // 语法为主(70%) + 听力(30%)
+      out.push(seed % 10 < 7 ? makeGrammarQ(lang, level, seed) : makeListeningQ(lang, level, seed));
+    } else if (etype === 'toefl') {
+      // 听力为主(60%) + 语法(40%)
+      out.push(seed % 10 < 6 ? makeListeningQ(lang, level, seed) : makeGrammarQ(lang, level, seed));
+    } else if (etype === 'business') {
+      // 商务场景题
+      out.push(seed % 2 === 0 ? makeGrammarQ(lang, level, seed) : makeListeningQ(lang, level, seed));
+    } else if (etype === 'daily') {
+      // 日常会话
+      out.push(seed % 3 === 0 ? makeGrammarQ(lang, level, seed) : makeListeningQ(lang, level, seed));
+    } else {
+      // all — 均匀混合
+      out.push(seed % 2 === 0 ? makeGrammarQ(lang, level, seed) : makeListeningQ(lang, level, seed));
+    }
   }
   return out;
 }
@@ -248,33 +264,41 @@ export const ExamEngine: React.FC<ExamEngineProps> = ({ languageCode, languageNa
     setPhase('loading');
     seedRef.current = 0;
 
-    const { data } = await supabase
-      .from('exam_questions')
-      .select('*')
-      .eq('language_code', languageCode)
-      .eq('level', levelFilter)
-      .order('order_hint');
+    try {
+      const { data, error } = await supabase
+        .from('exam_questions')
+        .select('*')
+        .eq('language_code', languageCode)
+        .eq('level', levelFilter)
+        .eq('exam_type', examType)
+        .order('order_hint');
 
-    let qs: Question[] = (data || []).map((r: Question & { options: unknown }) => {
-      try {
-        return {
-          ...r,
-          options: Array.isArray(r.options) ? r.options : JSON.parse(r.options as string || '[]'),
-        };
-      } catch {
-        return { ...r, options: [] as string[] };
+      if (error) console.warn('ExamEngine: Supabase query error, using generated fallback:', error.message);
+
+      let qs: Question[] = (data || []).map((r: Question & { options: unknown }) => {
+        try {
+          return {
+            ...r,
+            options: Array.isArray(r.options) ? r.options : JSON.parse(r.options as string || '[]'),
+          };
+        } catch {
+          return { ...r, options: [] as string[] };
+        }
+      });
+
+      // Pad with generated questions — use examType & level to generate type-appropriate questions
+      if (qs.length < 20) {
+        const fill = generateQuestions(languageCode, levelFilter, 0, Math.max(20, 50) - qs.length, examType);
+        qs = [...qs, ...fill];
+        seedRef.current = fill.length;
       }
-    });
 
-    // Pad with generated questions to ensure at least 10
-    if (qs.length < 10) {
-      const fill = generateQuestions(languageCode, levelFilter, 0, 10 - qs.length);
-      qs = [...qs, ...fill];
-      seedRef.current = fill.length;
-    }
-
-    qs.sort(() => Math.random() - 0.5);
-    setQuestions(qs);
+      // Fisher-Yates shuffle for uniform distribution
+      for (let i = qs.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [qs[i], qs[j]] = [qs[j], qs[i]];
+      }
+      setQuestions(qs);
     setQIndex(0);
     setSelected(null);
     setRevealed(false);

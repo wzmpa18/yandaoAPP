@@ -252,7 +252,27 @@ export const HomePage: React.FC<HomePageProps> = ({
                 className={`study-mode-btn ${studyMode === mode.key ? 'active' : ''}`}
                 onClick={() => {
                   setStudyMode(mode.key);
-                  showToast(`已切换到「${mode.label}」模式 — 内容将针对性调整`);
+                  // 根据模式调整场景筛选逻辑
+                  if (mode.key === 'exam') {
+                    // 考试模式：优先展示语法/考试类场景
+                    const examScenarios = scenarios.filter(s =>
+                      s.title?.includes('语法') || s.title?.includes('考试') || s.title?.includes('测试')
+                    );
+                    if (examScenarios.length > 0) setScenarios(examScenarios);
+                    else showToast(`已切换到「${mode.label}」模式 — 聚焦考试备考内容`);
+                  } else if (mode.key === 'interest') {
+                    // 兴趣模式：优先展示趣味/文化/生活场景
+                    const interestScenarios = scenarios.filter(s =>
+                      s.title?.includes('文化') || s.title?.includes('美食') || s.title?.includes('旅行') ||
+                      s.title?.includes('电影') || s.title?.包含('音乐') || s.title?.includes('动漫')
+                    );
+                    if (interestScenarios.length > 0) setScenarios(interestScenarios);
+                    else showToast(`已切换到「${mode.label}」模式 — 展示兴趣导向内容`);
+                  } else {
+                    // 日常模式：恢复全部场景
+                    loadAllScenarios();
+                    showToast(`已切换到「${mode.label}」模式 — 全部学习内容`);
+                  }
                 }}
               >
                 <span className="study-mode-icon">{mode.icon}</span>
@@ -333,13 +353,15 @@ interface CompassGridProps {
   onOpen: (id: string) => void;
 }
 
-const CompassGrid: React.FC<CompassGridProps> = ({ scenarios, onOpen }) => {
+const CompassGrid: React.FC<CompassGridProps> = ({ scenarios, completed, onOpen }) => {
   const positions = Array.from({ length: 9 }, (_, i) => i + 1);
   const sorted = [...scenarios].sort((a, b) => a.order_index - b.order_index);
 
   function isUnlocked(s: Scenario) {
     if (s.order_index <= 1) return true;
-    return !!sorted.find((x) => x.order_index === s.order_index - 1);
+    // 必须前一关卡已完成才能解锁
+    const prevScenario = sorted.find((x) => x.order_index === s.order_index - 1);
+    return prevScenario ? completed.has(prevScenario.id) : false;
   }
 
   return (
