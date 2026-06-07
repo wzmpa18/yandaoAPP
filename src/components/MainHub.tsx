@@ -29,6 +29,7 @@ import { FriendSystem } from './FriendSystem';
 import { AchievementWall } from './AchievementWall';
 import { StreakShield } from './StreakShield';
 import { NewFeatures } from './NewFeatures';
+import { LearningPath } from './LearningPath';
 import { mockLanguages } from '../data/mockData';
 
 type HubView =
@@ -36,7 +37,7 @@ type HubView =
   | 'profile' | 'partner' | 'circle' | 'member'
   | 'merchant' | 'privacy' | 'ai' | 'radio'
   | 'leaderboard' | 'daily_tasks' | 'friends' | 'achievements' | 'streak_shield'
-  | 'new_features';
+  | 'new_features' | 'learning_path';
 
 interface MainHubProps {
   initialProfile: UserProfile;
@@ -266,6 +267,10 @@ export const MainHub: React.FC<MainHubProps> = ({ initialProfile, onReset }) => 
                 <span className="hqt-icon">✨</span>
                 <span className="hqt-label">新功能</span>
               </button>
+              <button className="hub-quick-tile learning-path-tile" onClick={() => pushView('learning_path')}>
+                <span className="hqt-icon">🗺️</span>
+                <span className="hqt-label">学习路线</span>
+              </button>
             </div>
             <HomePage
               externalLang={lang}
@@ -411,6 +416,14 @@ export const MainHub: React.FC<MainHubProps> = ({ initialProfile, onReset }) => 
         )}
         {view === 'new_features' && (
           <NewFeatures />
+        )}
+        {view === 'learning_path' && (
+          <LearningPath
+            languageCode={lang}
+            languageName={currentLang ? getLangZh(currentLang) : lang}
+            userLevel={profile.level ?? 'beginner'}
+            onBack={() => popView()}
+          />
         )}
       </main>
 

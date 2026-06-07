@@ -180,7 +180,7 @@ export const HomePage: React.FC<HomePageProps> = ({
     setTimeout(() => setConfetti(false), ms);
   }
 
-  function markPhrase(phraseId: string, total: number) {
+  function markPhrase(phraseId: string, total: number, scenarioId?: string) {
     setCompleted((prev) => {
       const next = new Set(prev);
       const wasNew = !next.has(phraseId);
@@ -188,7 +188,10 @@ export const HomePage: React.FC<HomePageProps> = ({
         next.add(phraseId);
         onXP?.(10);
         if (next.size % 5 === 0) fireConfetti();
-        if (total > 0 && [...next].length % total === 0) fireConfetti(3000);
+        // 同时标记场景ID为完成（用于解锁判断）
+        if (scenarioId) next.add(scenarioId);
+        // 整个场景完成时3秒庆祝
+        if (total > 0 && [...next].filter(id => id.startsWith('phrase_')).length % total === 0) fireConfetti(3000);
       } else {
         next.delete(phraseId);
         onXP?.(-10);
@@ -210,7 +213,7 @@ export const HomePage: React.FC<HomePageProps> = ({
         <ScenarioPage
           scenarioId={route.id}
           completed={completed}
-          onMark={(id, total) => markPhrase(id, total)}
+          onMark={(id, total) => markPhrase(id, total, route.id)}
           onComplete={fireConfetti}
           onBack={() => navigate({ view: 'home' })}
         />
@@ -269,8 +272,21 @@ export const HomePage: React.FC<HomePageProps> = ({
                     if (interestScenarios.length > 0) setScenarios(interestScenarios);
                     else showToast(`已切换到「${mode.label}」模式 — 展示兴趣导向内容`);
                   } else {
-                    // 日常模式：恢复全部场景
-                    loadAllScenarios();
+                    // 日常模式：恢复全部场景（从缓存或重新加载）
+                    const cached = getCache<Scenario[]>(`scenarios_${externalLang || 'ja'}`, 300000);
+                    if (cached) {
+                      setScenarios(cached);
+                    } else {
+                      // 缓存过期，重新从Supabase/离线数据加载
+                      supabase.from('scenarios').select('*')
+                        .eq('language_code', externalLang || 'ja')
+                        .order('order_index')
+                        .then(({ data }) => {
+                          if (data && data.length > 0) setScenarios(data as Scenario[]);
+                          else setScenarios(getScenarios(externalLang || 'ja') as unknown as Scenario[]);
+                        })
+                        .catch(() => setScenarios(getScenarios(externalLang || 'ja') as unknown as Scenario[]));
+                    }
                     showToast(`已切换到「${mode.label}」模式 — 全部学习内容`);
                   }
                 }}
@@ -397,7 +413,7 @@ const CompassGrid: React.FC<CompassGridProps> = ({ scenarios, completed, onOpen 
 interface ScenarioPageProps {
   scenarioId: string;
   completed: Set<string>;
-  onMark: (phraseId: string, total: number) => void;
+  onMark: (phraseId: string, total: number, scenarioId: string) => void;
   onComplete: () => void;
   onBack: () => void;
 }
@@ -560,7 +576,7 @@ const ScenarioPage: React.FC<ScenarioPageProps> = ({
             orderIndex={phrase.order_index}
             isCompleted={completed.has(phrase.id)}
             isLocked={isLocked(idx)}
-            onMarkComplete={() => onMark(phrase.id, phrases.length)}
+            onMarkComplete={() => onMark(phrase.id, phrases.length, scenarioId)}
             langCode={scenario.language_code}
           />
         </div>
