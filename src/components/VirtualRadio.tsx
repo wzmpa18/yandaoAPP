@@ -372,7 +372,7 @@ export const VirtualRadio: React.FC<VirtualRadioProps> = ({
           <button
             key={t.key}
             className={`radio-type-btn ${activeType === t.key ? 'active' : ''}`}
-            onClick={() => setActiveType(t.key)}
+            onClick={() => { setActiveType(t.key); setDifficultyFilter('all'); }}
           >
             <span className="radio-type-icon">{t.icon}</span>
             <span className="radio-type-label">{t.label}</span>

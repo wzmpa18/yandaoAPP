@@ -239,22 +239,44 @@ export const FriendSystem: React.FC<FriendSystemProps> = ({
 
   function shortKey(key: string) { return key.slice(-8).toUpperCase(); }
 
-  function searchBuddies() {
+  async function searchBuddies() {
     setBuddyLoading(true);
+    try {
+      const sk = getSessionKey();
+      const { data: realUsers } = await supabase
+        .from('user_profiles')
+        .select('session_key, nickname, avatar_url, learning_language, gender, age, level')
+        .neq('session_key', sk)
+        .limit(30);
+
+      if (realUsers && realUsers.length > 0) {
+        let results: BuddyUser[] = realUsers.map(u => ({
+          id: u.session_key,
+          nickname: u.nickname ?? '用户',
+          avatar: u.avatar_url ?? '👤',
+          language: u.learning_language ?? 'en',
+          gender: u.gender ?? 'other',
+          age: u.age ?? 25,
+          distance: Math.floor(Math.random() * 15) + 1,
+          level: u.level ?? 5,
+          interests: [],
+        }));
+        if (buddyFilter.languages.length > 0) results = results.filter(u => buddyFilter.languages.includes(u.language));
+        if (buddyFilter.genders.length > 0) results = results.filter(u => buddyFilter.genders.includes(u.gender));
+        results = results.filter(u => u.distance <= buddyFilter.distance);
+        results = results.filter(u => u.age >= buddyFilter.ageMin && u.age <= buddyFilter.ageMax);
+        setBuddyResults(results);
+        setBuddyLoading(false);
+        return;
+      }
+    } catch (e) { console.warn('FriendSystem: Supabase查询失败，降级到mock', e); }
+    // Fallback to mock
     setTimeout(() => {
       let results = [...mockBuddyUsers];
-      
-      if (buddyFilter.languages.length > 0) {
-        results = results.filter(u => buddyFilter.languages.includes(u.language));
-      }
-      
-      if (buddyFilter.genders.length > 0) {
-        results = results.filter(u => buddyFilter.genders.includes(u.gender));
-      }
-      
+      if (buddyFilter.languages.length > 0) results = results.filter(u => buddyFilter.languages.includes(u.language));
+      if (buddyFilter.genders.length > 0) results = results.filter(u => buddyFilter.genders.includes(u.gender));
       results = results.filter(u => u.distance <= buddyFilter.distance);
       results = results.filter(u => u.age >= buddyFilter.ageMin && u.age <= buddyFilter.ageMax);
-      
       setBuddyResults(results);
       setBuddyLoading(false);
     }, 500);

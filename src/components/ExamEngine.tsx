@@ -438,7 +438,7 @@ export const ExamEngine: React.FC<ExamEngineProps> = ({ languageCode, languageNa
                       className="exam-analysis-toggle"
                       onClick={() => setShowAnalysis(showAnalysis === q.id ? null : q.id)}
                     >
-                      {showAnalysis === q.id ? 'Hide' : 'AI Deep Analysis 🤖'}
+                      {showAnalysis === q.id ? 'Hide Explanation' : 'View Explanation 💡'}
                     </button>
                     {showAnalysis === q.id && (
                       <div className="exam-analysis-panel"><p>{q.explanation}</p></div>

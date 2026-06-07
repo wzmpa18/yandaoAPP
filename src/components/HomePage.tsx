@@ -264,7 +264,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                     // 兴趣模式：优先展示趣味/文化/生活场景
                     const interestScenarios = scenarios.filter(s =>
                       s.title?.includes('文化') || s.title?.includes('美食') || s.title?.includes('旅行') ||
-                      s.title?.includes('电影') || s.title?.包含('音乐') || s.title?.includes('动漫')
+                      s.title?.includes('电影') || s.title?.includes('音乐') || s.title?.includes('动漫')
                     );
                     if (interestScenarios.length > 0) setScenarios(interestScenarios);
                     else showToast(`已切换到「${mode.label}」模式 — 展示兴趣导向内容`);

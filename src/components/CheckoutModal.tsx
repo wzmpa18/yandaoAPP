@@ -80,7 +80,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const [cardName, setCardName] = useState('');
   const [processing, setProcessing] = useState(false);
   const [done, setDone] = useState(false);
-  const [isMockMode, setIsMockMode] = useState(true);
+  const [isMockMode, setIsMockMode] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   // Base USD price from pricing_plans table
   const usdPriceRef = useRef<number | null>(null);
@@ -89,7 +89,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     (async () => {
       const { data: mockCfg } = await supabase.from('platform_configs')
         .select('value').eq('key', 'mock_payment_mode').maybeSingle();
-      setIsMockMode(!mockCfg || mockCfg.value === '1');
+      setIsMockMode(mockCfg?.value === '1');
 
       // Load USD base price from pricing_plans
       const { data } = await supabase.from('pricing_plans')
