@@ -299,13 +299,22 @@ export const ExamEngine: React.FC<ExamEngineProps> = ({ languageCode, languageNa
         [qs[i], qs[j]] = [qs[j], qs[i]];
       }
       setQuestions(qs);
-    setQIndex(0);
-    setSelected(null);
-    setRevealed(false);
-    setScore(0);
-    setWrongLog([]);
-    setTimeLeft(EXAM_DURATION);
-    setPhase('exam');
+      setQIndex(0);
+      setSelected(null);
+      setRevealed(false);
+      setScore(0);
+      setWrongLog([]);
+      setTimeLeft(EXAM_DURATION);
+      setPhase('exam');
+    } catch (err) {
+      console.error('ExamEngine: loadQuestions error, using fallback:', err);
+      const fallbackQs = generateQuestions(languageCode, levelFilter, 0, 20, examType);
+      setQuestions(fallbackQs);
+      setQIndex(0);
+      setScore(0);
+      setTimeLeft(EXAM_DURATION);
+      setPhase('exam');
+    }
   }, [languageCode, levelFilter]);
 
   useEffect(() => { loadQuestions(); }, [loadQuestions]);
