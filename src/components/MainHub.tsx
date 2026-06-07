@@ -263,14 +263,6 @@ export const MainHub: React.FC<MainHubProps> = ({ initialProfile, onReset }) => 
                 <span className="hqt-icon">🎖️</span>
                 <span className="hqt-label">{s.nav_achievements ?? '成就'}</span>
               </button>
-              <button className="hub-quick-tile" onClick={() => pushView('new_features')}>
-                <span className="hqt-icon">✨</span>
-                <span className="hqt-label">新功能</span>
-              </button>
-              <button className="hub-quick-tile learning-path-tile" onClick={() => pushView('learning_path')}>
-                <span className="hqt-icon">🗺️</span>
-                <span className="hqt-label">学习路线</span>
-              </button>
             </div>
             <HomePage
               externalLang={lang}
@@ -280,6 +272,7 @@ export const MainHub: React.FC<MainHubProps> = ({ initialProfile, onReset }) => 
                 setAiContext(context);
                 navigateToWithStack('ai' as HubView);
               }}
+              onNavigateToView={(view: string) => pushView(view as HubView)}
             />
           </>
         )}

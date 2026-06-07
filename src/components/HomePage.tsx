@@ -81,6 +81,7 @@ interface HomePageProps {
   externalLanguages?: Language[];
   onXP?: (delta: number) => void;
   onNavigateToAI?: (context: string) => void;
+  onNavigateToView?: (view: string) => void;  // 导航到其他功能模块
 }
 
 /* ──────────────────── Root ──────────────────── */
@@ -90,6 +91,7 @@ export const HomePage: React.FC<HomePageProps> = ({
   externalLanguages,
   onXP,
   onNavigateToAI,
+  onNavigateToView,
 }) => {
   const activeLang = externalLang || 'ja';
   const [scenarios, setScenarios]     = useState<Scenario[]>([]);
@@ -341,20 +343,103 @@ export const HomePage: React.FC<HomePageProps> = ({
           </div>
         </section>
 
-        {/* Compass Grid */}
-        <section className="zen-compass-section">
-          <h2 className="zen-section-title">Situational Compass</h2>
-          <p className="zen-section-desc">Choose your real-world scenario</p>
+        {/* ── 功能中心 Feature Hub ── 替代空洞的场景罗盘，直接展示核心功能模块 */}
+        <section className="feature-hub-section">
+          <h2 className="zen-section-title">🎯 学习中心</h2>
+          <p className="zen-section-desc">选择你的学习方式 — 每个模块都由AI驱动</p>
 
-          {loadingScen ? (
-            <GridSkeleton cells={9} />
-          ) : (
-            <CompassGrid
-              scenarios={scenarios}
-              completed={completed}
-              onOpen={(id) => navigate({ view: 'scenario', id })}
-            />
-          )}
+          <div className="feature-hub-grid">
+            {/* 核心功能：学习路线 */}
+            <button className="feature-tile feature-tile-primary" onClick={() => onNavigateToView?.('learning_path')}>
+              <span className="ft-icon">🗺️</span>
+              <div className="ft-body">
+                <span className="ft-title">AI 学习路线</span>
+                <span className="ft-desc">个性化规划 · 参考权威教材 · 8阶段进阶</span>
+              </div>
+              <span className="ft-badge ft-hot">推荐</span>
+            </button>
+
+            {/* AI 助手 - 已在上方有快捷入口，这里作为完整入口 */}
+            <button className="feature-tile" onClick={() => onNavigateToAI?.('你好，我是你的AI语言教练。请帮我制定今天的学习计划。')}>
+              <span className="ft-icon">🤖</span>
+              <div className="ft-body">
+                <span className="ft-title">AI 智能助手</span>
+                <span className="ft-desc">拍照翻译 · 语音对话 · 文字问答 · 聊天</span>
+              </div>
+              <span className="ft-badge ft-active">在线</span>
+            </button>
+
+            {/* 分级阅读 */}
+            <button className="feature-tile" onClick={() => onNavigateToView?.('bookshelf')}>
+              <span className="ft-icon">📚</span>
+              <div className="ft-body">
+                <span className="ft-title">分级阅读</span>
+                <span className="ft-desc">AI智能选书 · 难度匹配 · 深度分析总结</span>
+              </div>
+            </button>
+
+            {/* 模拟考试 */}
+            <button className="feature-tile" onClick={() => onNavigateToView?.('exam_engine')}>
+              <span className="ft-icon">📝</span>
+              <div className="ft-body">
+                <span className="ft-title">模拟考试</span>
+                <span className="ft-desc">JLPT · TOEFL · HSK · 商务 · 日常</span>
+              </div>
+            </button>
+
+            {/* 虚拟电台 */}
+            <button className="feature-tile" onClick={() => onNavigateToView?.('virtual_radio')}>
+              <span className="ft-icon">📻</span>
+              <div className="ft-body">
+                <span className="ft-title">虚拟电台</span>
+                <span className="ft-desc">新闻 · 文化 · 音乐 · 多难度级别</span>
+              </div>
+            </button>
+
+            {/* 发音/跟读练习 */}
+            <button className="feature-tile" onClick={() => onNavigateToView?.('phoneme_coach')}>
+              <span className="ft-icon">🎤</span>
+              <div className="ft-body">
+                <span className="ft-title">发音教练</span>
+                <span className="ft-desc">音标纠正 · 跟读打分 · AI实时反馈</span>
+              </div>
+            </button>
+
+            {/* 趣味游戏 */}
+            <button className="feature-tile" onClick={() => onNavigateToView?.('word_hunter')}>
+              <span className="ft-icon">🎮</span>
+              <div className="ft-body">
+                <span className="ft-title">趣味闯关</span>
+                <span className="ft-desc">单词猎人 · 语法魔方 · 密室逃脱</span>
+              </div>
+            </button>
+
+            {/* AI 写作教练 */}
+            <button className="feature-tile" onClick={() => onNavigateToView?.('ai_writing')}>
+              <span className="ft-icon">✍️</span>
+              <div className="ft-body">
+                <span className="ft-title">AI 写作教练</span>
+                <span className="ft-desc">作文批改 · 语法优化 · 风格建议</span>
+              </div>
+            </button>
+
+            {/* 场景对话（保留原功能但缩小为入口） */}
+            <button className="feature-tile" onClick={() => {
+              // 如果有场景数据才展示场景选择
+              if (scenarios.length > 0 && scenarios[0]?.phrase_count && scenarios[0].phrase_count > 0) {
+                navigate({ view: 'scenario', id: scenarios[0].id });
+              } else {
+                showToast('场景内容正在准备中，推荐使用「AI学习路线」开始学习');
+              }
+            }}>
+              <span className="ft-icon">💬</span>
+              <div className="ft-body">
+                <span className="ft-title">场景对话</span>
+                <span className="ft-desc">真实场景 · 翻转卡片 · 记忆技巧</span>
+              </div>
+              {scenarios.length > 0 ? <span className="ft-count">{scenarios.reduce((s, c) => s + (c.phrase_count ?? 0), 0)}句</span> : null}
+            </button>
+          </div>
         </section>
       </div>
     </>
