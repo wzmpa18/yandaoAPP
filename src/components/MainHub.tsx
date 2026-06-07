@@ -30,6 +30,10 @@ import { AchievementWall } from './AchievementWall';
 import { StreakShield } from './StreakShield';
 import { NewFeatures } from './NewFeatures';
 import { LearningPath } from './LearningPath';
+import { AIBookReader } from './AIBookReader';
+import { ExamEngine } from './ExamEngine';
+import { PhonemeCoach } from './PhonemeCoach';
+import { AIWritingCoach } from './AIWritingCoach';
 import { mockLanguages } from '../data/mockData';
 
 type HubView =
@@ -37,7 +41,8 @@ type HubView =
   | 'profile' | 'partner' | 'circle' | 'member'
   | 'merchant' | 'privacy' | 'ai' | 'radio'
   | 'leaderboard' | 'daily_tasks' | 'friends' | 'achievements' | 'streak_shield'
-  | 'new_features' | 'learning_path';
+  | 'new_features' | 'learning_path'
+  | 'bookshelf' | 'exam_engine' | 'phoneme_coach' | 'ai_writing';
 
 interface MainHubProps {
   initialProfile: UserProfile;
@@ -415,6 +420,35 @@ export const MainHub: React.FC<MainHubProps> = ({ initialProfile, onReset }) => 
             languageCode={lang}
             languageName={currentLang ? getLangZh(currentLang) : lang}
             userLevel={profile.level ?? 'beginner'}
+            onBack={() => popView()}
+          />
+        )}
+        {view === 'bookshelf' && (
+          <AIBookReader
+            key={`bookshelf-${lang}`}
+            onBack={() => popView()}
+          />
+        )}
+        {view === 'exam_engine' && (
+          <ExamEngine
+            key={`exam-${lang}`}
+            languageCode={lang}
+            languageName={currentLang ? getLangZh(currentLang) : lang}
+            level={profile.level ?? 'beginner'}
+            onBack={() => popView()}
+          />
+        )}
+        {view === 'phoneme_coach' && (
+          <PhonemeCoach
+            key={`phoneme-${lang}`}
+            languageCode={lang}
+            languageName={currentLang ? getLangZh(currentLang) : lang}
+            onBack={() => popView()}
+          />
+        )}
+        {view === 'ai_writing' && (
+          <AIWritingCoach
+            key={`writing-${lang}`}
             onBack={() => popView()}
           />
         )}

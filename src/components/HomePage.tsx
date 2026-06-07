@@ -388,7 +388,7 @@ export const HomePage: React.FC<HomePageProps> = ({
             </button>
 
             {/* 虚拟电台 */}
-            <button className="feature-tile" onClick={() => onNavigateToView?.('virtual_radio')}>
+            <button className="feature-tile" onClick={() => onNavigateToView?.('radio')}>
               <span className="ft-icon">📻</span>
               <div className="ft-body">
                 <span className="ft-title">虚拟电台</span>
@@ -406,7 +406,7 @@ export const HomePage: React.FC<HomePageProps> = ({
             </button>
 
             {/* 趣味游戏 */}
-            <button className="feature-tile" onClick={() => onNavigateToView?.('word_hunter')}>
+            <button className="feature-tile" onClick={() => onNavigateToView?.('game')}>
               <span className="ft-icon">🎮</span>
               <div className="ft-body">
                 <span className="ft-title">趣味闯关</span>
