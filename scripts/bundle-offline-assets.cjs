@@ -1176,12 +1176,22 @@ const funData={}, memoryData={}, celebrityData={}, aichatData={}, examData={}, c
 // 多邻国有40+语言，我们有10语言，每个语言需要更大容量来弥补
 const TARGET_COUNTS={ja:5000,en:5000,ko:3500,fr:3000,es:3000,de:3000,it:2500,pt:2500,ar:2000,zh:2000};
 
-LANGUAGES.forEach(lang=>{
-  console.log(`\n  📝 ${LN[lang]} (${TARGET_COUNTS[lang]} 词)...`);
+// 内存监控
+function logMemory(label) {
+  const mem = process.memoryUsage();
+  const mb = (v) => (v / 1024 / 1024).toFixed(1);
+  console.log(`  [MEM] ${label}: heap=${mb(mem.heapUsed)}/${mb(mem.heapTotal)}MB rss=${mb(mem.rss)}MB`);
+}
+
+try {
+LANGUAGES.forEach((lang, idx)=>{
+  console.log(`\n  📝 [${idx+1}/${LANGUAGES.length}] ${LN[lang]} (${TARGET_COUNTS[lang]} 词)...`);
+  
   vocabData[lang]=lang==='ja'?genJaVocab(TARGET_COUNTS[lang]):
                   lang==='en'?genEnVocab(TARGET_COUNTS[lang]):
                   genOtherVocab(lang,TARGET_COUNTS[lang]);
   console.log(`  ✅ ${lang}: ${vocabData[lang].length} 词汇`);
+  logMemory(`after vocab (${lang})`);
 
   phraseData[lang]=genPhrases(lang);
   quizData[lang]=genQuizData(lang,2000);        // 每语种2000题 (原500)
@@ -1194,6 +1204,7 @@ LANGUAGES.forEach(lang=>{
   aichatData[lang]=genAIChatData(lang);
   examData[lang]=genMockExamData(lang);
   challengeData[lang]=genDailyChallenges(lang);
+  logMemory(`after all (${lang})`);
 
   console.log(`  ✅ ${lang}: ${Object.keys(phraseData[lang]).length} 场景, ${quizData[lang].length} 题, ${radioData[lang].length} 电台, ${storyData[lang].length} 故事, ${funData[lang].length} 趣味, ${aichatData[lang].length} AI场景, ${examData[lang].length} 考试`);
 });
@@ -1276,3 +1287,11 @@ console.log('🤖 AI陪练: 日常闲聊 · 求职面试 · 旅行 · 辩论 · 
 console.log('📝 模拟考试: JLPT/TOEFL/IELTS/TOPIK/DELF/DELE/HSK等全面覆盖');
 console.log('🎯 每日挑战: 8种趣味任务，让学语言充满乐趣');
 console.log('\n🎉 开心学语言，学得哈哈笑！首次安装即可使用完整离线内容！');
+
+} catch (err) {
+  console.error('\n❌❌❌ BUNDLE SCRIPT FATAL ERROR ❌❌❌');
+  console.error('Error:', err.message);
+  console.error('Stack:', err.stack);
+  logMemory('at crash');
+  process.exit(1);
+}

@@ -43,6 +43,19 @@ jobs:
         ls node_modules/.bin/vite 2>&1 || echo "vite NOT in .bin"
         ls node_modules/vite 2>&1 || echo "vite NOT in node_modules"
 
+    - name: TypeScript check (fail fast)
+      id: tsc_check
+      run: |
+        echo "=== Running tsc --noEmit ==="
+        npx --yes tsc --noEmit 2>&1
+        RC=$?
+        echo "=== tsc exit: $RC ==="
+        if [ $RC -ne 0 ]; then
+          echo "!!! TYPE ERRORS DETECTED !!!"
+          exit 1
+        fi
+        echo "tsc_ok=true" >> $GITHUB_OUTPUT
+
     - name: Vite build
       id: vite_build
       run: |
@@ -61,8 +74,10 @@ jobs:
 
     - name: Bundle offline assets
       if: steps.vite_build.outputs.vite_build_ok == 'true'
+      env:
+        NODE_OPTIONS: --max-old-space-size=4096
       run: |
-        echo "=== Running offline asset bundler ==="
+        echo "=== Running offline asset bundler (Node heap: 4GB) ==="
         node scripts/bundle-offline-assets.cjs 2>&1
         RC=$?
         echo "=== bundle script exit: $RC ==="
@@ -256,6 +271,19 @@ jobs:
         echo "=== Install exit code: $? ==="
         ls node_modules/.bin/vite 2>&1 || echo "vite NOT found"
 
+    - name: TypeScript check (iOS)
+      id: tsc_check_ios
+      run: |
+        echo "=== Running tsc --noEmit ==="
+        npx --yes tsc --noEmit 2>&1
+        RC=$?
+        echo "=== tsc exit: $RC ==="
+        if [ $RC -ne 0 ]; then
+          echo "!!! TYPE ERRORS DETECTED !!!"
+          exit 1
+        fi
+        echo "tsc_ok=true" >> $GITHUB_OUTPUT
+
     - name: Vite build (iOS)
       id: vite_build_ios
       run: |
@@ -274,8 +302,10 @@ jobs:
 
     - name: Bundle offline assets (iOS)
       if: steps.vite_build_ios.outputs.vite_build_ok == 'true'
+      env:
+        NODE_OPTIONS: --max-old-space-size=4096
       run: |
-        echo "=== Running offline asset bundler ==="
+        echo "=== Running offline asset bundler (Node heap: 4GB) ==="
         node scripts/bundle-offline-assets.cjs 2>&1
         RC=$?
         echo "=== bundle script exit: $RC ==="

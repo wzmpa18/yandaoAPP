@@ -15,7 +15,7 @@ import { MemberCenter } from './MemberCenter';
 import { PaywallModal } from './PaywallModal';
 import { CheckoutModal } from './CheckoutModal';
 import { UserProfile } from './Onboarding';
-import { canAccessFeature, consumeCredit, FeatureType, UpsellPlan } from '../lib/featureGate';
+import { canAccessFeature, FeatureType, UpsellPlan } from '../lib/featureGate';
 import { MerchantHub } from './MerchantHub';
 import { PrivacySettings } from './PrivacySettings';
 import { AIAssistant } from './AIAssistant';
