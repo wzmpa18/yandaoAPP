@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+<title>经络演示 · 2D动态</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --teal:#00BFA5;--teal-d:#00897B;--teal-bg:#E0F7FA;
+  --bg:#F5EDE6;--card:#FFFDF9;--ink:#1A1A1A;--ink2:#3A3A3A;--muted:#666;--rule:#E0D8CC;
+  --font-main:'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif;
+  --radius:12px;--shadow:0 2px 6px rgba(0,0,0,.05);
+}
+body{font-family:var(--font-main);background:var(--bg);color:var(--ink);font-size:14px;max-width:480px;margin:0 auto;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+
+/* HEADER */
+.header{display:flex;align-items:center;padding:0 14px;background:var(--teal);color:#FFF;min-height:44px;flex-shrink:0;position:relative}
+.header .back-btn{display:flex;align-items:center;justify-content:center;width:44px;height:44px;cursor:pointer;border:none;background:none;padding:0;margin-left:-14px;transition:opacity .2s}
+.header .back-btn:active{opacity:.7}
+.header .back-btn svg{width:22px;height:22px}
+.header .title{font-size:16px;font-weight:700;margin-left:4px;letter-spacing:1px}
+.header .subtitle{font-size:11px;opacity:.8;margin-left:auto}
+
+/* MAIN CONTENT */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.canvas-wrap{flex:1;position:relative;background:var(--card);margin:10px;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;min-height:320px}
+.canvas-wrap canvas{width:100%;height:100%;display:block}
+
+/* MERIDIAN LIST */
+.meridian-list{display:flex;overflow-x:auto;gap:6px;padding:8px 10px;background:var(--card);border-top:1px solid var(--rule);flex-shrink:0;-webkit-overflow-scrolling:touch}
+.meridian-list::-webkit-scrollbar{height:0}
+.meridian-chip{flex:0 0 auto;padding:6px 12px;border-radius:16px;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid var(--rule);background:var(--card);color:var(--ink2);font-family:inherit;white-space:nowrap;transition:all .2s}
+.meridian-chip.active{background:var(--teal);color:#FFF;border-color:var(--teal)}
+.meridian-chip.yin{color:#1976D2}
+.meridian-chip.yang{color:#E53935}
+
+/* BOTTOM PANEL */
+.bottom-panel{background:var(--card);padding:10px 14px 14px;border-top:1px solid var(--rule);flex-shrink:0;max-height:140px;overflow-y:auto}
+.bottom-panel .bp-title{font-size:13px;font-weight:700;color:var(--teal-d);margin-bottom:6px;letter-spacing:1px}
+.bottom-panel .bp-info{font-size:12px;color:var(--ink2);line-height:1.6}
+.bottom-panel .bp-points{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.bottom-panel .bp-point{background:var(--teal-bg);color:var(--teal-d);font-size:10px;padding:2px 8px;border-radius:10px;font-weight:500}
+
+/* TOAST */
+.toast{position:fixed;top:60px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.82);color:#FFF;padding:10px 22px;border-radius:22px;font-size:13px;z-index:999;pointer-events:none;opacity:0;transition:opacity .3s;max-width:90%}
+.toast.show{opacity:1}
+
+/* LEGEND */
+.legend{display:flex;gap:12px;padding:6px 10px;background:var(--card);font-size:10px;color:var(--muted);justify-content:center;align-items:center;flex-wrap:wrap}
+.legend .dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px}
+.legend .dot.yin-d{background:#1976D2}.legend .dot.yang-d{background:#E53935}
+.legend .dot.qi-d{background:#4CAF50;animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <button class="back-btn" onclick="window.close()||history.back()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+  <span class="title">人体经络演示</span>
+  <span class="subtitle">2D动态 · 十二正经</span>
+</div>
+
+<div class="main">
+  <div class="canvas-wrap">
+    <canvas id="meridianCanvas"></canvas>
+  </div>
+  <div class="legend">
+    <span><span class="dot yin-d"></span>阴经</span>
+    <span><span class="dot yang-d"></span>阳经</span>
+    <span><span class="dot qi-d"></span>气血流动</span>
+    <span style="margin-left:4px">✦ 点击经穴查看详情</span>
+  </div>
+  <div class="meridian-list" id="meridianList"></div>
+  <div class="bottom-panel" id="bottomPanel">
+    <div class="bp-title">请选择经络</div>
+    <div class="bp-info">点击上方经络标签或画布上的经穴，查看详细信息</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ==================== MERIDIAN DATA ==================== */
+const WX = { 木:'#34A853', 火:'#EA4335', 土:'#A67C52', 金:'#F1B232', 水:'#2368B2' };
+
+const MERIDIANS = [
+  { id:'lung', name:'手太阴肺经', type:'yin', hand:'手', zangfu:'肺', element:'金', dir:'胸→手', points:11,
+    time:'寅时(3-5)', color:WX.金,
+    pathDesc:'起于中焦，下络大肠，还循胃口，上膈属肺，从肺系横出腋下',
+    indications:'咳嗽、气喘、胸闷、咽喉肿痛、手臂内侧前缘疼痛',
+    fullPoints:['中府','云门','天府','侠白','尺泽','孔最','列缺','经渠','太渊','鱼际','少商'] },
+  { id:'heart', name:'手少阴心经', type:'yin', hand:'手', zangfu:'心', element:'火', dir:'胸→手', points:9,
+    time:'午时(11-13)', color:WX.火,
+    pathDesc:'起于心中，出属心系，下膈络小肠，其支脉从心系上挟咽喉，系目系',
+    indications:'心悸、心痛、失眠、健忘、癫狂',
+    fullPoints:['极泉','少海','通里','神门','少府','少冲'] },
+  { id:'pc', name:'手厥阴心包经', type:'yin', hand:'手', zangfu:'心包', element:'火', dir:'胸→手', points:9,
+    time:'戌时(19-21)', color:WX.火,
+    pathDesc:'起于胸中，出属心包，下膈历络三焦',
+    indications:'心痛、心悸、胸闷、心烦、癫狂、胃痛呕吐',
+    fullPoints:['天池','曲泽','内关','大陵','劳宫','中冲'] },
+  { id:'spleen', name:'足太阴脾经', type:'yin', hand:'足', zangfu:'脾', element:'土', dir:'足→胸', points:21,
+    time:'巳时(9-11)', color:WX.土,
+    pathDesc:'起于大趾内侧端，沿足内侧赤白肉际上行，经内踝前，沿小腿内侧上行',
+    indications:'腹胀、泄泻、食少、倦怠、月经不调、崩漏',
+    fullPoints:['隐白','大都','太白','公孙','三阴交','阴陵泉','血海','大横'] },
+  { id:'kidney', name:'足少阴肾经', type:'yin', hand:'足', zangfu:'肾', element:'水', dir:'足→胸', points:27,
+    time:'酉时(17-19)', color:WX.水,
+    pathDesc:'起于小趾之下，斜走足心，出于然骨之下，循内踝之后，别入跟中',
+    indications:'遗精、阳痿、月经不调、腰痛、耳鸣、耳聋',
+    fullPoints:['涌泉','然谷','太溪','大钟','照海','复溜','阴谷'] },
+  { id:'liver', name:'足厥阴肝经', type:'yin', hand:'足', zangfu:'肝', element:'木', dir:'足→胸', points:14,
+    time:'丑时(1-3)', color:WX.木,
+    pathDesc:'起于大趾丛毛之际，上循足跗上廉，去内踝一寸，上踝八寸交出太阴之后',
+    indications:'胸胁胀痛、疝气、月经不调、遗尿、头痛眩晕',
+    fullPoints:['大敦','行间','太冲','中封','蠡沟','曲泉','章门','期门'] },
+  { id:'li', name:'手阳明大肠经', type:'yang', hand:'手', zangfu:'大肠', element:'金', dir:'手→头', points:20,
+    time:'卯时(5-7)', color:WX.金,
+    pathDesc:'起于食指桡侧端，沿手臂外侧前缘上行至肩，入缺盆，络肺，下膈属大肠',
+    indications:'头痛、牙痛、鼻衄、咽喉肿痛、腹痛泄泻',
+    fullPoints:['商阳','二间','三间','合谷','阳溪','偏历','手三里','曲池','肩髃','迎香'] },
+  { id:'si', name:'手太阳小肠经', type:'yang', hand:'手', zangfu:'小肠', element:'火', dir:'手→头', points:19,
+    time:'未时(13-15)', color:WX.火,
+    pathDesc:'起于小指尺侧端，沿手臂外侧后缘上行，绕肩胛，入缺盆，络心，下膈属小肠',
+    indications:'耳聋、目黄、颊肿、咽喉肿痛、肩臂外侧后缘疼痛',
+    fullPoints:['少泽','后溪','腕骨','养老','支正','小海','听宫'] },
+  { id:'sj', name:'手少阳三焦经', type:'yang', hand:'手', zangfu:'三焦', element:'火', dir:'手→头', points:23,
+    time:'亥时(21-23)', color:WX.火,
+    pathDesc:'起于无名指尺侧端，沿手臂外侧中间上行，入缺盆，布膻中，散络心包，下膈属三焦',
+    indications:'耳聋、耳鸣、目赤肿痛、偏头痛、肩臂外侧痛',
+    fullPoints:['关冲','中渚','阳池','外关','支沟','翳风','丝竹空'] },
+  { id:'stomach', name:'足阳明胃经', type:'yang', hand:'足', zangfu:'胃', element:'土', dir:'头→足', points:45,
+    time:'辰时(7-9)', color:WX.土,
+    pathDesc:'起于鼻翼旁，上行至鼻根部，下行入上齿龈，环绕口唇，沿下颌角上行至额角',
+    indications:'胃痛、腹胀、呕吐、消谷善饥、口眼歪斜',
+    fullPoints:['四白','地仓','颊车','下关','头维','天枢','足三里','上巨虚','丰隆','内庭'] },
+  { id:'bladder', name:'足太阳膀胱经', type:'yang', hand:'足', zangfu:'膀胱', element:'水', dir:'头→足', points:67,
+    time:'申时(15-17)', color:WX.水,
+    pathDesc:'起于目内眦，上额交巅，入络脑，下行项后，挟脊抵腰，络肾属膀胱',
+    indications:'小便不利、遗尿、癫狂、头痛、目痛、腰背痛',
+    fullPoints:['睛明','攒竹','风门','肺俞','心俞','肝俞','脾俞','肾俞','委中','承山','昆仑','至阴'] },
+  { id:'gb', name:'足少阳胆经', type:'yang', hand:'足', zangfu:'胆', element:'木', dir:'头→足', points:44,
+    time:'子时(23-1)', color:WX.木,
+    pathDesc:'起于目外眦，上行至额角，下耳后，沿颈侧下行，入缺盆',
+    indications:'口苦、目眩、偏头痛、胁痛、疟疾',
+    fullPoints:['听会','风池','肩井','环跳','风市','阳陵泉','悬钟','足临泣'] }
+];
+
+/* ==================== EXTRA TCM DATA ==================== */
+const QI_JING_BA_MAI = [
+  { name:'任脉', desc:'起于小腹内，下出会阴，向前上行于胸腹正中，经咽喉至承浆。主胞胎，为阴脉之海。', keyPts:['关元','气海','神阙','中脘','膻中'] },
+  { name:'督脉', desc:'起于小腹内，下出会阴，向后上行于脊柱正中，经头顶至上唇。主阳气，为阳脉之海。', keyPts:['长强','命门','至阳','大椎','百会'] },
+  { name:'冲脉', desc:'起于小腹内，下出会阴，与足少阴经并行。为血海，主月经。', keyPts:[] },
+  { name:'带脉', desc:'起于季胁，环腰一周。约束诸经。', keyPts:[] },
+  { name:'阴跷脉', desc:'主肢节运动与眼睑开合。', keyPts:[] },
+  { name:'阳跷脉', desc:'主肢节运动与眼睑开合。', keyPts:[] },
+  { name:'阴维脉', desc:'维系全身阴经。', keyPts:[] },
+  { name:'阳维脉', desc:'维系全身阳经。', keyPts:[] }
+];
+
+const JING_LUO_BIAN_ZHENG = [
+  { name:'肺经病证', desc:'咳嗽气喘，胸闷，咽喉肿痛，肩背痛。' },
+  { name:'心经病证', desc:'心悸，心痛，失眠，手心热。' },
+  { name:'肝经病证', desc:'胸胁胀痛，易怒，眩晕，目赤。' },
+  { name:'脾经病证', desc:'腹胀，食少，便溏，乏力。' },
+  { name:'肾经病证', desc:'腰膝酸软，耳鸣，遗精，月经不调。' }
+];
+
+const ZHEN_CI_JI_CHU = {
+  techniques: [
+    { name:'提插法', desc:'将针上下提插，幅度均匀，频率适中。' },
+    { name:'捻转法', desc:'将针左右旋转，角度适中，速度均匀。' },
+    { name:'补法', desc:'慢进针、快出针，捻转角度小，用力轻。' },
+    { name:'泻法', desc:'快进针、慢出针，捻转角度大，用力重。' }
+  ],
+  formulas: [
+    { name:'四总穴', desc:'肚腹三里留，腰背委中求，头项寻列缺，面口合谷收。' },
+    { name:'八会穴', desc:'脏会章门，腑会中脘，气会膻中，血会膈俞，筋会阳陵泉，脉会太渊，骨会大杼，髓会悬钟。' }
+  ]
+};
+
+const JING_LUO_YANG_SHENG = [
+  { title:'经络拍打', desc:'沿经络循行方向轻轻拍打，以皮肤微红为度。每日早晚各一次，每次每条经络拍打3-5分钟。' },
+  { title:'足三里按摩', desc:'每天按揉3-5分钟，健脾和胃，强壮身体。' },
+  { title:'涌泉穴按摩', desc:'每晚睡前搓揉100次，补肾安神。' },
+  { title:'百会穴叩击', desc:'用手指轻叩百会穴36次，提神醒脑。' }
+];
+
+let activeMeridian = null;
+let flowPhase = 0;
+
+/* ==================== CANVAS RENDER ==================== */
+const canvas = document.getElementById('meridianCanvas');
+const ctx = canvas.getContext('2d');
+
+function resize() {
+  const wrap = canvas.parentElement;
+  canvas.width = wrap.clientWidth * devicePixelRatio;
+  canvas.height = wrap.clientHeight * devicePixelRatio;
+  canvas.style.width = wrap.clientWidth + 'px';
+  canvas.style.height = wrap.clientHeight + 'px';
+  ctx.setTransform(1,0,0,1,0,0);
+  ctx.scale(devicePixelRatio, devicePixelRatio);
+}
+resize();
+window.addEventListener('resize', () => { resize(); draw(); });
+
+/* ==================== BODY OUTLINE (Self-made vector) ==================== */
+function drawBody() {
+  const w = canvas.width / devicePixelRatio;
+  const h = canvas.height / devicePixelRatio;
+  const cx = w/2, cy = h/2;
+  const scale = Math.min(w/280, h/500) * 1.1;
+
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.scale(scale, scale);
+
+  // Head
+  ctx.beginPath();
+  ctx.arc(0, -180, 28, 0, Math.PI*2);
+  ctx.strokeStyle = '#3A3A3A';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // Neck
+  ctx.beginPath();
+  ctx.moveTo(-8, -152);
+  ctx.lineTo(-6, -135);
+  ctx.moveTo(8, -152);
+  ctx.lineTo(6, -135);
+  ctx.stroke();
+
+  // Trunk
+  ctx.beginPath();
+  ctx.moveTo(-6, -135);
+  ctx.lineTo(-18, 50);
+  ctx.lineTo(-16, 80);
+  ctx.moveTo(6, -135);
+  ctx.lineTo(18, 50);
+  ctx.lineTo(16, 80);
+  ctx.stroke();
+
+  // Shoulder line
+  ctx.beginPath();
+  ctx.moveTo(-50, -130);
+  ctx.lineTo(50, -130);
+  ctx.strokeStyle = '#3A3A3A';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // Arms
+  // Left
+  ctx.beginPath();
+  ctx.moveTo(-50, -130);
+  ctx.lineTo(-70, -80);
+  ctx.lineTo(-72, -30);
+  ctx.lineTo(-68, 10);
+  ctx.stroke();
+  // Right
+  ctx.beginPath();
+  ctx.moveTo(50, -130);
+  ctx.lineTo(70, -80);
+  ctx.lineTo(72, -30);
+  ctx.lineTo(68, 10);
+  ctx.stroke();
+
+  // Hands
+  ctx.beginPath();
+  ctx.arc(-68, 18, 10, 0, Math.PI*2);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(68, 18, 10, 0, Math.PI*2);
+  ctx.stroke();
+
+  // Legs
+  ctx.beginPath();
+  ctx.moveTo(-16, 80);
+  ctx.lineTo(-20, 160);
+  ctx.lineTo(-18, 200);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(16, 80);
+  ctx.lineTo(20, 160);
+  ctx.lineTo(18, 200);
+  ctx.stroke();
+
+  // Feet
+  ctx.beginPath();
+  ctx.ellipse(-18, 210, 12, 6, 0, 0, Math.PI*2);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.ellipse(18, 210, 12, 6, 0, 0, Math.PI*2);
+  ctx.stroke();
+
+  // Eyes
+  ctx.fillStyle = '#3A3A3A';
+  ctx.beginPath();
+  ctx.arc(-8, -182, 2.5, 0, Math.PI*2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(8, -182, 2.5, 0, Math.PI*2);
+  ctx.fill();
+
+  // Mouth
+  ctx.beginPath();
+  ctx.arc(0, -170, 6, 0.1, Math.PI-0.1);
+  ctx.strokeStyle = '#3A3A3A';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  ctx.restore();
+  return { cx, cy, scale };
+}
+
+/* ==================== MERIDIAN PATHS ==================== */
+function getMeridianPath(id, cx, cy, scale) {
+  const paths = {
+    lung: [ // 手太阴肺经: chest → arm inner → thumb
+      {x: 8, y: -120}, {x: 15, y: -90}, {x: 30, y: -60}, {x: 40, y: -30}, {x: 45, y: 0}, {x: 50, y: 10}
+    ],
+    heart: [ // 手少阴心经: chest → arm inner → little finger
+      {x: 6, y: -118}, {x: 12, y: -85}, {x: 25, y: -55}, {x: 35, y: -25}, {x: 38, y: 5}, {x: 42, y: 15}
+    ],
+    pc: [ // 手厥阴心包经: chest center → arm → middle finger
+      {x: 0, y: -115}, {x: 10, y: -90}, {x: 22, y: -60}, {x: 32, y: -30}, {x: 38, y: 0}, {x: 44, y: 10}
+    ],
+    spleen: [ // 足太阴脾经: foot → leg inner → chest
+      {x: -14, y: 200}, {x: -12, y: 160}, {x: -10, y: 120}, {x: -8, y: 80}, {x: -6, y: 40}, {x: -4, y: -10}, {x: 0, y: -60}, {x: -4, y: -110}
+    ],
+    kidney: [ // 足少阴肾经: foot sole → leg inner → chest
+      {x: -18, y: 205}, {x: -16, y: 170}, {x: -14, y: 130}, {x: -10, y: 90}, {x: -6, y: 50}, {x: -2, y: 10}, {x: 2, y: -40}, {x: 0, y: -100}
+    ],
+    liver: [ // 足厥阴肝经: foot → leg inner → chest → ribs
+      {x: -16, y: 200}, {x: -14, y: 165}, {x: -12, y: 125}, {x: -8, y: 85}, {x: -4, y: 45}, {x: 0, y: 5}, {x: 4, y: -45}, {x: 6, y: -95}
+    ],
+    li: [ // 手阳明大肠经: hand → arm outer → face
+      {x: 55, y: 15}, {x: 50, y: -10}, {x: 42, y: -40}, {x: 30, y: -70}, {x: 20, y: -100}, {x: 10, y: -130}, {x: 5, y: -155}
+    ],
+    si: [ // 手太阳小肠经: hand → arm outer → face
+      {x: 48, y: 15}, {x: 44, y: -10}, {x: 36, y: -40}, {x: 24, y: -70}, {x: 14, y: -100}, {x: 6, y: -130}, {x: 2, y: -155}
+    ],
+    sj: [ // 手少阳三焦经: hand → arm outer → head
+      {x: 52, y: 15}, {x: 48, y: -10}, {x: 40, y: -40}, {x: 28, y: -70}, {x: 18, y: -100}, {x: 8, y: -130}, {x: 4, y: -155}
+    ],
+    stomach: [ // 足阳明胃经: face → trunk → leg outer
+      {x: 4, y: -155}, {x: 8, y: -135}, {x: 14, y: -80}, {x: 18, y: -20}, {x: 20, y: 40}, {x: 22, y: 80}, {x: 24, y: 130}, {x: 22, y: 180}, {x: 20, y: 200}
+    ],
+    bladder: [ // 足太阳膀胱经: head → back → leg → foot
+      {x: 0, y: -180}, {x: -2, y: -140}, {x: -4, y: -80}, {x: -6, y: -20}, {x: -8, y: 40}, {x: -10, y: 80}, {x: -14, y: 130}, {x: -16, y: 180}, {x: -18, y: 205}
+    ],
+    gb: [ // 足少阳胆经: head → side → leg outer
+      {x: 6, y: -175}, {x: 12, y: -140}, {x: 18, y: -95}, {x: 22, y: -40}, {x: 24, y: 10}, {x: 26, y: 60}, {x: 24, y: 110}, {x: 22, y: 160}, {x: 20, y: 200}
+    ]
+  };
+  return paths[id] || [];
+}
+
+function drawMeridian(id, cx, cy, scale, alpha = 1) {
+  const m = MERIDIANS.find(m => m.id === id);
+  if (!m) return;
+  const pts = getMeridianPath(id, cx, cy, scale);
+
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.scale(scale, scale);
+
+  // Glow
+  if (activeMeridian === id) {
+    ctx.shadowColor = m.color;
+    ctx.shadowBlur = 8;
+  }
+
+  // Main path
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, pts[0].y);
+  for (let i = 1; i < pts.length; i++) {
+    ctx.lineTo(pts[i].x, pts[i].y);
+  }
+  ctx.strokeStyle = m.color;
+  ctx.lineWidth = activeMeridian === id ? 3 : 1.5;
+  ctx.globalAlpha = alpha;
+  ctx.stroke();
+
+  // Flowing dots
+  if (activeMeridian === id || alpha > 0.5) {
+    const totalLen = pts.reduce((sum, p, i) => i > 0 ? sum + Math.hypot(p.x-pts[i-1].x, p.y-pts[i-1].y) : 0, 0);
+    for (let d = 0; d < 3; d++) {
+      const t = ((flowPhase * 0.02 + d * 0.33) % 1);
+      let target = t * totalLen;
+      let acc = 0;
+      for (let i = 1; i < pts.length; i++) {
+        const seg = Math.hypot(pts[i].x-pts[i-1].x, pts[i].y-pts[i-1].y);
+        if (acc + seg >= target) {
+          const frac = (target - acc) / seg;
+          const px = pts[i-1].x + (pts[i].x - pts[i-1].x) * frac;
+          const py = pts[i-1].y + (pts[i].y - pts[i-1].y) * frac;
+          ctx.beginPath();
+          ctx.arc(px, py, 2.5, 0, Math.PI*2);
+          ctx.fillStyle = '#4CAF50';
+          ctx.globalAlpha = 0.9;
+          ctx.fill();
+          break;
+        }
+        acc += seg;
+      }
+    }
+  }
+
+  // Key points
+  if (activeMeridian === id) {
+    ctx.globalAlpha = 1;
+    ctx.shadowBlur = 0;
+    for (const pt of pts) {
+      ctx.beginPath();
+      ctx.arc(pt.x, pt.y, 3.5, 0, Math.PI*2);
+      ctx.fillStyle = '#FFF';
+      ctx.fill();
+      ctx.strokeStyle = m.color;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+  }
+
+  ctx.restore();
+}
+
+/* ==================== MAIN DRAW ==================== */
+function draw() {
+  const w = canvas.width / devicePixelRatio;
+  const h = canvas.height / devicePixelRatio;
+  ctx.clearRect(0, 0, w, h);
+
+  const { cx, cy, scale } = drawBody();
+
+  // Draw all meridians
+  MERIDIANS.forEach(m => {
+    const alpha = activeMeridian ? (activeMeridian === m.id ? 1 : 0.2) : 0.5;
+    drawMeridian(m.id, cx, cy, scale, alpha);
+  });
+
+  flowPhase = (flowPhase + 1) % 100;
+  requestAnimationFrame(() => requestAnimationFrame(draw));
+}
+
+/* ==================== INTERACTION ==================== */
+canvas.addEventListener('click', (e) => {
+  const rect = canvas.getBoundingClientRect();
+  const mx = (e.clientX - rect.left) * devicePixelRatio;
+  const my = (e.clientY - rect.top) * devicePixelRatio;
+  const w = canvas.width;
+  const h = canvas.height;
+  const cx = w/2, cy = h/2;
+  const scale = Math.min(w/280, h/500) * 1.1;
+
+  let best = null, bestDist = Infinity;
+  MERIDIANS.forEach(m => {
+    const pts = getMeridianPath(m.id, cx, cy, scale);
+    pts.forEach(pt => {
+      const sx = cx + pt.x * scale;
+      const sy = cy + pt.y * scale;
+      const dist = Math.hypot(mx - sx, my - sy);
+      if (dist < 20 && dist < bestDist) {
+        bestDist = dist;
+        best = m;
+      }
+    });
+  });
+
+  if (best) {
+    selectMeridian(best.id);
+  }
+});
+
+/* ==================== MERIDIAN LIST ==================== */
+function renderMeridianList() {
+  const list = document.getElementById('meridianList');
+  list.innerHTML = MERIDIANS.map(m => `
+    <button class="meridian-chip ${m.type} ${activeMeridian === m.id ? 'active' : ''}"
+            onclick="selectMeridian('${m.id}')">
+      ${m.name}
+    </button>
+  `).join('');
+}
+
+function selectMeridian(id) {
+  activeMeridian = activeMeridian === id ? null : id;
+  renderMeridianList();
+  updateBottomPanel();
+}
+
+function updateBottomPanel() {
+  const panel = document.getElementById('bottomPanel');
+  if (!activeMeridian) {
+    panel.innerHTML = `
+      <div class="bp-title">奇经八脉</div>
+      <div class="bp-info" style="font-size:11px;line-height:1.5">
+        ${QI_JING_BA_MAI.map(q => `<span style="font-weight:700;color:var(--teal-d)">${q.name}</span>：${q.desc}`).join('<br>')}
+      </div>`;
+    return;
+  }
+  const m = MERIDIANS.find(m => m.id === activeMeridian);
+  panel.innerHTML = `
+    <div class="bp-title" style="color:${m.color}">${m.name}（${m.hand}${m.type==='yin'?'阴':'阳'}经）</div>
+    <div class="bp-info" style="font-size:11px;line-height:1.6">
+      <span style="font-weight:700">所属脏腑</span>：${m.zangfu}　|　<span style="font-weight:700">五行</span>：${m.element}　|　<span style="font-weight:700">当令</span>：${m.time}<br>
+      <span style="font-weight:700">循行</span>：${m.pathDesc}<br>
+      <span style="font-weight:700">主治</span>：${m.indications}
+    </div>
+    <div class="bp-points">
+      ${m.fullPoints.map(p => `<span class="bp-point">${p}</span>`).join('')}
+    </div>`;
+}
+
+/* ==================== INIT ==================== */
+renderMeridianList();
+requestAnimationFrame(draw);
+</script>
+</body>
+</html>

@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=960">
+<title>问真八字</title>
+<style>
+:root{
+  --gold:#b5953d;--gold-light:#d4b86a;--gold-bg:#f5ecd7;
+  --black:#333;--gray:#999;--gray2:#666;--bg:#f5f5f5;
+  --c-wood:#2da84a;--c-fire:#d12828;--c-earth:#8b6914;--c-metal:#b8860b;--c-water:#1a6fcc;
+  --divider:#eee;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:960px;margin:0 auto;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;color:var(--black);background:#fff;font-size:14px;line-height:1.6;}
+a{text-decoration:none;color:inherit;}
+img{max-width:100%;}
+
+/* 顶部导航 */
+.top-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:#fff;}
+.back{font-size:24px;color:var(--black);cursor:pointer;}
+.top-title{font-size:24px;font-weight:600;color:var(--black);}
+.top-right{font-size:24px;color:var(--gray);cursor:pointer;}
+
+/* Tab导航 */
+.tabs{display:flex;background:#fff;border-bottom:1px solid var(--divider);}
+.tab{flex:1;text-align:center;padding:16px 0;font-size:20px;color:var(--gray);cursor:pointer;position:relative;}
+.tab.active{color:var(--gold);font-weight:600;}
+.tab.active::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:40px;height:3px;background:var(--gold);border-radius:2px;}
+
+/* ===== Banner 样式 ===== */
+.banner-center{background:linear-gradient(135deg,#1a1a1a 0%,#2a2010 50%,#1a1a1a 100%);position:relative;overflow:hidden;padding:30px 24px 24px;display:flex;flex-direction:column;align-items:center;text-align:center;}
+.banner-center::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at 50% 30%,rgba(181,149,61,0.1) 0%,transparent 60%);}
+.banner-left{background:linear-gradient(135deg,#1a1a1a 0%,#2a2010 50%,#1a1a1a 100%);position:relative;overflow:hidden;padding:20px 24px;display:flex;align-items:flex-start;gap:20px;}
+.banner-left::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at 30% 20%,rgba(181,149,61,0.08) 0%,transparent 60%);}
+.snake-wrap{display:flex;flex-direction:column;align-items:center;position:relative;z-index:1;}
+.snake-circle{width:90px;height:90px;border:2px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.snake-circle svg{width:64px;height:64px;}
+.snake-name{color:var(--gold-light);font-size:24px;font-weight:600;margin-top:8px;}
+.banner-date{position:relative;z-index:1;color:#b0a080;font-size:17px;line-height:2;padding-top:12px;}
+.banner-dark{background:linear-gradient(135deg,#1a1a1a 0%,#2a2010 50%,#1a1a1a 100%);padding:20px 24px;position:relative;overflow:hidden;}
+.banner-dark::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at 30% 20%,rgba(181,149,61,0.08) 0%,transparent 60%);}
+.bz-banner{display:flex;align-items:flex-start;gap:20px;position:relative;z-index:1;}
+.bz-banner .ganzao{color:var(--gold-light);font-size:18px;writing-mode:vertical-lr;padding-top:8px;letter-spacing:4px;}
+.bz-banner .pillars{display:flex;gap:32px;}
+.bz-banner .pillar{text-align:center;}
+.bz-banner .pillar .gan{font-size:36px;color:#fff;font-weight:500;line-height:1.3;}
+.bz-banner .pillar .zhi{font-size:36px;color:#fff;font-weight:500;line-height:1.3;}
+.bz-banner .dayun-list{display:flex;gap:12px;margin-top:12px;color:var(--gold-light);font-size:18px;}
+
+/* ===== 页面 ===== */
+.page{display:none;}
+.page.active{display:block;}
+
+/* ===== 基本信息 ===== */
+.info-list{background:#fff;}
+.info-row{display:flex;padding:12px 20px;border-bottom:1px solid var(--divider);min-height:48px;align-items:center;}
+.info-row.alt{background:#fafafa;}
+.info-label{color:var(--gray2);font-size:18px;width:140px;flex-shrink:0;}
+.info-value{font-size:18px;flex:1;}
+.info-value .red{color:var(--c-fire);}
+.info-value .highlight-red{color:var(--c-fire);font-weight:600;}
+.info-row.double{display:grid;grid-template-columns:1fr 1fr;gap:0;}
+.info-row.double > div{display:flex;align-items:center;}
+.info-row.double .info-label{width:auto;margin-right:8px;}
+.ai-section{background:var(--bg);padding:12px 20px;text-align:center;}
+.ai-title{display:inline-flex;align-items:center;gap:8px;font-size:18px;color:var(--gray2);}
+.ai-title .robot{font-size:22px;}
+.ai-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:20px;background:#fff;}
+.ai-item{display:flex;align-items:center;gap:8px;font-size:18px;}
+.ai-item .ai-label{color:var(--gray2);}
+.ai-item .ai-value{color:var(--gold);font-weight:600;font-size:22px;}
+.lock{display:inline-block;width:20px;height:20px;border:2px solid var(--gold);border-radius:4px;position:relative;}
+.lock::after{content:'';position:absolute;top:-8px;left:50%;transform:translateX(-50%);width:12px;height:10px;border:2px solid var(--gold);border-bottom:none;border-radius:8px 8px 0 0;}
+.ai-progress{height:8px;background:linear-gradient(90deg,#f5d0d0,#d0e0f5);border-radius:4px;margin:0 20px 20px;position:relative;}
+.ai-progress .lock-center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:28px;height:28px;}
+.vip-badge{position:absolute;top:-2px;left:-2px;background:linear-gradient(135deg,var(--gold),var(--gold-light));color:#fff;font-size:12px;padding:2px 8px;border-radius:0 0 8px 0;font-weight:600;z-index:2;}
+.tab-bar{display:flex;background:var(--bg);padding:0 12px;border-bottom:1px solid var(--divider);position:relative;}
+.tab-bar .t-item{flex:1;text-align:center;padding:14px 0;font-size:20px;color:var(--gray);cursor:pointer;background:transparent;border:none;}
+.tab-bar .t-item.active{color:var(--black);font-weight:600;position:relative;background:#fff;border-radius:16px 16px 0 0;border:1px solid var(--divider);border-bottom:none;margin-bottom:-1px;z-index:1;}
+.vip-content{padding:40px 20px;text-align:center;position:relative;background:#fff;filter:blur(0px);}
+.vip-content::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(45deg,transparent,transparent 20px,rgba(200,200,200,0.02) 20px,rgba(200,200,200,0.02) 40px);pointer-events:none;}
+.vip-desc{color:var(--gray2);font-size:18px;line-height:1.8;margin-bottom:24px;position:relative;z-index:1;}
+.vip-btn{display:inline-block;background:linear-gradient(135deg,var(--gold),var(--gold-light));color:#fff;font-size:20px;padding:14px 48px;border-radius:30px;font-weight:600;position:relative;z-index:1;border:none;cursor:pointer;}
+.wuxing-bar{display:flex;background:#fff;}
+.wx-state{flex:1;text-align:center;padding:12px 0;font-size:20px;color:var(--gray2);border-right:1px solid var(--divider);}
+.wx-state:last-child{border-right:none;}
+.wx-state .wx-char{font-size:24px;color:var(--black);font-weight:600;margin-right:4px;}
+.bg-banner{height:120px;background:linear-gradient(rgba(0,0,0,0.3),rgba(0,0,0,0.3)),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='120'%3E%3Cdefs%3E%3CradialGradient id='g' cx='50%25' cy='50%25' r='60%25'%3E%3Cstop offset='0%25' stop-color='%238b7355'/%3E%3Cstop offset='100%25' stop-color='%232a1a08'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect fill='url(%23g)' width='800' height='120'/%3E%3Cg stroke='%23d4b86a' fill='none' opacity='0.2'%3E%3Ccircle cx='400' cy='60' r='50' stroke-width='1'/%3E%3Ccircle cx='400' cy='60' r='40' stroke-width='1'/%3E%3Ccircle cx='400' cy='60' r='30' stroke-width='1'/%3E%3Cpath d='M380 30 L400 10 L420 30 L400 90 Z' fill='%23d4b86a' opacity='0.15'/%3E%3C/g%3E%3C/svg%3E");background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;position:relative;border-radius:12px 12px 0 0;margin:12px 12px 0;}
+.bg-banner .overlay-text{border:2px solid rgba(255,255,255,0.9);border-radius:16px;padding:10px 36px;color:#fff;font-size:26px;letter-spacing:4px;}
+.chenggu-section{background:#fff;margin:0 12px;padding:20px;border-radius:0 0 12px 12px;position:relative;}
+.ribbon{position:absolute;top:-4px;right:-4px;background:var(--c-fire);color:#fff;font-size:14px;padding:6px 20px;transform:rotate(45deg) translate(16px,4px);font-weight:600;}
+.chenggu-title{font-size:24px;color:var(--black);font-weight:600;margin-bottom:12px;}
+.chenggu-weight{display:flex;align-items:center;gap:24px;font-size:20px;margin-bottom:16px;}
+.chenggu-weight .w-label{color:var(--gray2);}
+.chenggu-weight .w-value{font-size:28px;color:var(--black);font-weight:600;}
+.chenggu-poem{font-size:20px;color:var(--black);line-height:2;}
+
+/* ===== 基本命盘表格 ===== */
+.bz-table-wrap{background:#fff;}
+.bz-tip{padding:8px 20px;font-size:14px;color:var(--gray);text-align:center;display:flex;align-items:center;justify-content:center;gap:8px;}
+.bz-tip .close-x{cursor:pointer;color:var(--gray);font-size:18px;margin-left:auto;}
+.bz-table{width:100%;border-collapse:collapse;background:#fff;table-layout:fixed;}
+.bz-table tr{border-bottom:1px solid var(--divider);}
+.bz-table tr.alt{background:#fafafa;}
+.bz-table td{padding:10px 6px;text-align:center;vertical-align:middle;font-size:16px;}
+.bz-table td:first-child{color:var(--gray);font-size:18px;text-align:left;padding-left:20px;width:80px;white-space:nowrap;}
+.bz-table .zhuxing{font-size:20px;color:var(--black);font-weight:500;}
+.bz-table .tiangan{font-size:40px;font-weight:700;line-height:1.2;}
+.bz-table .dizhi{font-size:46px;font-weight:700;line-height:1.2;}
+.c-wood{color:var(--c-wood);}.c-fire{color:var(--c-fire);}.c-earth{color:var(--c-earth);}.c-metal{color:var(--c-metal);}.c-water{color:var(--c-water);}
+.wx-icon{display:inline-block;width:18px;height:18px;margin-left:2px;vertical-align:middle;font-size:14px;}
+.canggan-basic{line-height:1.7;font-size:0;}
+.cg-b-item{display:block;white-space:nowrap;}
+.cg-b-gan{font-size:22px;font-weight:600;}
+.cg-b-wx{font-size:18px;font-weight:500;}
+.fuxing{line-height:1.7;font-size:18px;color:var(--gray2);}
+.shensha{line-height:1.7;font-size:17px;color:var(--gold);text-align:left;}
+.other-info{font-size:18px;color:var(--gray2);}
+
+.smart-pillar-btn{margin:16px 20px;padding:14px;background:#fff;border-radius:12px;text-align:center;font-size:20px;color:var(--black);border:1px solid var(--divider);cursor:pointer;}
+.liuyi-row{display:flex;align-items:center;padding:10px 20px;border-bottom:1px solid var(--divider);background:#fff;}
+.liuyi-tag{background:var(--gold-bg);color:var(--gold);padding:4px 12px;border-radius:6px;font-size:18px;margin-right:12px;font-weight:600;white-space:nowrap;}
+.liuyi-text{font-size:18px;color:var(--black);}
+.book-section{padding:16px 0;background:#fff;position:relative;}
+.book-banner{height:60px;background:linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='60'%3E%3Cdefs%3E%3ClinearGradient id='b' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%233a2a10'/%3E%3Cstop offset='100%25' stop-color='%231a1005'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23b)' width='800' height='60'/%3E%3C/svg%3E");display:flex;align-items:center;justify-content:center;color:var(--gold-light);font-size:20px;position:relative;}
+.book-banner .vip-corner{position:absolute;top:0;right:0;background:linear-gradient(135deg,var(--gold),var(--gold-light));color:#fff;font-size:12px;padding:4px 20px;transform:rotate(45deg) translate(18px,-2px);font-weight:600;}
+.book-list{display:flex;gap:16px;padding:20px;}
+.book-item{width:140px;height:100px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:600;flex-shrink:0;}
+.book-item.locked{background:#fff;border:2px solid var(--divider);color:var(--gold);}
+.book-item.unlocked{background:linear-gradient(135deg,#4a3520,#2a1a08);color:#d4c0a0;position:relative;overflow:hidden;}
+.book-item.unlocked::before{content:'';position:absolute;inset:0;border-radius:16px;background:repeating-linear-gradient(45deg,transparent,transparent 5px,rgba(255,255,255,0.02) 5px,rgba(255,255,255,0.02) 10px);}
+.book-dots{display:flex;gap:8px;justify-content:center;margin-bottom:16px;}
+.book-dots .dot{width:8px;height:8px;border-radius:50%;background:#ddd;}
+.book-dots .dot.active{background:var(--gold);}
+.tiaohou{padding:16px 20px;background:#fff;}
+.tiaohou-label{font-size:18px;color:var(--gray2);display:flex;align-items:baseline;gap:8px;}
+.tiaohou-label .th-tag{color:var(--gold);font-size:28px;font-weight:600;}
+.tiaohou-bazi{margin:16px 0;font-size:24px;display:flex;align-items:center;gap:8px;}
+.tiaohou-bazi .prefix{color:var(--black);}
+.tiaohou-bazi .char{background:var(--gold);color:#fff;width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center;font-size:26px;font-weight:600;}
+.lun-pill{display:inline-block;background:var(--gold);color:#fff;padding:8px 24px;border-radius:20px;font-size:20px;margin-bottom:16px;}
+.lun-text{font-size:20px;line-height:2;color:var(--black);}
+
+/* ===== 专业细盘表格 ===== */
+.pro-table{width:100%;border-collapse:collapse;background:#fff;table-layout:fixed;}
+.pro-table tr{border-bottom:1px solid var(--divider);}
+.pro-table tr.alt{background:#fafafa;}
+.pro-table td{padding:10px 3px;text-align:center;vertical-align:middle;font-size:15px;}
+.pro-table td:first-child{color:var(--gray);font-size:17px;text-align:left;padding-left:16px;width:64px;white-space:nowrap;}
+.pro-table td.liunian-col{border-right:2px solid var(--divider);}
+.pro-table td.dayun-col{border-right:2px solid var(--divider);}
+.pro-table .zhuxing{font-size:18px;color:var(--black);}
+.pro-table .tiangan{font-size:32px;font-weight:700;line-height:1.2;}
+.pro-table .dizhi{font-size:38px;font-weight:700;line-height:1.2;}
+.canggan-pro{line-height:1.6;}
+.cg-p-item{display:block;white-space:nowrap;}
+.cg-p-gan{font-size:20px;font-weight:600;}
+.cg-p-shen{font-size:14px;color:var(--gray2);font-weight:400;}
+
+/* ===== 大运流年流月 ===== */
+.qiyun-row{display:flex;justify-content:space-between;padding:12px 20px;background:#fff;font-size:16px;color:var(--gray2);border-bottom:1px solid var(--divider);align-items:center;position:relative;}
+.qiyun-row .qy-right{text-align:right;}
+.qiyun-row .gold{color:var(--c-water);font-weight:600;font-size:18px;}
+.cmd-icon{position:absolute;right:20px;top:50%;transform:translateY(-50%);width:36px;height:36px;border:2px solid var(--gold);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:18px;cursor:pointer;font-weight:600;}
+.luck-row{display:flex;background:#fff;border-bottom:1px solid var(--divider);}
+.luck-label{width:64px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;border-right:1px solid var(--divider);position:relative;background:#fff;}
+.luck-label .lk-text{font-size:22px;color:var(--gray);font-weight:600;writing-mode:vertical-lr;letter-spacing:6px;}
+.luck-label .lk-sub{font-size:13px;color:var(--gray);margin-top:4px;}
+.luck-label .toggle{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:36px;height:20px;background:#ddd;border-radius:10px;cursor:pointer;}
+.luck-label .toggle::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;background:#fff;border-radius:50%;box-shadow:0 1px 3px rgba(0,0,0,0.2);}
+.luck-cells{flex:1;display:flex;min-width:0;}
+.luck-cell{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 2px;border-right:1px solid var(--divider);text-align:center;}
+.luck-cell:last-child{border-right:none;}
+.luck-cell.current{background:var(--gold);}
+.luck-cell.current .ly-year,.luck-cell.current .ly-age,.luck-cell.current .ly-gan,.luck-cell.current .ly-zhi,.luck-cell.current .ly-xiaoyun,.luck-cell.current .ly-jieqi,.luck-cell.current .ly-date{color:#fff;}
+.luck-cell.current .shen-gan,.luck-cell.current .shen-zhi{color:rgba(255,255,255,0.95);}
+.ly-year{font-size:13px;color:var(--gray);line-height:1.3;}
+.ly-age{font-size:12px;color:var(--gray);line-height:1.2;}
+.ly-ganzhi{display:flex;align-items:baseline;justify-content:center;line-height:1.2;margin:2px 0;}
+.ly-gan{font-size:26px;font-weight:700;}
+.ly-zhi{font-size:26px;font-weight:700;}
+.ly-shishen{display:flex;width:100%;line-height:1.3;}
+.shen-gan,.shen-zhi{font-size:15px;font-weight:600;flex:1;text-align:center;}
+.ly-xiaoyun{font-size:13px;color:var(--gray);margin-top:2px;}
+.ly-jieqi{font-size:13px;color:var(--gray);line-height:1.3;}
+.ly-date{font-size:12px;color:var(--gray);line-height:1.2;}
+.ly-shishen-flat{display:flex;width:100%;margin-top:2px;}
+.ly-shishen-flat span{font-size:15px;font-weight:600;flex:1;text-align:center;}
+.wuxing-bars{display:flex;background:var(--gold);}
+.wuxing-bars .bar{flex:1;text-align:center;padding:10px 0;color:#fff;font-size:20px;border-right:1px solid rgba(255,255,255,0.3);}
+.wuxing-bars .bar:last-child{border-right:none;}
+
+/* ===== 神煞卡片 ===== */
+.shensha-card{margin:12px;background:#fff;border-radius:12px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,0.06);position:relative;}
+.shensha-card .card-title{font-size:24px;color:var(--gold);font-weight:600;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;}
+.shensha-card .sort-icon{color:var(--gray);font-size:20px;cursor:pointer;}
+.ss-row{margin-bottom:10px;font-size:18px;line-height:2;display:flex;align-items:flex-start;}
+.ss-row .ss-ganzhi{font-weight:600;color:var(--black);margin-right:8px;white-space:nowrap;flex-shrink:0;}
+.ss-row .ss-names{color:var(--gold);}
+.floating-ai{position:fixed;right:16px;bottom:100px;width:56px;height:56px;border-radius:50%;background:conic-gradient(from 0deg,#ff6b6b,#ffd93d,#6bcb77,#4d96ff,#ff6b6b);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.15);z-index:100;}
+.floating-ai::after{content:'';position:absolute;inset:4px;border-radius:50%;background:#fff;}
+.floating-ai span{position:relative;z-index:1;font-size:24px;}
+
+/* ===== 断事笔记 ===== */
+.duanshi-tabs{display:flex;padding:20px;gap:0;background:#fff;justify-content:center;}
+.duanshi-tabs .ds-tab{padding:12px 40px;font-size:20px;cursor:pointer;font-weight:600;}
+.duanshi-tabs .ds-tab:first-child{border-radius:12px 0 0 12px;}
+.duanshi-tabs .ds-tab:last-child{border-radius:0 12px 12px 0;}
+.ds-tab.active{background:var(--gold);color:#fff;border:2px solid var(--gold);}
+.ds-tab.inactive{background:#fff;color:var(--gold);border:2px solid var(--gold);}
+.feedback-list{padding:0 20px;background:#fff;}
+.fb-item{display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-bottom:1px solid var(--divider);font-size:20px;color:var(--black);cursor:pointer;}
+.fb-item .arrow{color:var(--gold);font-size:20px;}
+.fb-input{padding:16px 20px;border-bottom:1px solid var(--divider);font-size:18px;color:var(--gray);background:#fff;}
+.fb-section-title{padding:20px;font-size:24px;font-weight:600;color:var(--black);background:#fff;}
+.event-row{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:#fff;}
+.cal-icon{width:48px;height:48px;border:2px solid var(--black);border-radius:8px;position:relative;cursor:pointer;}
+.cal-icon::before{content:'';position:absolute;top:-8px;left:8px;right:8px;height:12px;border:2px solid var(--black);border-bottom:none;border-radius:4px 4px 0 0;background:var(--c-fire);}
+.add-btn{width:48px;height:48px;border-radius:50%;background:var(--gold);color:#fff;display:flex;align-items:center;justify-content:center;font-size:32px;cursor:pointer;box-shadow:0 2px 8px rgba(181,149,61,0.3);border:none;}
+.bottom-bar{display:flex;align-items:center;justify-content:flex-end;gap:20px;padding:16px 20px;background:#fff;border-top:1px solid var(--divider);position:sticky;bottom:0;}
+.gear-icon{width:40px;height:40px;cursor:pointer;}
+.save-btn{background:var(--gold);color:#fff;padding:12px 32px;border-radius:24px;font-size:18px;font-weight:600;cursor:pointer;border:none;}
+</style>
+</head>
+<body>
+
+<!-- 顶部导航 -->
+<div class="top-bar">
+  <div class="back">&lt;</div>
+  <div class="top-title">问真八字</div>
+  <div class="top-right">···</div>
+</div>
+
+<!-- Tab导航 -->
+<div class="tabs">
+  <div class="tab active" onclick="switchTab(0)">基本信息</div>
+  <div class="tab" onclick="switchTab(1)">基本命盘</div>
+  <div class="tab" onclick="switchTab(2)">专业细盘</div>
+  <div class="tab" onclick="switchTab(3)">断事笔记</div>
+</div>
+
+<!-- ============ 页面1: 基本信息 ============ -->
+<div class="page active" id="page0">
+  <div class="banner-center">
+    <div class="snake-circle">
+      <!-- 螺旋盘蛇 - 盘绕成圆形螺旋，头在中心 -->
+      <svg viewBox="0 0 100 100" fill="none">
+        <g stroke="#d4b86a" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <!-- 螺旋身体从外向内卷 -->
+          <path d="M72 50 C72 64,60 74,48 74 C34 74,24 62,24 50 C24 36,36 26,48 26 C58 26,66 34,66 44 C66 52,60 58,52 58 C46 58,42 54,42 48 C42 44,46 42,48 42"/>
+          <!-- 蛇头（椭圆）-->
+          <ellipse cx="48" cy="42" rx="6" ry="5" fill="#d4b86a" stroke="#d4b86a"/>
+          <!-- 蛇眼 -->
+          <circle cx="46" cy="40" r="1.2" fill="#1a1a1a"/>
+          <!-- 蛇信 -->
+          <path d="M44 44 Q40 47 38 44 M40 46 L38 49" stroke="#d12828" stroke-width="1.2" fill="none"/>
+        </g>
+        <!-- 蛇身鳞片纹 -->
+        <g fill="#b5953d" opacity="0.5">
+          <ellipse cx="60" cy="35" rx="2" ry="1.5" transform="rotate(-30 60 35)"/>
+          <ellipse cx="68" cy="48" rx="2" ry="1.5" transform="rotate(90 68 48)"/>
+          <ellipse cx="60" cy="62" rx="2" ry="1.5" transform="rotate(30 60 62)"/>
+          <ellipse cx="46" cy="68" rx="2" ry="1.5" transform="rotate(0 46 68)"/>
+          <ellipse cx="32" cy="60" rx="2" ry="1.5" transform="rotate(-30 32 60)"/>
+          <ellipse cx="28" cy="46" rx="2" ry="1.5" transform="rotate(-90 28 46)"/>
+          <ellipse cx="36" cy="34" rx="2" ry="1.5" transform="rotate(30 36 34)"/>
+          <ellipse cx="52" cy="52" rx="2" ry="1.5"/>
+        </g>
+      </svg>
+    </div>
+    <div class="snake-name">某某179</div>
+  </div>
+
+  <div class="info-list">
+    <div class="info-row">
+      <div class="info-label">姓名：</div>
+      <div class="info-value">某某179 <span class="red">（阴 乾造）</span></div>
+      <div class="info-label" style="width:auto">性别：</div>
+      <div class="info-value" style="flex:none">男</div>
+    </div>
+    <div class="info-row alt">
+      <div class="info-label">农历：</div>
+      <div class="info-value">1989年腊月初五 子时</div>
+      <div class="info-label" style="width:auto">生肖：</div>
+      <div class="info-value" style="flex:none">蛇</div>
+    </div>
+    <div class="info-row">
+      <div class="info-label">阳历：</div>
+      <div class="info-value">1990-01-01 00:00:00</div>
+    </div>
+    <div class="info-row alt">
+      <div class="info-label">真太阳时：</div>
+      <div class="info-value">1990-01-01 00:00:00</div>
+    </div>
+    <div class="info-row">
+      <div class="info-label">出生地区：</div>
+      <div class="info-value">北京市东城区</div>
+    </div>
+    <div class="info-row alt">
+      <div class="info-label">人元司令分野：</div>
+      <div class="info-value">癸水用事</div>
+    </div>
+    <div class="info-row">
+      <div class="info-label">出生节气：</div>
+      <div class="info-value">出生于大雪后<span class="highlight-red">24</span>天12小时，小寒前<span class="highlight-red">4</span>天22小时</div>
+    </div>
+    <div class="info-row alt">
+      <div class="info-label">大雪：</div>
+      <div class="info-value">1989-12-07 11:20:57</div>
+      <div class="info-label" style="width:auto">小寒：</div>
+      <div class="info-value">1990-01-05 22:33:14</div>
+    </div>
+    <div class="info-row double">
+      <div>
+        <div class="info-label">星座：</div>
+        <div class="info-value">摩羯座（Capricorn）</div>
+      </div>
+      <div>
+        <div class="info-label">星宿：</div>
+        <div class="info-value">心宿东方苍龙</div>
+      </div>
+    </div>
+    <div class="info-row double alt">
+      <div>
+        <div class="info-label">胎元：</div>
+        <div class="info-value">丁卯（炉中火）</div>
+      </div>
+      <div>
+        <div class="info-label">空亡：</div>
+        <div class="info-value">戌亥 戌亥</div>
+      </div>
+    </div>
+    <div class="info-row double">
+      <div>
+        <div class="info-label">命宫：</div>
+        <div class="info-value">己巳（大林木）</div>
+      </div>
+      <div>
+        <div class="info-label">胎息：</div>
+        <div class="info-value">辛亥（钗钏金）</div>
+      </div>
+    </div>
+    <div class="info-row double alt">
+      <div>
+        <div class="info-label">身宫：</div>
+        <div class="info-value">丁丑（涧下水）</div>
+      </div>
+      <div>
+        <div class="info-label">命卦：</div>
+        <div class="info-value">坤卦（西四命）</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ai-section">
+    <div class="ai-title">
+      <span class="robot">🤖</span> 小真智能系统
+    </div>
+  </div>
+
+  <div class="ai-grid">
+    <div class="ai-item">
+      <span class="ai-label">日主属性：</span>
+      <span class="ai-value">丙火</span>
+    </div>
+    <div class="ai-item">
+      <span class="ai-label">阴阳参考：</span>
+      <span class="lock"></span>
+    </div>
+    <div class="ai-item">
+      <span class="ai-label">旺衰参考：</span>
+      <span class="lock"></span>
+    </div>
+    <div class="ai-item">
+      <span class="ai-label">格局参考：</span>
+      <span class="lock"></span>
+    </div>
+  </div>
+  <div class="ai-progress">
+    <div class="lock lock-center"></div>
+  </div>
+
+  <div style="height:12px;background:var(--bg)"></div>
+
+  <div class="tab-bar" style="position:relative">
+    <div class="vip-badge">VIP</div>
+    <div class="t-item active">五行能量</div>
+    <div class="t-item">五行个数</div>
+    <div class="t-item">含藏干数</div>
+  </div>
+  <div class="vip-content">
+    <div class="vip-desc">
+      五行能量综合计算了五行个数、干支比重、藏干深浅、宫位力量、刑冲破害合等因素影响后的量化结果，是喜用神判断的重要参考指标。
+    </div>
+    <button class="vip-btn">开通VIP会员</button>
+  </div>
+
+  <div class="wuxing-bar">
+    <div class="wx-state"><span class="wx-char">水</span>旺</div>
+    <div class="wx-state"><span class="wx-char">木</span>相</div>
+    <div class="wx-state"><span class="wx-char">金</span>休</div>
+    <div class="wx-state"><span class="wx-char">土</span>囚</div>
+    <div class="wx-state"><span class="wx-char">火</span>死</div>
+  </div>
+
+  <div class="bg-banner">
+    <div class="overlay-text">袁天罡称骨</div>
+  </div>
+  <div class="chenggu-section">
+    <div class="ribbon">评语</div>
+    <div class="chenggu-title">袁天罡称骨</div>
+    <div class="chenggu-weight">
+      <span class="w-label">重量</span>
+      <span class="w-value">四两二钱</span>
+    </div>
+    <div class="chenggu-poem">
+      得宽怀处且宽怀，何用双眉皱不开<br>
+      若使中年命运济，那时名利一齐来
+    </div>
+  </div>
+  <div style="height:20px;background:var(--bg)"></div>
+</div>
+
+<!-- ============ 页面2: 基本命盘 ============ -->
+<div class="page" id="page1">
+  <div class="banner-left">
+    <div class="snake-wrap">
+      <div class="snake-circle">
+        <svg viewBox="0 0 100 100" fill="none">
+          <g stroke="#d4b86a" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M72 50 C72 64,60 74,48 74 C34 74,24 62,24 50 C24 36,36 26,48 26 C58 26,66 34,66 44 C66 52,60 58,52 58 C46 58,42 54,42 48 C42 44,46 42,48 42"/>
+            <ellipse cx="48" cy="42" rx="6" ry="5" fill="#d4b86a" stroke="#d4b86a"/>
+            <circle cx="46" cy="40" r="1.2" fill="#1a1a1a"/>
+            <path d="M44 44 Q40 47 38 44 M40 46 L38 49" stroke="#d12828" stroke-width="1.2" fill="none"/>
+          </g>
+          <g fill="#b5953d" opacity="0.5">
+            <ellipse cx="60" cy="35" rx="2" ry="1.5" transform="rotate(-30 60 35)"/>
+            <ellipse cx="68" cy="48" rx="2" ry="1.5" transform="rotate(90 68 48)"/>
+            <ellipse cx="60" cy="62" rx="2" ry="1.5" transform="rotate(30 60 62)"/>
+            <ellipse cx="46" cy="68" rx="2" ry="1.5" transform="rotate(0 46 68)"/>
+            <ellipse cx="32" cy="60" rx="2" ry="1.5" transform="rotate(-30 32 60)"/>
+            <ellipse cx="28" cy="46" rx="2" ry="1.5" transform="rotate(-90 28 46)"/>
+            <ellipse cx="36" cy="34" rx="2" ry="1.5" transform="rotate(30 36 34)"/>
+            <ellipse cx="52" cy="52" rx="2" ry="1.5"/>
+          </g>
+        </svg>
+      </div>
+      <div class="snake-name">某某179</div>
+    </div>
+    <div class="banner-date">
+      农历：1989年腊月初五 子时 （乾造）<br>
+      阳历：1990年01月01日 00:00:00
+    </div>
+  </div>
+
+  <div class="bz-tip">
+    以下小字内容可点击 神煞、十神等小知识弹窗。
+    <span class="close-x">⨯</span>
+  </div>
+
+  <div class="bz-table-wrap">
+    <table class="bz-table">
+      <tr><td>日期</td><td>年柱</td><td>月柱</td><td>日柱</td><td>时柱</td></tr>
+      <tr class="alt"><td>主星</td><td class="zhuxing">伤官</td><td class="zhuxing">比肩</td><td class="zhuxing">元男</td><td class="zhuxing">食神</td></tr>
+      <tr>
+        <td>天干</td>
+        <td><span class="tiangan c-earth">己</span><span class="wx-icon c-earth">⛰</span></td>
+        <td><span class="tiangan c-fire">丙</span><span class="wx-icon c-fire">🔥</span></td>
+        <td><span class="tiangan c-fire">丙</span><span class="wx-icon c-fire">🔥</span></td>
+        <td><span class="tiangan c-earth">戊</span><span class="wx-icon c-earth">⛰</span></td>
+      </tr>
+      <tr class="alt">
+        <td>地支</td>
+        <td><span class="dizhi c-fire">巳</span><span class="wx-icon c-fire">🔥</span></td>
+        <td><span class="dizhi c-water">子</span><span class="wx-icon c-water">💧</span></td>
+        <td><span class="dizhi c-wood">寅</span><span class="wx-icon c-wood">🌲</span></td>
+        <td><span class="dizhi c-water">子</span><span class="wx-icon c-water">💧</span></td>
+      </tr>
+      <!-- 藏干：天干+五行名（丙火、庚金、戊土）-->
+      <tr>
+        <td>藏干</td>
+        <td class="canggan-basic">
+          <span class="cg-b-item"><span class="cg-b-gan c-fire">丙</span><span class="cg-b-wx c-fire">火</span></span>
+          <span class="cg-b-item"><span class="cg-b-gan c-metal">庚</span><span class="cg-b-wx c-metal">金</span></span>
+          <span class="cg-b-item"><span class="cg-b-gan c-earth">戊</span><span class="cg-b-wx c-earth">土</span></span>
+        </td>
+        <td class="canggan-basic">
+          <span class="cg-b-item"><span class="cg-b-gan c-water">癸</span><span class="cg-b-wx c-water">水</span></span>
+        </td>
+        <td class="canggan-basic">
+          <span class="cg-b-item"><span class="cg-b-gan c-wood">甲</span><span class="cg-b-wx c-wood">木</span></span>
+          <span class="cg-b-item"><span class="cg-b-gan c-fire">丙</span><span class="cg-b-wx c-fire">火</span></span>
+          <span class="cg-b-item"><span class="cg-b-gan c-earth">戊</span><span class="cg-b-wx c-earth">土</span></span>
+        </td>
+        <td class="canggan-basic">
+          <span class="cg-b-item"><span class="cg-b-gan c-water">癸</span><span class="cg-b-wx c-water">水</span></span>
+        </td>
+      </tr>
+      <!-- 副星：十神名 -->
+      <tr class="alt">
+        <td>副星</td>
+        <td class="fuxing">比肩<br>偏财<br>食神</td>
+        <td class="fuxing">正官</td>
+        <td class="fuxing">偏印<br>比肩<br>食神</td>
+        <td class="fuxing">正官</td>
+      </tr>
+      <tr><td>星运</td><td class="other-info">临官</td><td class="other-info">胎</td><td class="other-info">长生</td><td class="other-info">胎</td></tr>
+      <tr class="alt"><td>自坐</td><td class="other-info">帝旺</td><td class="other-info">胎</td><td class="other-info">长生</td><td class="other-info">胎</td></tr>
+      <tr><td>空亡</td><td class="other-info">戌亥</td><td class="other-info">申酉</td><td class="other-info">戌亥</td><td class="other-info">午未</td></tr>
+      <tr class="alt"><td>纳音</td><td class="other-info">大林木</td><td class="other-info">涧下水</td><td class="other-info">炉中火</td><td class="other-info">霹雳火</td></tr>
+      <tr>
+        <td>神煞</td>
+        <td class="shensha">天德贵人<br>德秀贵人<br>天厨贵人<br>禄神<br>亡神</td>
+        <td class="shensha">天乙贵人<br>福星贵人<br>德秀贵人<br>飞刃</td>
+        <td class="shensha">福星贵人<br>德秀贵人<br>红艳煞<br>词馆<br>劫煞<br>国印<br>披麻</td>
+        <td class="shensha">天乙贵人<br>福星贵人<br>德秀贵人<br>飞刃</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="smart-pillar-btn">智能四柱图示</div>
+
+  <div class="liuyi-row">
+    <span class="liuyi-tag">天干留意</span>
+    <span class="liuyi-text">无合冲关系</span>
+  </div>
+  <div class="liuyi-row">
+    <span class="liuyi-tag">地支留意</span>
+    <span class="liuyi-text">子巳暗合;寅巳相刑;寅巳相害</span>
+  </div>
+
+  <div class="book-section">
+    <div class="book-banner">
+      智能古籍参考
+      <div class="vip-corner">VIP会员</div>
+    </div>
+    <div class="book-list">
+      <div class="book-item locked">穷通宝鉴</div>
+      <div class="book-item unlocked">滴天髓</div>
+      <div class="book-item unlocked">三命通会</div>
+      <div class="book-item unlocked">八字提要</div>
+    </div>
+    <div class="book-dots">
+      <div class="dot active"></div><div class="dot"></div><div class="dot"></div>
+    </div>
+  </div>
+
+  <div class="tiaohou">
+    <div class="tiaohou-label">
+      <span>调候用神提示：</span>
+      <span class="th-tag">壬 戊 己</span>
+    </div>
+    <div class="tiaohou-bazi">
+      <span class="prefix">本八字：透</span>
+      <span class="char">己</span>
+      <span class="char">戊</span>
+    </div>
+    <div class="lun-pill">论丙生子月</div>
+    <div class="lun-text">
+      十一月冬至阳生，弱中生旺，先壬，戊佐之。
+    </div>
+  </div>
+  <div style="height:20px;background:var(--bg)"></div>
+</div>
+
+<!-- ============ 页面3: 专业细盘 ============ -->
+<div class="page" id="page2">
+  <div class="banner-dark">
+    <div class="bz-banner">
+      <div class="ganzao">乾造</div>
+      <div>
+        <div class="pillars">
+          <div class="pillar"><div class="gan c-earth">己</div><div class="zhi c-fire">巳</div></div>
+          <div class="pillar"><div class="gan c-fire">丙</div><div class="zhi c-water">子</div></div>
+          <div class="pillar"><div class="gan c-fire">丙</div><div class="zhi c-wood">寅</div></div>
+          <div class="pillar"><div class="gan c-earth">戊</div><div class="zhi c-water">子</div></div>
+        </div>
+        <div class="dayun-list">
+          <span>乙亥</span><span>甲戌</span><span>癸酉</span><span>壬申</span><span>辛未</span><span>庚午</span><span>己巳</span><span>戊辰</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bz-tip">
+    以下小字内容可点击 神煞、十神等小知识弹窗。
+    <span class="close-x">⨯</span>
+  </div>
+
+  <!-- 专业盘表格：藏干=彩色天干+小字十神同行 -->
+  <table class="pro-table">
+    <tr><td>日期</td><td class="liunian-col">流年</td><td class="dayun-col">大运</td><td>年柱</td><td>月柱</td><td>日柱</td><td>时柱</td></tr>
+    <tr class="alt"><td>主星</td><td class="liunian-col zhuxing">比肩</td><td class="dayun-col zhuxing">正官</td><td class="zhuxing">伤官</td><td class="zhuxing">比肩</td><td class="zhuxing">元男</td><td class="zhuxing">食神</td></tr>
+    <tr>
+      <td>天干</td>
+      <td class="liunian-col"><span class="tiangan c-fire">丙</span></td>
+      <td class="dayun-col"><span class="tiangan c-water">癸</span></td>
+      <td><span class="tiangan c-earth">己</span></td>
+      <td><span class="tiangan c-fire">丙</span></td>
+      <td><span class="tiangan c-fire">丙</span></td>
+      <td><span class="tiangan c-earth">戊</span></td>
+    </tr>
+    <tr class="alt">
+      <td>地支</td>
+      <td class="liunian-col"><span class="dizhi c-fire">午</span></td>
+      <td class="dayun-col"><span class="dizhi c-metal">酉</span></td>
+      <td><span class="dizhi c-fire">巳</span></td>
+      <td><span class="dizhi c-water">子</span></td>
+      <td><span class="dizhi c-wood">寅</span></td>
+      <td><span class="dizhi c-water">子</span></td>
+    </tr>
+    <!-- 藏干：彩色天干+小字十神同行 -->
+    <tr>
+      <td>藏干</td>
+      <td class="liunian-col canggan-pro">
+        <span class="cg-p-item"><span class="cg-p-gan c-fire">丁</span><span class="cg-p-shen">劫财</span></span>
+        <span class="cg-p-item"><span class="cg-p-gan c-earth">己</span><span class="cg-p-shen">伤官</span></span>
+      </td>
+      <td class="dayun-col canggan-pro">
+        <span class="cg-p-item"><span class="cg-p-gan c-metal">辛</span><span class="cg-p-shen">正财</span></span>
+      </td>
+      <td class="canggan-pro">
+        <span class="cg-p-item"><span class="cg-p-gan c-fire">丙</span><span class="cg-p-shen">比肩</span></span>
+        <span class="cg-p-item"><span class="cg-p-gan c-metal">庚</span><span class="cg-p-shen">偏财</span></span>
+        <span class="cg-p-item"><span class="cg-p-gan c-earth">戊</span><span class="cg-p-shen">食神</span></span>
+      </td>
+      <td class="canggan-pro">
+        <span class="cg-p-item"><span class="cg-p-gan c-water">癸</span><span class="cg-p-shen">正官</span></span>
+      </td>
+      <td class="canggan-pro">
+        <span class="cg-p-item"><span class="cg-p-gan c-wood">甲</span><span class="cg-p-shen">偏印</span></span>
+        <span class="cg-p-item"><span class="cg-p-gan c-fire">丙</span><span class="cg-p-shen">比肩</span></span>
+        <span class="cg-p-item"><span class="cg-p-gan c-earth">戊</span><span class="cg-p-shen">食神</span></span>
+      </td>
+      <td class="canggan-pro">
+        <span class="cg-p-item"><span class="cg-p-gan c-water">癸</span><span class="cg-p-shen">正官</span></span>
+      </td>
+    </tr>
+    <tr class="alt"><td>星运</td><td class="liunian-col other-info">帝旺</td><td class="dayun-col other-info">死</td><td class="other-info">临官</td><td class="other-info">胎</td><td class="other-info">长生</td><td class="other-info">胎</td></tr>
+    <tr><td>自坐</td><td class="liunian-col other-info">帝旺</td><td class="dayun-col other-info">病</td><td class="other-info">帝旺</td><td class="other-info">胎</td><td class="other-info">长生</td><td class="other-info">胎</td></tr>
+    <tr class="alt"><td>空亡</td><td class="liunian-col other-info">寅卯</td><td class="dayun-col other-info">戌亥</td><td class="other-info">戌亥</td><td class="other-info">申酉</td><td class="other-info">戌亥</td><td class="other-info">午未</td></tr>
+    <tr><td>纳音</td><td class="liunian-col other-info">天河水</td><td class="dayun-col other-info">剑锋金</td><td class="other-info">大林木</td><td class="other-info">涧下水</td><td class="other-info">炉中火</td><td class="other-info">霹雳火</td></tr>
+  </table>
+
+  <div class="qiyun-row">
+    <div>
+      <div>起运：出生后8年2月3天6时起运</div>
+      <div>交运：逢戊、癸年 立春后27天 交大运</div>
+    </div>
+    <div class="qy-right">
+      <div>37岁</div>
+      <div>司令：<span class="gold">癸</span></div>
+    </div>
+    <div class="cmd-icon">令</div>
+  </div>
+
+  <!-- 大运 -->
+  <div class="luck-row">
+    <div class="luck-label">
+      <span class="lk-text">大运</span>
+      <div class="toggle"></div>
+    </div>
+    <div class="luck-cells">
+      <div class="luck-cell">
+        <div class="ly-year">1990</div><div class="ly-age">1~8岁</div>
+        <div class="ly-ganzhi"><span class="ly-gan c-fire">小</span><span class="ly-zhi c-fire">运</span></div>
+      </div>
+      <div class="luck-cell">
+        <div class="ly-year">1998</div><div class="ly-age">9岁</div>
+        <div class="ly-ganzhi"><span class="ly-gan c-wood">乙</span><span class="ly-zhi c-water">亥</span></div>
+        <div class="ly-shishen"><span class="shen-gan c-wood">印</span><span class="shen-zhi c-water">杀</span></div>
+      </div>
+      <div class="luck-cell">
+        <div class="ly-year">2008</div><div class="ly-age">19岁</div>
+        <div class="ly-ganzhi"><span class="ly-gan c-wood">甲</span><span class="ly-zhi c-earth">戌</span></div>
+        <div class="ly-shishen"><span class="shen-gan c-wood">枭</span><span class="shen-zhi c-earth">食</span></div>
+      </div>
+      <div class="luck-cell current">
+        <div class="ly-year">2018</div><div class="ly-age">29岁</div>
+        <div class="ly-ganzhi"><span class="ly-gan c-water">癸</span><span class="ly-zhi c-metal">酉</span></div>
+        <div class="ly-shishen"><span class="shen-gan">官</span><span class="shen-zhi">财</span></div>
+      </div>
+      <div class="luck-cell">
+        <div class="ly-year">2028</div><div class="ly-age">39岁</div>
+        <div class="ly-ganzhi"><span class="ly-gan c-water">壬</span><span class="ly-zhi c-metal">申</span></div>
+        <div class="ly-shishen"><span class="shen-gan c-water">杀</span><span class="shen-zhi c-metal">才</span></div>
+      </div>
+      <div class="luck-cell">
+        <div class="ly-year">2038</div><div class="ly-age">49岁</div>
+        <div class="ly-ganzhi"><span class="ly-gan c-metal">辛</span><span class="ly-zhi c-earth">未</span></div>
+        <div class="ly-shishen"><span class="shen-gan c-metal">财</span><span class="shen-zhi c-earth">伤</span></div>
+      </div>
+      <div class="luck-cell">
+        <div class="ly-year">2048</div><div class="ly-age">59岁</div>
+        <div class="ly-ganzhi"><span class="ly-gan c-metal">庚</span><span class="ly-zhi c-fire">午</span></div>
+        <div class="ly-shishen"><span class="shen-gan c-metal">才</span><span class="shen-zhi c-fire">劫</span></div>
+      </div>
+      <div class="luck-cell">
+        <div class="ly-year">2058</div><div class="ly-age">69岁</div>
+        <div class="ly-ganzhi"><span class="ly-gan c-earth">己</span><span class="ly-zhi c-fire">巳</span></div>
+        <div class="ly-shishen"><span class="shen-gan c-earth">伤</span><span class="shen-zhi c-fire">比</span></div>
+      </div>
+      <div class="luck-cell">
+        <div class="ly-year">2068</div><div class="ly-age">79岁</div>
+        <div class="ly-ganzhi"><span class="ly-gan c-earth">戊</span><span class="ly-zhi c-earth">辰</span></div>
+        <div class="ly-shishen"><span class="shen-gan c-earth">食</span><span class="shen-zhi c-earth">食</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 流年 -->
+  <div class="luck-row">
+    <div class="luck-label">
+      <span class="lk-text">流年</span>
+      <span class="lk-sub">小运</span>
+    </div>
+    <div class="luck-cells">
+      <div class="luck-cell">
+        <div class="ly-year">2018</div>
+        <div class="ly-ganzhi"><span class="ly-gan c-earth">戊</span><span class="ly-zhi c-earth">戌</span></div>
+        <div class="ly-shishen"><span class="shen-gan c-earth">食</span><span class="shen-zhi c-earth">食</span></div>
+        <div class="ly-xiaoyun">己未</div>
+      </div>
+      <div class="luck-cell">
+        <div class="ly-year">2019</div>
+        <div class="ly-ganzhi"><span class="ly-gan c-earth">己</span><span class="ly-zhi c-water">亥</span></div>
+        <div class="ly-shishen"><span class="shen-gan c-earth">伤</span><span class="shen-zhi c-water">杀</span></div>
+        <div class="ly-xiaoyun">戊午</div>
+      </div>
+      <div class="luck-cell">
+        <div class="ly-year">2020</div>
+        <div class="ly-ganzhi"><span class="ly-gan c-metal">庚</span><span class="ly-zhi c-water">子</span></div>
+        <div class="ly-shishen"><span class="shen-gan c-metal">才</span><span class="shen-zhi c-water">官</span></div>
+        <div class="ly-xiaoyun">丁巳</div>
+      </div>
+      <div class="luck-cell">
+        <div class="ly-year">2021</div>
+        <div class="ly-ganzhi"><span class="ly-gan c-metal">辛</span><span class="ly-zhi c-earth">丑</span></div>
+        <div class="ly-shishen"><span class="shen-gan c-metal">财</span><span class="shen-zhi c-earth">伤</span></div>
+        <div class="ly-xiaoyun">丙辰</div>
+      </div>
+      <div class="luck-cell">
+        <div class="ly-year">2022</div>
+        <div class="ly-ganzhi"><span class="ly-gan c-water">壬</span><span class="ly-zhi c-wood">寅</span></div>
+        <div class="ly-shishen"><span class="shen-gan c-water">杀</span><span class="shen-zhi c-wood">枭</span></div>
+        <div class="ly-xiaoyun">乙卯</div>
+      </div>
+      <div class="luck-cell">
+        <div class="ly-year">2023</div>
+        <div class="ly-ganzhi"><span class="ly-gan c-water">癸</span><span class="ly-zhi c-wood">卯</span></div>
+        <div class="ly-shishen"><span class="shen-gan c-water">官</span><span class="shen-zhi c-wood">印</span></div>
+        <div class="ly-xiaoyun">甲寅</div>
+      </div>
+      <div class="luck-cell">
+        <div class="ly-year">2024</div>
+        <div class="ly-ganzhi"><span class="ly-gan c-wood">甲</span><span class="ly-zhi c-earth">辰</span></div>
+        <div class="ly-shishen"><span class="shen-gan c-wood">枭</span><span class="shen-zhi c-earth">食</span></div>
+        <div class="ly-xiaoyun">癸丑</div>
+      </div>
+      <div class="luck-cell">
+        <div class="ly-year">2025</div>
+        <div class="ly-ganzhi"><span class="ly-gan c-wood">乙</span><span class="ly-zhi c-fire">巳</span></div>
+        <div class="ly-shishen"><span class="shen-gan c-wood">印</span><span class="shen-zhi c-fire">比</span></div>
+        <div class="ly-xiaoyun">壬子</div>
+      </div>
+      <div class="luck-cell current">
+        <div class="ly-year">2026</div>
+        <div class="ly-ganzhi"><span class="ly-gan c-fire">丙</span><span class="ly-zhi c-fire">午</span></div>
+        <div class="ly-shishen"><span class="shen-gan">比</span><span class="shen-zhi">劫</span></div>
+        <div class="ly-xiaoyun">辛亥</div>
+      </div>
+      <div class="luck-cell">
+        <div class="ly-year">2027</div>
+        <div class="ly-ganzhi"><span class="ly-gan c-fire">丁</span><span class="ly-zhi c-earth">未</span></div>
+        <div class="ly-shishen"><span class="shen-gan c-fire">劫</span><span class="shen-zhi c-earth">伤</span></div>
+        <div class="ly-xiaoyun">庚戌</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 流月 -->
+  <div class="luck-row">
+    <div class="luck-label">
+      <span class="lk-text">流月</span>
+    </div>
+    <div class="luck-cells">
+      <div class="luck-cell">
+        <div class="ly-jieqi">立春</div><div class="ly-date">2/4</div>
+        <div class="ly-ganzhi"><span class="ly-gan c-metal">庚</span><span class="ly-zhi c-wood">寅</span></div>
+        <div class="ly-shishen-flat"><span class="c-metal">才</span><span class="c-wood">枭</span></div>
+      </div>
+      <div class="luck-cell">
+        <div class="ly-jieqi">惊蛰</div><div class="ly-date">3/5</div>
+        <div class="ly-ganzhi"><span class="ly-gan c-metal">辛</span><span class="ly-zhi c-wood">卯</span></div>
+        <div class="ly-shishen-flat"><span class="c-metal">财</span><span class="c-wood">印</span></div>
+      </div>
+      <div class="luck-cell">
+        <div class="ly-jieqi">清明</div><div class="ly-date">4/5</div>
+        <div class="ly-ganzhi"><span class="ly-gan c-water">壬</span><span class="ly-zhi c-earth">辰</span></div>
+        <div class="ly-shishen-flat"><span class="c-water">杀</span><span class="c-earth">食</span></div>
+      </div>
+      <div class="luck-cell">
+        <div class="ly-jieqi">立夏</div><div class="ly-date">5/5</div>
+        <div class="ly-ganzhi"><span class="ly-gan c-water">癸</span><span class="ly-zhi c-fire">巳</span></div>
+        <div class="ly-shishen-flat"><span class="c-water">官</span><span class="c-fire">比</span></div>
+      </div>
+      <div class="luck-cell">
+        <div class="ly-jieqi">芒种</div><div class="ly-date">6/5</div>
+        <div class="ly-ganzhi"><span class="ly-gan c-wood">甲</span><span class="ly-zhi c-fire">午</span></div>
+        <div class="ly-shishen-flat"><span class="c-wood">枭</span><span class="c-fire">劫</span></div>
+      </div>
+      <div class="luck-cell">
+        <div class="ly-jieqi">小暑</div><div class="ly-date">7/7</div>
+        <div class="ly-ganzhi"><span class="ly-gan c-wood">乙</span><span class="ly-zhi c-earth">未</span></div>
+        <div class="ly-shishen-flat"><span class="c-wood">印</span><span class="c-earth">伤</span></div>
+      </div>
+      <div class="luck-cell">
+        <div class="ly-jieqi">立秋</div><div class="ly-date">8/7</div>
+        <div class="ly-ganzhi"><span class="ly-gan c-fire">丙</span><span class="ly-zhi c-metal">申</span></div>
+        <div class="ly-shishen-flat"><span class="c-fire">比</span><span class="c-metal">才</span></div>
+      </div>
+      <div class="luck-cell">
+        <div class="ly-jieqi">白露</div><div class="ly-date">9/7</div>
+        <div class="ly-ganzhi"><span class="ly-gan c-fire">丁</span><span class="ly-zhi c-metal">酉</span></div>
+        <div class="ly-shishen-flat"><span class="c-fire">劫</span><span class="c-metal">财</span></div>
+      </div>
+      <div class="luck-cell">
+        <div class="ly-jieqi">寒露</div><div class="ly-date">10/8</div>
+        <div class="ly-ganzhi"><span class="ly-gan c-earth">戊</span><span class="ly-zhi c-earth">戌</span></div>
+        <div class="ly-shishen-flat"><span class="c-earth">食</span><span class="c-earth">食</span></div>
+      </div>
+      <div class="luck-cell">
+        <div class="ly-jieqi">立冬</div><div class="ly-date">11/7</div>
+        <div class="ly-ganzhi"><span class="ly-gan c-earth">己</span><span class="ly-zhi c-water">亥</span></div>
+        <div class="ly-shishen-flat"><span class="c-earth">伤</span><span class="c-water">杀</span></div>
+      </div>
+      <div class="luck-cell">
+        <div class="ly-jieqi">大雪</div><div class="ly-date">12/7</div>
+        <div class="ly-ganzhi"><span class="ly-gan c-metal">庚</span><span class="ly-zhi c-water">子</span></div>
+        <div class="ly-shishen-flat"><span class="c-metal">才</span><span class="c-water">官</span></div>
+      </div>
+      <div class="luck-cell">
+        <div class="ly-jieqi">小寒</div><div class="ly-date">1/5</div>
+        <div class="ly-ganzhi"><span class="ly-gan c-metal">辛</span><span class="ly-zhi c-earth">丑</span></div>
+        <div class="ly-shishen-flat"><span class="c-metal">财</span><span class="c-earth">伤</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 五行旺衰 - 金色底白字 -->
+  <div class="wuxing-bars">
+    <div class="bar">水旺</div><div class="bar">木相</div><div class="bar">金休</div><div class="bar">土囚</div><div class="bar">火死</div>
+  </div>
+
+  <div class="liuyi-row">
+    <span class="liuyi-tag">天干留意</span>
+    <span class="liuyi-text">己癸相克;戊癸合化火</span>
+  </div>
+  <div class="liuyi-row">
+    <span class="liuyi-tag">地支留意</span>
+    <span class="liuyi-text">寅午半合火局;巳酉半合金局;巳酉暗合;寅午暗合;子巳暗合;寅巳相刑;子午相冲;子酉相破;寅巳相害</span>
+  </div>
+
+  <div class="shensha-card">
+    <div class="card-title">四柱神煞 <span class="sort-icon">⇅</span></div>
+    <div class="ss-row"><span class="ss-ganzhi">己巳：</span><span class="ss-names">天德贵人　德秀贵人　天厨贵人　禄神　亡神</span></div>
+    <div class="ss-row"><span class="ss-ganzhi">丙子：</span><span class="ss-names">天乙贵人　福星贵人　德秀贵人　飞刃</span></div>
+    <div class="ss-row"><span class="ss-ganzhi">丙寅：</span><span class="ss-names">福星贵人　德秀贵人　红艳煞　词馆　劫煞　国印　披麻</span></div>
+    <div class="ss-row"><span class="ss-ganzhi">戊子：</span><span class="ss-names">天乙贵人　福星贵人　德秀贵人　飞刃</span></div>
+  </div>
+
+  <div class="shensha-card">
+    <div class="card-title">大运神煞</div>
+    <div class="ss-row"><span class="ss-ganzhi">乙亥：</span><span class="ss-names">天乙贵人　驿马　学堂　词馆　天医　劫煞　空亡</span></div>
+    <div class="ss-row"><span class="ss-ganzhi">甲戌：</span><span class="ss-names">太极贵人　德秀贵人　华盖　红鸾　元辰　空亡</span></div>
+    <div class="ss-row"><span class="ss-ganzhi">癸酉：</span><span class="ss-names">天乙贵人　太极贵人　文昌贵人　德秀贵人　天厨贵人　将星</span></div>
+    <div class="ss-row"><span class="ss-ganzhi">壬申：</span><span class="ss-names">天乙贵人　月德贵人　文昌贵人　德秀贵人　天德合　勾绞煞　驿马　词馆　金舆　孤辰　亡神</span></div>
+    <div class="ss-row"><span class="ss-ganzhi">辛未：</span><span class="ss-names">太极贵人　福星贵人　德秀贵人　金舆　丧门　流霞</span></div>
+    <div class="ss-row"><span class="ss-ganzhi">庚午：</span><span class="ss-names">将星　桃花　血刃　羊刃</span></div>
+    <div class="ss-row"><span class="ss-ganzhi">己巳：</span><span class="ss-names">天德贵人　德秀贵人　天厨贵人　禄神　亡神</span></div>
+    <div class="ss-row"><span class="ss-ganzhi">戊辰：</span><span class="ss-names">太极贵人　德秀贵人　天罗地网　天喜　寡宿</span></div>
+    <div class="ss-row"><span class="ss-ganzhi">丁卯：</span><span class="ss-names">太极贵人　月德合　桃花　吊客　灾煞</span></div>
+    <div class="ss-row"><span class="ss-ganzhi">丙寅：</span><span class="ss-names">福星贵人　德秀贵人　红艳煞　词馆　劫煞　国印　披麻</span></div>
+    <div class="ss-row"><span class="ss-ganzhi">乙丑：</span><span class="ss-names">太极贵人　华盖　国印</span></div>
+    <div class="ss-row"><span class="ss-ganzhi">甲子：</span><span class="ss-names">天乙贵人　福星贵人　德秀贵人　飞刃</span></div>
+  </div>
+
+  <div class="shensha-card">
+    <div class="card-title">流年神煞</div>
+    <div class="ss-row"><span class="ss-ganzhi">丙午：</span><span class="ss-names">德秀贵人　将星　桃花　血刃　羊刃</span></div>
+  </div>
+
+  <div class="floating-ai"><span>🌈</span></div>
+  <div style="height:20px"></div>
+</div>
+
+<!-- ============ 页面4: 断事笔记 ============ -->
+<div class="page" id="page3">
+  <div class="banner-dark">
+    <div class="bz-banner">
+      <div class="ganzao">乾造</div>
+      <div>
+        <div class="pillars">
+          <div class="pillar"><div class="gan c-earth">己</div><div class="zhi c-fire">巳</div></div>
+          <div class="pillar"><div class="gan c-fire">丙</div><div class="zhi c-water">子</div></div>
+          <div class="pillar"><div class="gan c-fire">丙</div><div class="zhi c-wood">寅</div></div>
+          <div class="pillar"><div class="gan c-earth">戊</div><div class="zhi c-water">子</div></div>
+        </div>
+        <div class="dayun-list">
+          <span>乙亥</span><span>甲戌</span><span>癸酉</span><span>壬申</span><span>辛未</span><span>庚午</span><span>己巳</span><span>戊辰</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="duanshi-tabs">
+    <div class="ds-tab active">命主反馈</div>
+    <div class="ds-tab inactive">师傅点评</div>
+  </div>
+
+  <div class="feedback-list">
+    <div class="fb-item"><span>职业</span><span class="arrow">∨</span></div>
+    <div class="fb-item"><span>学历</span><span class="arrow">∨</span></div>
+    <div class="fb-item"><span>财富</span><span class="arrow">∨</span></div>
+    <div class="fb-item"><span>婚姻</span><span class="arrow">∨</span></div>
+  </div>
+
+  <div class="fb-input">健康状态：请输入</div>
+  <div class="fb-input">六亲状况：请输入</div>
+
+  <div class="fb-section-title">关键事件反馈记录</div>
+
+  <div class="event-row">
+    <div class="cal-icon"></div>
+    <button class="add-btn">+</button>
+  </div>
+
+  <div style="height:60px"></div>
+
+  <div class="bottom-bar">
+    <svg class="gear-icon" viewBox="0 0 40 40" fill="none">
+      <circle cx="20" cy="20" r="6" stroke="#333" stroke-width="2" fill="none"/>
+      <path d="M20 4 L20 10 M20 30 L20 36 M4 20 L10 20 M30 20 L36 20 M8.5 8.5 L12.7 12.7 M27.3 27.3 L31.5 31.5 M8.5 31.5 L12.7 27.3 M27.3 12.7 L31.5 8.5" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="20" cy="20" r="12" stroke="#333" stroke-width="2" fill="none"/>
+    </svg>
+    <button class="save-btn">保存</button>
+  </div>
+</div>
+
+<script>
+function switchTab(idx){
+  document.querySelectorAll('.tab').forEach((t,i)=>{t.classList.toggle('active',i===idx);});
+  document.querySelectorAll('.page').forEach((p,i)=>{p.classList.toggle('active',i===idx);});
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>

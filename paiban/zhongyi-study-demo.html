@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+<title>中医综合学习平台</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --teal:#00BFA5;--teal-d:#00897B;--teal-bg:#E0F7FA;
+  --bg:#F5EDE6;--card:#FFFDF9;--ink:#1A1A1A;--ink2:#3A3A3A;--muted:#666;--rule:#E0D8CC;
+  --red:#C62828;--green:#2E7D32;--blue:#0D47A1;--gold:#B8860B;
+  --font-main:'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif;
+  --radius:12px;--shadow:0 2px 6px rgba(0,0,0,.05);
+}
+body{font-family:var(--font-main);background:var(--bg);color:var(--ink);font-size:14px;max-width:480px;margin:0 auto;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+.header{display:flex;align-items:center;padding:0 14px;background:linear-gradient(135deg,var(--gold),#C7913A);color:#FFF;min-height:44px;flex-shrink:0;position:relative}
+.header .back-btn{display:flex;align-items:center;justify-content:center;width:44px;height:44px;cursor:pointer;border:none;background:none;padding:0;margin-left:-14px;transition:opacity .2s}
+.header .back-btn:active{opacity:.7}
+.header .back-btn svg{width:22px;height:22px}
+.header .title{font-size:16px;font-weight:700;margin-left:4px;letter-spacing:1px}
+.main{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 14px}
+.tab-bar{display:flex;gap:0;background:var(--card);border-radius:10px;padding:3px;margin-bottom:12px;box-shadow:var(--shadow);position:sticky;top:0;z-index:10}
+.tab{flex:1;padding:7px 4px;text-align:center;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;border:none;background:none;font-family:inherit;color:var(--muted);transition:.2s}
+.tab.active{background:var(--gold);color:#FFF}
+.card{background:var(--card);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);margin-bottom:10px}
+.card h3{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.card h3 svg{width:20px;height:20px;flex-shrink:0}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 16px;text-align:center;color:var(--muted);font-size:13px;gap:6px}
+.empty-state svg{width:28px;height:28px;opacity:.4}
+.form-group{margin-bottom:10px}
+.form-group label{display:block;font-size:12px;font-weight:700;color:var(--ink2);margin-bottom:4px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:8px 10px;border:1.5px solid var(--rule);border-radius:8px;font-size:13px;font-family:inherit;background:var(--bg);color:var(--ink);outline:none}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--gold)}
+.form-row{display:flex;gap:8px}
+.form-row .form-group{flex:1}
+.btn{display:block;width:100%;padding:10px;background:var(--gold);color:#FFF;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity .2s}
+.btn:active{opacity:.85}
+.btn-sm{padding:6px 14px;font-size:12px;width:auto;display:inline-block}
+.result-box{background:var(--teal-bg);border-radius:10px;padding:12px;margin-top:10px;font-size:12px;line-height:1.7;color:var(--ink);min-height:36px}
+.quiz-card{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:12px;margin-bottom:8px;cursor:pointer;transition:.2s}
+.quiz-card:active{background:var(--bg)}
+.quiz-card .qc-q{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:6px}
+.quiz-card .qc-options{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.quiz-card .qc-opt{padding:6px 10px;border-radius:6px;font-size:12px;text-align:center;border:1.5px solid var(--rule);cursor:pointer;font-family:inherit;background:var(--card);color:var(--ink);transition:.2s}
+.quiz-card .qc-opt:hover{border-color:var(--gold)}
+.quiz-card .qc-opt.correct{background:#C8E6C9;border-color:var(--green);color:var(--green)}
+.quiz-card .qc-opt.wrong{background:#FFCDD2;border-color:var(--red);color:var(--red)}
+.acupoint-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.acupoint-chip{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:8px;font-size:11px;text-align:center;cursor:pointer;transition:.2s;font-family:inherit}
+.acupoint-chip:active{background:var(--bg)}
+.acupoint-chip .ac-name{font-weight:700;color:var(--ink);font-size:12px}
+.acupoint-chip .ac-meridian{font-size:10px;color:var(--muted);margin-top:2px}
+.history-item{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:10px 12px;margin-bottom:6px;cursor:pointer;transition:.2s}
+.history-item:active{background:var(--bg)}
+.history-item .hi-title{font-size:13px;font-weight:700;color:var(--ink)}
+.history-item .hi-meta{font-size:11px;color:var(--muted);margin-top:3px}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;margin-right:4px}
+.badge-yangsheng{background:#E8F5E9;color:var(--green)}
+.badge-fangji{background:#FFF3E0;color:#E65100}
+.badge-zhenjiu{background:#E3F2FD;color:var(--blue)}
+.toast{position:fixed;top:60px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.82);color:#FFF;padding:10px 22px;border-radius:22px;font-size:13px;z-index:999;pointer-events:none;opacity:0;transition:opacity .3s;max-width:90%}
+.toast.show{opacity:1}
+::-webkit-scrollbar{width:0}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <button class="back-btn" onclick="window.close()||history.back()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+  <span class="title">中医综合学习平台</span>
+</div>
+
+<div class="main">
+  <div class="tab-bar">
+    <button class="tab active" onclick="switchTab('theory')">理论学习</button>
+    <button class="tab" onclick="switchTab('fangji')">模拟开方</button>
+    <button class="tab" onclick="switchTab('zhenjiu')">针灸实训</button>
+    <button class="tab" onclick="switchTab('quiz')">题库考试</button>
+    <button class="tab" onclick="switchTab('yian')">历代医案</button>
+  </div>
+  <div id="tabContent"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ==================== SVG ICONS (Self-made) ==================== */
+const I = {
+  book: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>',
+  pill: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="8"/><line x1="12" y1="4" x2="12" y2="20"/></svg>',
+  needle: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="2" x2="12" y2="20"/><circle cx="12" cy="8" r="2"/><path d="M8 20h8"/></svg>',
+  quiz: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+  scroll: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>',
+  leaf: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8 6 2 10 2 14a6 6 0 0 0 10 4.5A6 6 0 0 0 22 14c0-4-6-8-10-12z"/><line x1="12" y1="2" x2="12" y2="22"/></svg>',
+  search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>',
+  alert: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+  body: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="2"/><path d="M12 7v6m-3 4v4m6-4v4M8 13c-2 1-4 3-4 6m16-6c2 1 4 3 4 6"/><path d="M12 13v5"/></svg>',
+  clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+  star: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+};
+
+const EMPTY = '<span style="color:var(--muted);font-style:italic">正在加载知识库数据...</span>';
+let activeTab = 'theory';
+let quizState = { current: 0, score: 0, answered: false };
+
+/* ==================== TOAST ==================== */
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2000);
+}
+
+/* ==================== TAB ==================== */
+function switchTab(tab) {
+  activeTab = tab;
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', i===['theory','fangji','zhenjiu','quiz','yian'].indexOf(tab)));
+  renderTab();
+}
+function renderTab() {
+  const c = document.getElementById('tabContent');
+  switch(activeTab) {
+    case 'theory': c.innerHTML = renderTheory(); break;
+    case 'fangji': c.innerHTML = renderFangji(); break;
+    case 'zhenjiu': c.innerHTML = renderZhenjiu(); break;
+    case 'quiz': c.innerHTML = renderQuiz(); quizState.answered=false; break;
+    case 'yian': c.innerHTML = renderYian(); break;
+  }
+}
+
+/* ==================== THEORY ==================== */
+function renderTheory() {
+  return `
+    <div class="card">
+      <h3>${I.book} 中医理论学习资料库</h3>
+      <div class="form-group">
+        <input type="text" id="theorySearch" placeholder="搜索经典著作、理论篇章..." oninput="searchTheory()">
+      </div>
+      <div id="theoryResults">
+        <div style="font-size:12px;color:var(--ink2);line-height:1.7;padding:4px 0">
+          <span style="font-weight:700;color:var(--gold)">阴阳学说</span>：对立制约、互根互用、消长平衡、相互转化<br><br>
+          <span style="font-weight:700;color:var(--gold)">五行学说</span>：木火土金水，相生相克，制化平衡<br>
+          <span style="display:inline-block;color:#34A853;margin-right:6px">木</span>
+          <span style="display:inline-block;color:#EA4335;margin-right:6px">火</span>
+          <span style="display:inline-block;color:#A67C52;margin-right:6px">土</span>
+          <span style="display:inline-block;color:#F1B232;margin-right:6px">金</span>
+          <span style="display:inline-block;color:#2368B2">水</span><br><br>
+          <span style="font-weight:700;color:var(--gold)">藏象学说</span>：五脏六腑的生理功能与病理变化<br>
+          <span style="font-weight:700">心</span>：君主之官，主血脉，藏神<br>
+          <span style="font-weight:700">肝</span>：将军之官，主疏泄，藏血<br>
+          <span style="font-weight:700">脾</span>：仓廪之官，主运化，统血<br>
+          <span style="font-weight:700">肺</span>：相傅之官，主气，司呼吸<br>
+          <span style="font-weight:700">肾</span>：作强之官，主藏精，主水<br><br>
+          <span style="font-weight:700;color:var(--gold)">气血津液</span>：气主推动温煦，血主营养滋润，津液主滋润濡养
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>${I.leaf} 经典著作分类</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px">
+        ${['黄帝内经','伤寒论','金匮要略','温病条辨','神农本草经','难经','脉经','针灸甲乙经'].map(b => `
+          <div class="acupoint-chip" onclick="showToast('${getClassicQuote(b)}')">
+            <div class="ac-name">${b}</div>
+            <div class="ac-meridian">经典著作</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>`;
+}
+
+function getClassicQuote(name) {
+  const quotes = {
+    '黄帝内经':'上古之人，其知道者，法于阴阳，和于术数，食饮有节，起居有常，不妄作劳，故能形与神俱，而尽终其天年，度百岁乃去。',
+    '伤寒论':'太阳之为病，脉浮，头项强痛而恶寒。',
+    '金匮要略':'夫治未病者，见肝之病，知肝传脾，当先实脾。',
+    '温病条辨':'温邪上受，首先犯肺，逆传心包。',
+    '神农本草经':'上药一百二十种为君，主养命以应天。中药一百二十种为臣，主养性以应人。下药一百二十五种为佐使，主治病以应地。',
+    '难经':'独取寸口，以决五脏六腑死生吉凶之法。',
+    '脉经':'脉理精微，其体难辨。弦紧浮芤，展转相类。',
+    '针灸甲乙经':'凡刺之道，必通十二经络之所终始，络脉之所别处。'
+  };
+  return quotes[name] || '经典著作，医道之源。';
+}
+
+function searchTheory() {
+  const q = document.getElementById('theorySearch')?.value?.trim();
+  if (!q) { renderTab(); return; }
+  document.getElementById('theoryResults').innerHTML = `
+    <div class="empty-state">${I.clock}<span>${EMPTY}</span></div>`;
+}
+
+/* ==================== FANGJI ==================== */
+function renderFangji() {
+  return `
+    <div class="card">
+      <h3>${I.pill} 模拟开方系统</h3>
+      <div class="form-group"><label>病症描述</label><textarea id="symptomInput" rows="3" placeholder="请输入症状描述，如：头痛、发热、恶寒、脉浮..."></textarea></div>
+      <div class="form-row">
+        <div class="form-group"><label>舌象</label><select id="tongueInput"><option value="">请选择</option><option>舌淡红苔薄白</option><option>舌红苔黄</option><option>舌淡胖有齿痕</option><option>舌紫暗有瘀斑</option></select></div>
+        <div class="form-group"><label>脉象</label><select id="pulseInput"><option value="">请选择</option><option>浮脉</option><option>沉脉</option><option>数脉</option><option>弦脉</option><option>滑脉</option><option>细脉</option></select></div>
+      </div>
+      <button class="btn" onclick="submitFangji()">开始辨证开方</button>
+      <div class="result-box" id="fangjiResult">请填写症状后点击"开始辨证开方"</div>
+    </div>
+    <div class="card">
+      <h3>${I.search} 方剂快速检索</h3>
+      <div class="form-group"><input type="text" id="fangjiSearch" placeholder="输入方名，如：麻黄汤、桂枝汤..." oninput="searchFangji()"></div>
+      <div id="fangjiSearchResult" style="font-size:12px;color:var(--ink2);line-height:1.6;margin-top:4px"></div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">
+        ${['麻黄汤','桂枝汤','小柴胡汤','四君子汤','六味地黄丸','逍遥散','白虎汤','理中丸'].map(f => `
+          <span class="badge badge-fangji" style="cursor:pointer" onclick="document.getElementById('fangjiSearch').value='${f}';searchFangji()">${f}</span>
+        `).join('')}
+      </div>
+    </div>`;
+}
+
+function searchFangji() {
+  const q = document.getElementById('fangjiSearch')?.value?.trim();
+  const result = document.getElementById('fangjiSearchResult');
+  if (!q) { result.innerHTML = ''; return; }
+  const formulas = {
+    '麻黄汤':'麻黄、桂枝、杏仁、甘草。发汗解表，宣肺平喘。主治外感风寒表实证。',
+    '桂枝汤':'桂枝、芍药、甘草、生姜、大枣。解肌发表，调和营卫。主治外感风寒表虚证。',
+    '小柴胡汤':'柴胡、黄芩、人参、半夏、甘草、生姜、大枣。和解少阳。主治少阳病。',
+    '四君子汤':'人参、白术、茯苓、甘草。益气健脾。主治脾胃气虚证。',
+    '六味地黄丸':'熟地黄、山茱萸、山药、泽泻、牡丹皮、茯苓。滋补肾阴。主治肾阴不足证。',
+    '逍遥散':'柴胡、当归、白芍、白术、茯苓、甘草、薄荷、生姜。疏肝解郁，养血健脾。',
+    '白虎汤':'石膏、知母、甘草、粳米。清热生津。主治阳明气分热盛证。',
+    '理中丸':'人参、干姜、白术、甘草。温中祛寒，补气健脾。主治脾胃虚寒证。',
+    '四物汤':'当归、川芎、白芍、熟地黄。补血调血。主治营血虚滞证。',
+    '银翘散':'金银花、连翘、桔梗、薄荷、竹叶、甘草、荆芥穗、淡豆豉、牛蒡子。辛凉解表，清热解毒。',
+    '补中益气汤':'黄芪、人参、白术、甘草、当归、陈皮、升麻、柴胡。补中益气，升阳举陷。'
+  };
+  const found = Object.entries(formulas).find(([k]) => k.includes(q));
+  result.innerHTML = found
+    ? `<span style="font-weight:700;color:var(--gold)">${found[0]}</span>：${found[1]}`
+    : '<span style="color:var(--muted)">未找到匹配方剂，请尝试其他方名</span>';
+}
+
+function submitFangji() {
+  const s = document.getElementById('symptomInput')?.value?.trim();
+  const t = document.getElementById('tongueInput')?.value;
+  const p = document.getElementById('pulseInput')?.value;
+  if (!s && !t && !p) { showToast('请输入症状描述'); return; }
+  document.getElementById('fangjiResult').innerHTML = EMPTY;
+  showToast('辨证分析请求已提交，AI分析中...');
+}
+
+/* ==================== ZHENJIU ==================== */
+function renderZhenjiu() {
+  const meridians = [
+    { name:'手太阴肺经', pts:'中府·云门·尺泽·列缺·太渊·少商', time:'寅时', points:11, indications:'咳嗽气喘，咽喉肿痛' },
+    { name:'手阳明大肠经', pts:'商阳·合谷·曲池·肩髃·迎香', time:'卯时', points:20, indications:'头痛牙痛，鼻衄' },
+    { name:'足阳明胃经', pts:'四白·天枢·足三里·丰隆·内庭', time:'辰时', points:45, indications:'胃痛腹胀，口眼歪斜' },
+    { name:'足太阴脾经', pts:'隐白·三阴交·阴陵泉·血海·大横', time:'巳时', points:21, indications:'腹胀泄泻，月经不调' },
+    { name:'手少阴心经', pts:'极泉·少海·通里·神门·少冲', time:'午时', points:9, indications:'心悸失眠，心痛' },
+    { name:'手太阳小肠经', pts:'少泽·后溪·养老·听宫', time:'未时', points:19, indications:'耳聋目黄，肩臂痛' },
+    { name:'足太阳膀胱经', pts:'睛明·肺俞·心俞·肾俞·委中·至阴', time:'申时', points:67, indications:'小便不利，腰背痛' },
+    { name:'足少阴肾经', pts:'涌泉·太溪·照海·复溜·阴谷', time:'酉时', points:27, indications:'遗精阳痿，腰痛耳鸣' },
+    { name:'手厥阴心包经', pts:'天池·曲泽·内关·大陵·中冲', time:'戌时', points:9, indications:'心痛心悸，胸闷' },
+    { name:'手少阳三焦经', pts:'关冲·中渚·外关·翳风·丝竹空', time:'亥时', points:23, indications:'耳聋耳鸣，偏头痛' },
+    { name:'足少阳胆经', pts:'听会·风池·肩井·阳陵泉·足临泣', time:'子时', points:44, indications:'口苦目眩，偏头痛' },
+    { name:'足厥阴肝经', pts:'大敦·行间·太冲·章门·期门', time:'丑时', points:14, indications:'胸胁胀痛，头痛眩晕' }
+  ];
+  const commonAcupoints = [
+    { name:'合谷', loc:'手背第1、2掌骨间', ind:'头痛、牙痛、面瘫，孕妇禁用', code:'LI4' },
+    { name:'足三里', loc:'小腿前外侧，犊鼻下3寸', ind:'胃肠疾病，强壮保健要穴', code:'ST36' },
+    { name:'三阴交', loc:'小腿内侧足内踝尖上3寸', ind:'妇科病、脾胃病、失眠', code:'SP6' },
+    { name:'内关', loc:'前臂掌侧腕横纹上2寸', ind:'心悸、胸闷、呕吐、失眠', code:'PC6' },
+    { name:'神门', loc:'腕掌侧横纹尺侧端', ind:'失眠、健忘、心悸', code:'HT7' },
+    { name:'太冲', loc:'足背第1、2跖骨间', ind:'头痛、眩晕、目赤肿痛', code:'LR3' },
+    { name:'涌泉', loc:'足底前1/3凹陷处', ind:'补肾安神，每晚搓揉100次', code:'KI1' },
+    { name:'百会', loc:'头顶正中', ind:'头痛、眩晕、失眠、脱肛', code:'GV20' },
+    { name:'风池', loc:'胸锁乳突肌与斜方肌上端之间', ind:'头痛、眩晕、颈项强痛', code:'GB20' },
+    { name:'关元', loc:'脐下3寸', ind:'补肾固本，强壮要穴', code:'CV4' },
+    { name:'气海', loc:'脐下1.5寸', ind:'补气要穴，气虚乏力', code:'CV6' },
+    { name:'大椎', loc:'第7颈椎棘突下', ind:'清热解表，退热要穴', code:'GV14' }
+  ];
+  return `
+    <div class="card">
+      <h3>${I.needle} 模拟针灸实训</h3>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:8px">点击经络名称查看穴位详情，对接后端经络知识库</div>
+      <div class="acupoint-grid">
+        ${meridians.map(m => `
+          <div class="acupoint-chip" onclick="showToast('${m.name}：${m.indications}\\n\\n重点穴位：${m.pts}')">
+            <div class="ac-name">${m.name}</div>
+            <div class="ac-meridian">${m.points}穴 · ${m.time}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    <div class="card">
+      <h3>${I.body} 常用穴位速查</h3>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">
+        ${commonAcupoints.map(a => `
+          <span class="badge badge-zhenjiu" style="cursor:pointer" onclick="showToast('${a.name}(${a.code})：${a.loc}。主治：${a.ind}')">${a.name}</span>
+        `).join('')}
+      </div>
+    </div>`;
+}
+
+/* ==================== QUIZ ==================== */
+const QUIZ_QUESTIONS = [
+  { q:'「四气」指的是？', opts:['寒热温凉','风寒暑湿','升降浮沉','辛甘酸苦'], ans:0 },
+  { q:'被称为「医家之宗」的经典是？', opts:['《伤寒论》','《黄帝内经》','《神农本草经》','《难经》'], ans:1 },
+  { q:'麻黄汤的君药是？', opts:['桂枝','杏仁','麻黄','甘草'], ans:2 },
+  { q:'五行的正确顺序是？', opts:['金木水火土','木火土金水','水火金土木','土金水木火'], ans:1 },
+  { q:'「望闻问切」中「切」指？', opts:['切脉','切肤','切药','切诊含脉诊和按诊'], ans:3 },
+  { q:'六味地黄丸主治？', opts:['肾阳虚','肾阴虚','脾胃虚','肝火旺'], ans:1 },
+  { q:'十二经脉中循行于上肢内侧后缘的是？', opts:['手太阴肺经','手厥阴心包经','手少阴心经','手阳明大肠经'], ans:2 },
+  { q:'「治未病」的核心思想是？', opts:['未病先防','既病防变','愈后防复','以上都是'], ans:3 },
+  { q:'五行中「木」的特性是？', opts:['曲直','炎上','稼穑','从革'], ans:0 },
+  { q:'被称为「后天之本」的脏腑是？', opts:['心','肝','脾','肾'], ans:2 },
+  { q:'四诊中不包括？', opts:['望','闻','问','摸'], ans:3 },
+  { q:'八纲辨证的核心纲领是？', opts:['表里','寒热','阴阳','虚实'], ans:2 },
+  { q:'六味地黄丸中「三补」指？', opts:['熟地山药山茱萸','熟地泽泻丹皮','山茱萸山药泽泻','丹皮茯苓泽泻'], ans:0 },
+  { q:'十二经脉中循行于上肢内侧前缘的是？', opts:['手太阴肺经','手厥阴心包经','手少阴心经','手阳明大肠经'], ans:0 },
+  { q:'心的功能是？', opts:['主疏泄','主运化','主血脉藏神','主气司呼吸'], ans:2 },
+  { q:'四君子汤的组成是？', opts:['参术苓草','归芎芍地','麻桂杏草','柴芩参夏'], ans:0 }
+];
+
+function renderQuiz() {
+  const q = QUIZ_QUESTIONS[quizState.current];
+  return `
+    <div class="card">
+      <h3>${I.quiz} 中医题库在线考试</h3>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <span style="font-size:13px;font-weight:600;color:var(--ink2)">第 ${quizState.current+1}/${QUIZ_QUESTIONS.length} 题</span>
+        <span style="font-size:13px;font-weight:700;color:var(--gold)">得分: ${quizState.score}</span>
+      </div>
+      <div class="quiz-card">
+        <div class="qc-q">${q.q}</div>
+        <div class="qc-options" id="quizOptions">
+          ${q.opts.map((o,i) => `
+            <button class="qc-opt ${quizState.answered ? (i===q.ans?'correct':(quizState.lastPick===i?'wrong':'')) : ''}"
+                    onclick="answerQuiz(${i})" ${quizState.answered?'disabled':''}>${o}</button>
+          `).join('')}
+        </div>
+      </div>
+      ${quizState.answered ? `
+        <div style="text-align:center;margin-top:10px">
+          <button class="btn btn-sm" onclick="${quizState.current < QUIZ_QUESTIONS.length-1 ? 'nextQuiz()' : 'finishQuiz()'}">
+            ${quizState.current < QUIZ_QUESTIONS.length-1 ? '下一题 →' : '查看成绩'}
+          </button>
+        </div>
+      ` : ''}
+    </div>`;
+}
+
+function answerQuiz(i) {
+  if (quizState.answered) return;
+  quizState.answered = true;
+  quizState.lastPick = i;
+  if (i === QUIZ_QUESTIONS[quizState.current].ans) quizState.score++;
+  renderTab();
+}
+
+function nextQuiz() {
+  quizState.current++;
+  quizState.answered = false;
+  renderTab();
+}
+
+function finishQuiz() {
+  showToast('考试完成！得分: ' + quizState.score + '/' + QUIZ_QUESTIONS.length);
+  quizState = { current: 0, score: 0, answered: false };
+  renderTab();
+}
+
+/* ==================== YIAN ==================== */
+function renderYian() {
+  const yianList = [
+    { title:'《伤寒论》太阳病桂枝汤证', author:'张仲景', era:'东汉', detail:'太阳中风，阳浮而阴弱。阳浮者热自发，阴弱者汗自出。啬啬恶寒，淅淅恶风，翕翕发热，鼻鸣干呕者，桂枝汤主之。' },
+    { title:'李东垣补中益气汤治脾虚', author:'李东垣', era:'金元', detail:'脾胃气虚，清阳不升。补中益气汤：黄芪、人参、白术、甘草、当归、陈皮、升麻、柴胡。' },
+    { title:'叶天士温病卫气营血辨治', author:'叶天士', era:'清代', detail:'温邪上受，首先犯肺，逆传心包。肺主气属卫，心主血属营。辨营卫气血虽与伤寒同，若论治法则与伤寒大异也。' },
+    { title:'张锡纯镇肝熄风汤治中风', author:'张锡纯', era:'近代', detail:'肝阳上亢，气血逆乱。镇肝熄风汤：怀牛膝、生赭石、生龙骨、生牡蛎、生龟板、生杭芍、玄参、天冬、川楝子、生麦芽、茵陈、甘草。' },
+    { title:'金匮要略治未病思想', author:'张仲景', era:'东汉', detail:'夫治未病者，见肝之病，知肝传脾，当先实脾。四季脾旺不受邪，即勿补之。' },
+    { title:'朱丹溪滋阴降火治虚劳', author:'朱丹溪', era:'元代', detail:'阳常有余，阴常不足。大补阴丸：黄柏、知母、熟地黄、龟板。滋阴降火，主治阴虚火旺证。' },
+  ];
+  return `
+    <div class="card">
+      <h3>${I.scroll} 历代医案阅览</h3>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:8px">对接后端中医知识库，实时检索历代名医医案</div>
+      ${yianList.map(y => `
+        <div class="history-item" onclick="showToast('${y.detail}')">
+          <div class="hi-title">${y.title}</div>
+          <div class="hi-meta">${y.author} · ${y.era} | ${y.detail.substring(0,30)}...</div>
+        </div>
+      `).join('')}
+      <div style="text-align:center;margin-top:10px">
+        <button class="btn btn-sm" onclick="showToast('${EMPTY}')">查看更多医案</button>
+      </div>
+    </div>
+    <div class="card">
+      <h3>${I.star} 名医名家</h3>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">
+        ${['张仲景','华佗','孙思邈','李时珍','叶天士','张锡纯','朱丹溪','刘完素'].map(n => `
+          <span class="badge badge-yangsheng" style="cursor:pointer" onclick="showToast('${EMPTY}')">${n}</span>
+        `).join('')}
+      </div>
+    </div>`;
+}
+
+/* ==================== INIT ==================== */
+renderTab();
+</script>
+</body>
+</html>

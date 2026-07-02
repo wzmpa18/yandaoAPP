@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>大六壬</title>
+<style>
+/* ===== 全局重置与基础 ===== */
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html, body { width:100%; font-family:"PingFang SC","Microsoft YaHei","Helvetica Neue",sans-serif; color:#333; background:#F0EFE9; }
+body { max-width:430px; margin:0 auto; min-height:100vh; position:relative; padding-bottom:70px; background:#F0EFE9; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'><path d='M20,100 Q40,60 60,100 T100,100 T140,100 T180,100' stroke='%23D9D5C8' stroke-width='0.5' fill='none' opacity='0.3'/><path d='M100,20 Q60,40 100,60 T100,100 T100,140 T100,180' stroke='%23D9D5C8' stroke-width='0.5' fill='none' opacity='0.3'/><circle cx='50' cy='50' r='15' stroke='%23D9D5C8' stroke-width='0.3' fill='none' opacity='0.2'/><circle cx='150' cy='150' r='20' stroke='%23D9D5C8' stroke-width='0.3' fill='none' opacity='0.2'/></svg>"); }
+
+/* ===== 主题色 ===== */
+:root {
+  --blue:#2196F3;
+  --header-bg:#EEEEF0;
+  --beige:#F0EFE9;
+  --dark-gray:#5A5A5A;
+  --light-gray:#AAAAAA;
+  --zebra:#F0F0F0;
+}
+
+/* ===== 干支颜色 ===== */
+.c-red{color:#EA4335;}
+.c-green{color:#34A853;}
+.c-blue{color:#2368B2;}
+.c-orange{color:#F1B232;}
+.c-brown{color:#A67C52;}
+.c-black{color:#212121;}
+.c-yellow{color:#F1B232;}
+/* 五行标准色 */
+.c-wood{color:#34A853;} .c-fire{color:#EA4335;} .c-earth{color:#A67C52;} .c-metal{color:#F1B232;} .c-water{color:#2368B2;}
+
+/* ===== Header ===== */
+.header {
+  position:sticky; top:0; z-index:100;
+  height:48px; background:var(--header-bg);
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 12px; border-bottom:1px solid #E0E0E0;
+}
+.header .title { font-size:18px; font-weight:bold; color:#212121; }
+.header .back { color:var(--blue); font-size:22px; cursor:pointer; text-decoration:none; line-height:1; }
+.header .hamburger { color:var(--blue); font-size:22px; cursor:pointer; line-height:1; }
+.header .nav-icons { display:flex; gap:16px; align-items:center; }
+.header .nav-icons span { color:var(--blue); font-size:20px; cursor:pointer; }
+
+/* ===== 底部Tab栏（5个功能Tab） ===== */
+.tab-bar {
+  position:fixed; bottom:56px; left:50%; transform:translateX(-50%);
+  width:100%; max-width:430px; height:44px;
+  background:#fff; display:flex; z-index:99;
+  border-top:1px solid #E0E0E0;
+}
+.tab-bar label {
+  flex:1; display:flex; align-items:center; justify-content:center;
+  font-size:14px; color:#666; cursor:pointer; position:relative;
+  transition:color .2s;
+}
+.tab-bar label.active { color:var(--blue); font-weight:bold; }
+.tab-bar label.active::after {
+  content:''; position:absolute; bottom:0; left:20%; right:20%; height:2px;
+  background:var(--blue);
+}
+/* hide radios */
+.tab-radio { display:none; }
+
+/* ===== 底部固定4栏导航 ===== */
+.bottom-nav {
+  position:fixed; bottom:0; left:50%; transform:translateX(-50%);
+  width:100%; max-width:430px; height:56px;
+  background:#fff; display:flex; z-index:100;
+  border-top:1px solid #E0E0E0;
+}
+.bottom-nav .nav-item {
+  flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  font-size:11px; color:#999; cursor:pointer; gap:2px;
+}
+.bottom-nav .nav-item .nav-icon { font-size:22px; line-height:1; }
+.bottom-nav .nav-item.active { color:var(--blue); }
+
+/* ===== Tab页面容器 ===== */
+.tab-page { display:none; }
+#tab-panel:checked ~ .page-panel,
+#tab-assist:checked ~ .page-assist,
+#tab-shensha:checked ~ .page-shensha,
+#tab-pingzhu:checked ~ .page-pingzhu,
+#tab-dangan:checked ~ .page-dangan { display:block; }
+
+/* Tab页面显示由:checked规则控制 */
+
+/* ===== 设置页切换 ===== */
+#settings-toggle { display:none; }
+.settings-page { display:none; }
+#settings-toggle:checked ~ .settings-page { display:block; }
+#settings-toggle:checked ~ .main-pages { display:none; }
+#settings-toggle:checked ~ .tab-bar { display:none; }
+#settings-toggle:checked ~ .bottom-nav { display:none; }
+
+/* ===== 通用卡片 ===== */
+.card {
+  background:#fff; border-radius:8px; margin:10px 12px;
+  overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.06);
+}
+.card-header {
+  background:var(--dark-gray); color:#fff;
+  padding:10px 14px; font-size:15px; font-weight:bold;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.card-header .qmark {
+  width:22px; height:22px; border-radius:50%;
+  background:#fff; color:var(--dark-gray);
+  display:flex; align-items:center; justify-content:center;
+  font-size:14px; font-weight:bold; cursor:pointer;
+}
+.card-body { padding:12px 14px; }
+
+/* ===== 屏蔽文字 ===== */
+.blocked-text {
+  color:var(--blue); text-align:center; padding:16px 8px;
+  font-size:14px; line-height:1.6;
+}
+
+/* ===== 日期信息条 ===== */
+.date-bar {
+  background:#fff; padding:10px 12px; margin:0;
+  display:flex; align-items:flex-start; gap:10px;
+  border-bottom:1px solid #EEE;
+}
+.date-bar .labels { display:flex; flex-direction:column; gap:4px; }
+.date-bar .labels span {
+  background:#9E9E9E; color:#fff; font-size:12px;
+  width:22px; text-align:center; padding:2px 0; border-radius:2px;
+  line-height:1.4;
+}
+.date-bar .ganzhi-cols { display:flex; gap:8px; flex:1; }
+.date-bar .gz-col { text-align:center; min-width:48px; }
+.date-bar .gz-col .gz { font-size:28px; font-weight:bold; line-height:1.2; }
+.date-bar .gz-col .yy { font-size:11px; color:#888; margin-top:2px; }
+.date-bar .date-info { text-align:right; font-size:11px; color:#666; line-height:1.6; }
+.date-bar .date-info .d1 { font-size:13px; color:#212121; font-weight:500; }
+
+/* ===== 主盘面flex布局 ===== */
+.panel-main {
+  display:flex; padding:8px 6px; gap:6px;
+  background:#fff; margin:0;
+}
+.panel-left { width:24%; flex-shrink:0; }
+.panel-right { flex:1; min-width:0; }
+
+/* 左侧信息列 */
+.info-block { margin-bottom:10px; font-size:11px; line-height:1.5; }
+.info-block .block-title {
+  background:#9E9E9E; color:#fff; font-size:11px;
+  padding:2px 4px; text-align:center; margin-bottom:4px; border-radius:2px;
+}
+.info-block .info-row { padding:1px 2px; font-size:11px; }
+.info-block .yuejiang {
+  font-size:28px; font-weight:bold; color:#E53935;
+  text-align:center; text-decoration:underline;
+  text-decoration-color:#E53935; padding:4px 0;
+}
+.shensha-grid { font-size:10px; line-height:1.7; }
+.shensha-grid .ss-row { display:flex; align-items:center; gap:3px; flex-wrap:wrap; }
+.shensha-grid .ss-tag {
+  background:#E0E0E0; color:#555; font-size:10px;
+  padding:0 3px; border-radius:2px; margin-right:2px;
+}
+.kong-box {
+  display:inline-block; border:1.5px solid #212121;
+  padding:0 3px; border-radius:2px; font-weight:bold;
+}
+.ul-red { text-decoration:underline; text-decoration-color:#E53935; }
+.ul-blue { text-decoration:underline; text-decoration-color:#1E88E5; }
+.ul-orange { text-decoration:underline; text-decoration-color:#F57C00; }
+
+/* 右侧盘格 */
+.panel-right .sanchuan {
+  display:flex; margin-bottom:6px; gap:4px; min-width:0;
+}
+.panel-right .chuan-item {
+  flex:1; background:#FAFAFA; border:1px solid #E8E8E8;
+  border-radius:4px; padding:4px 2px; text-align:center; min-width:0; overflow:visible;
+}
+.panel-right .chuan-item .chuan-label {
+  background:#9E9E9E; color:#fff; font-size:10px;
+  display:inline-block; padding:0 5px; border-radius:2px; margin-bottom:3px;
+}
+.panel-right .chuan-item .chuan-tianjiang { font-size:10px; color:#F57C00; font-weight:500; white-space:nowrap; }
+.panel-right .chuan-item .chuan-dizhi { font-size:15px; font-weight:bold; line-height:1.2; }
+.panel-right .chuan-item .chuan-tiangan { font-size:10px; }
+.panel-right .chuan-item .chuan-extra { font-size:9px; color:#666; line-height:1.3; }
+
+/* 四课 */
+.sike {
+  display:flex; gap:4px; margin-bottom:6px; min-width:0;
+}
+.sike .ke-item {
+  flex:1; background:#FAFAFA; border:1px solid #E8E8E8;
+  border-radius:4px; padding:4px 2px; text-align:center; min-width:0; overflow:visible;
+}
+.sike .ke-item .ke-label {
+  background:#9E9E9E; color:#fff; font-size:10px;
+  display:inline-block; padding:0 5px; border-radius:2px; margin-bottom:3px;
+}
+.sike .ke-item .ke-tj { font-size:10px; color:#F57C00; font-weight:500; white-space:nowrap; }
+.sike .ke-item .ke-dz { font-size:16px; font-weight:bold; line-height:1.2; }
+.sike .ke-item .ke-cg { font-size:8px; color:#888; line-height:1.2; white-space:nowrap; }
+
+/* 天地盘 */
+.tiandipan {
+  background:#FAFAFA; border:1px solid #E8E8E8;
+  border-radius:4px; padding:4px; margin-bottom:4px; overflow:visible;
+}
+.tdp-grid {
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  grid-template-rows:repeat(4,74px);
+  gap:2px;
+  width:100%;
+  height:304px;
+}
+.tdp-cell {
+  background:#fff; border:1px solid #F0F0F0;
+  border-radius:3px; padding:2px 1px; text-align:center;
+  font-size:9px; line-height:1.3; position:relative;
+  min-height:0; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; overflow:visible;
+}
+.tdp-cell .tj-name { color:#F57C00; font-size:9px; font-weight:500; white-space:nowrap; }
+.tdp-cell .tdp-dz { font-size:13px; font-weight:bold; line-height:1.2; }
+.tdp-cell .tdp-sub { font-size:8px; color:#888; white-space:nowrap; }
+.tdp-cell.is-kong { border:1.5px solid #212121; }
+.tdp-center {
+  grid-column:2/4; grid-row:2/4;
+  background:#fff; border:1px solid #E8E8E8;
+  border-radius:4px; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; padding:4px;
+  font-size:11px; font-weight:bold; color:#212121;
+  min-height:0;
+}
+.tdp-hint {
+  text-align:center; color:#E53935; font-size:11px;
+  padding:6px 0 4px; display:block; width:100%;
+}
+
+/* ===== 辅助功能页 ===== */
+.assist-grid {
+  display:grid; grid-template-columns:repeat(3,1fr);
+  gap:8px; padding:12px;
+}
+.assist-btn {
+  background:#fff; border:1.5px solid var(--blue);
+  color:var(--blue); border-radius:6px;
+  padding:14px 4px; text-align:center; font-size:13px;
+  cursor:pointer; font-weight:500;
+}
+
+/* ===== 神煞列表 ===== */
+.filter-row {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 14px; background:#fff; border-bottom:1px solid #EEE;
+}
+.filter-row .filter-label {
+  background:#212121; color:#fff; font-size:12px;
+  padding:3px 8px; border-radius:2px;
+}
+.filter-row .filter-value {
+  font-size:14px; color:#212121; display:flex; align-items:center; gap:4px;
+}
+.filter-row .filter-value::after {
+  content:'▼'; color:var(--blue); font-size:10px;
+}
+.shensha-list { padding:0 12px; }
+.ss-list-row {
+  display:flex; align-items:center; padding:10px 8px; font-size:13px;
+  border-bottom:1px solid #F5F5F5;
+}
+.ss-list-row:nth-child(odd) { background:#fff; }
+.ss-list-row:nth-child(even) { background:var(--zebra); }
+.ss-list-row .ss-name { width:70px; font-weight:500; flex-shrink:0; }
+.ss-list-row .ss-dz { width:50px; flex-shrink:0; font-weight:bold; }
+.ss-list-row .ss-desc { flex:1; color:#333; font-size:12px; }
+
+/* ===== 评注页 ===== */
+.pingzhu-section {
+  background:#AAAAAA; color:#fff;
+  padding:6px 12px; font-size:13px; font-weight:500;
+  margin-top:2px;
+}
+
+/* ===== 档案页 ===== */
+.form-row {
+  display:flex; align-items:center; padding:8px 0;
+  border-bottom:1px solid #F0F0F0; font-size:13px;
+}
+.form-row:last-child { border-bottom:none; }
+.form-row .form-label { width:90px; color:#555; flex-shrink:0; }
+.form-row .form-input {
+  flex:1; border:none; outline:none; font-size:13px;
+  text-align:right; color:#333; background:transparent;
+  border-bottom:1px dotted #CCC; padding:4px 0;
+}
+.form-row .form-input::placeholder { color:#BBB; }
+.form-row .form-value { flex:1; text-align:right; color:#333; font-size:13px; }
+.form-row .form-value .arrow { color:var(--blue); margin-left:4px; }
+.form-row .form-value .sel { color:var(--blue); }
+.btn-row { display:flex; gap:10px; padding:12px; justify-content:center; }
+.btn-blue-outline {
+  background:#fff; border:1.5px solid var(--blue); color:var(--blue);
+  border-radius:6px; padding:8px 24px; font-size:14px; cursor:pointer;
+  display:flex; align-items:center; gap:6px; font-weight:500;
+}
+.btn-blue-solid {
+  background:var(--blue); border:none; color:#fff;
+  border-radius:6px; padding:8px 28px; font-size:14px; cursor:pointer;
+}
+.radio-group { display:flex; gap:12px; flex:1; justify-content:flex-end; }
+.radio-group label { font-size:13px; color:#333; display:flex; align-items:center; gap:3px; cursor:pointer; }
+.radio-group label::before {
+  content:''; width:14px; height:14px; border:1.5px solid #CCC; border-radius:50%;
+  display:inline-block;
+}
+.radio-group label.checked::before {
+  border-color:var(--blue); background:var(--blue);
+  box-shadow:inset 0 0 0 2px #fff;
+}
+
+/* 参数信息卡片（白底浅灰边） */
+.card-outline {
+  background:#fff; border:1px solid #E0E0E0; border-radius:8px;
+  margin:10px 12px; overflow:hidden;
+}
+.card-outline .card-title {
+  padding:10px 14px; font-size:14px; font-weight:bold; color:#212121;
+  border-bottom:1px solid #F0F0F0;
+}
+
+/* ===== 设置页样式 ===== */
+.settings-page { background:var(--beige); min-height:100vh; }
+.settings-page .header { background:var(--header-bg); }
+.exchange-icon { color:#fff; font-size:16px; cursor:pointer; }
+.swap-row {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 0; border-bottom:1px solid #F0F0F0; font-size:13px;
+}
+.swap-row:last-child { border-bottom:none; }
+.swap-row .swap-label { color:#555; }
+.swap-row .swap-control { color:var(--blue); font-size:13px; display:flex; align-items:center; gap:4px; cursor:pointer; }
+.swap-row .swap-control::after { content:'›'; font-size:18px; }
+.swap-row .swap-time {
+  display:flex; gap:8px; align-items:center;
+}
+.swap-row .swap-time select, .swap-row .swap-time input {
+  border:1px solid var(--blue); color:var(--blue); border-radius:4px;
+  padding:3px 6px; font-size:13px; background:#fff; outline:none;
+}
+
+/* ===== Tab切换高亮（纯CSS） ===== */
+.tab-bar label { font-weight:normal; color:#666; }
+.tab-bar label.active { color:var(--blue); font-weight:bold; }
+#tab-panel:checked ~ .tab-bar label[for="tab-panel"],
+#tab-assist:checked ~ .tab-bar label[for="tab-assist"],
+#tab-shensha:checked ~ .tab-bar label[for="tab-shensha"],
+#tab-pingzhu:checked ~ .tab-bar label[for="tab-pingzhu"],
+#tab-dangan:checked ~ .tab-bar label[for="tab-dangan"] {
+  color:var(--blue); font-weight:bold;
+}
+#tab-panel:checked ~ .tab-bar label[for="tab-panel"]::after,
+#tab-assist:checked ~ .tab-bar label[for="tab-assist"]::after,
+#tab-shensha:checked ~ .tab-bar label[for="tab-shensha"]::after,
+#tab-pingzhu:checked ~ .tab-bar label[for="tab-pingzhu"]::after,
+#tab-dangan:checked ~ .tab-bar label[for="tab-dangan"]::after {
+  content:''; position:absolute; bottom:0; left:20%; right:20%; height:2px;
+  background:var(--blue);
+}
+
+/* ===== textarea 修正 ===== */
+textarea.form-input {
+  width:100%; min-height:60px; font-family:inherit;
+}
+
+/* ===== 进入设置页入口（在盤面页加一个设置图标链接） ===== */
+.header .settings-entry {
+  color:var(--blue); font-size:20px; cursor:pointer;
+}
+</style>
+</head>
+<body>
+
+<!-- ==================== 设置页（checkbox控制显示） ==================== -->
+<input type="checkbox" id="settings-toggle">
+<div class="settings-page">
+  <!-- Header -->
+  <div class="header">
+    <label class="hamburger" for="settings-toggle">≡</label>
+    <div class="title">起六壬</div>
+    <div style="width:22px;"></div>
+  </div>
+
+  <!-- 新建资料卡片 -->
+  <div class="card" style="margin-top:12px;">
+    <div class="card-header">
+      <span>新建資料</span>
+      <div class="qmark">?</div>
+    </div>
+    <div class="card-body">
+      <div class="swap-row">
+        <span class="swap-label">起課法</span>
+        <span class="swap-control">正時起課</span>
+      </div>
+      <div class="swap-row">
+        <span class="swap-label">日期</span>
+        <div class="swap-time">
+          <select><option>2026年</option><option>2025年</option></select>
+          <select><option>6月</option></select>
+          <select><option>28日</option></select>
+        </div>
+      </div>
+      <div class="swap-row">
+        <span class="swap-label">時間</span>
+        <div class="swap-time">
+          <select><option>18時</option></select>
+          <select><option>23分</option></select>
+        </div>
+      </div>
+      <div class="swap-row">
+        <span class="swap-label">出生年</span>
+        <div class="swap-time">
+          <select><option>1980年</option></select>
+        </div>
+      </div>
+      <div class="swap-row">
+        <span class="swap-label">性別</span>
+        <div class="radio-group">
+          <label class="checked">男</label>
+          <label>女</label>
+        </div>
+      </div>
+      <div class="btn-row">
+        <label class="btn-blue-outline" for="settings-toggle" style="cursor:pointer;">
+          <span style="font-size:18px;">起盤</span>
+        </label>
+        <button class="btn-blue-outline" onclick="void(0)">
+          <span style="font-size:18px;">重置</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 更多参数卡片 -->
+  <div class="card">
+    <div class="card-header">
+      <span>更多參數</span>
+      <span class="exchange-icon">⇄</span>
+    </div>
+    <div class="card-body">
+      <div class="swap-row">
+        <span class="swap-label">月將選取</span>
+        <span class="swap-control">自動</span>
+      </div>
+      <div class="swap-row">
+        <span class="swap-label">貴人起法</span>
+        <span class="swap-control">甲戊庚牛羊(壬癸蛇兔)</span>
+      </div>
+      <div class="swap-row">
+        <span class="swap-label">貴人選取</span>
+        <span class="swap-control">自動</span>
+      </div>
+      <div class="swap-row">
+        <span class="swap-label">涉害取法</span>
+        <span class="swap-control">根據深度</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 主页面（Tab页面容器） ==================== -->
+<div class="main-pages">
+<!-- 用于控制Tab显示的radio -->
+<input type="radio" name="tab" id="tab-panel" class="tab-radio" checked>
+<input type="radio" name="tab" id="tab-assist" class="tab-radio">
+<input type="radio" name="tab" id="tab-shensha" class="tab-radio">
+<input type="radio" name="tab" id="tab-pingzhu" class="tab-radio">
+<input type="radio" name="tab" id="tab-dangan" class="tab-radio">
+
+<!-- ==================== Tab1: 盤面 ==================== -->
+<div class="tab-page page-panel">
+  <!-- Header -->
+  <div class="header">
+    <div class="back" onclick="history.back()">&lt;</div>
+    <div class="title">六壬盤面</div>
+    <div class="nav-icons">
+      <span>&lt;</span>
+      <span>&#8635;</span>
+      <span>&gt;</span>
+      <label for="settings-toggle" class="settings-entry">&#9881;</label>
+    </div>
+  </div>
+
+  <!-- 日期信息条 -->
+  <div class="date-bar">
+    <div class="labels">
+      <span>年</span><span>月</span><span>日</span><span>時</span>
+    </div>
+    <div class="ganzhi-cols">
+      <div class="gz-col">
+        <div class="gz"><span class="c-red">丙</span><span class="c-red">午</span></div>
+        <div class="yy">年</div>
+      </div>
+      <div class="gz-col">
+        <div class="gz"><span class="c-green">甲</span><span class="c-red">午</span></div>
+        <div class="yy">月</div>
+      </div>
+      <div class="gz-col">
+        <div class="gz"><span class="c-black">癸</span><span class="c-orange">酉</span></div>
+        <div class="yy">日</div>
+      </div>
+      <div class="gz-col">
+        <div class="gz"><span class="c-black">辛</span><span class="c-orange">酉</span></div>
+        <div class="yy">時</div>
+      </div>
+    </div>
+    <div class="date-info">
+      <div class="d1">2026-06-28 18:23</div>
+      <div>二〇二六年 五月十四 酉時</div>
+      <div style="color:#999;">芒種(5日23時48分) 夏至(21日16時24分)</div>
+    </div>
+  </div>
+
+  <!-- 主盘面 -->
+  <div class="panel-main">
+    <!-- 左侧信息列 -->
+    <div class="panel-left">
+      <!-- 求测人信息 -->
+      <div class="info-block">
+        <div class="block-title">求測人</div>
+        <div class="info-row">猴(1980) 男</div>
+        <div class="info-row">本命:<span class="c-yellow">庚</span><span class="c-red">午</span></div>
+        <div class="info-row">行年:<span class="c-black">壬</span><span class="c-blue">子</span></div>
+      </div>
+      <!-- 月将 -->
+      <div class="info-block">
+        <div class="block-title">月將</div>
+        <div class="yuejiang">未</div>
+      </div>
+      <!-- 神煞表 -->
+      <div class="info-block shensha-grid">
+        <div class="block-title">神煞</div>
+        <div class="ss-row"><span class="ss-tag">日空</span><span class="kong-box">戌</span><span class="kong-box">亥</span></div>
+        <div class="ss-row"><span class="ss-tag">時空</span><span class="c-blue">子</span></div>
+        <div class="ss-row"><span class="ss-tag">旬首</span><span class="c-orange">丑</span></div>
+        <div class="ss-row"><span class="ss-tag">旬尾</span></div>
+        <div class="ss-row"><span class="ss-tag">太歲</span><span class="c-red ul-red">午</span></div>
+        <div class="ss-row"><span class="ss-tag">月建</span><span class="c-red">午</span></div>
+        <div class="ss-row"><span class="ss-tag">日建</span><span class="c-orange ul-orange">酉</span></div>
+        <div class="ss-row"><span class="ss-tag">月破</span><span class="c-blue ul-blue">子</span></div>
+        <div class="ss-row"><span class="ss-tag">日德</span><span class="c-red">巳</span></div>
+        <div class="ss-row"><span class="ss-tag">日祿</span><span class="c-blue">子</span></div>
+        <div class="ss-row"><span class="ss-tag">日馬</span><span class="c-red">亥</span></div>
+        <div class="ss-row"><span class="ss-tag">桃花</span><span class="c-red">午</span></div>
+        <div class="ss-row"><span class="ss-tag">天喜</span><span class="c-orange">丑</span></div>
+      </div>
+      <!-- 自选神煞 -->
+      <div class="info-block">
+        <div class="block-title">自選神煞</div>
+        <div class="info-row" style="color:#999; text-align:center; padding:4px 0;">(未添加)</div>
+      </div>
+    </div>
+
+    <!-- 右侧盘格 -->
+    <div class="panel-right">
+      <!-- 三传 -->
+      <div class="sanchuan">
+        <div class="chuan-item">
+          <div class="chuan-label">初</div>
+          <div class="chuan-tianjiang">勾陳</div>
+          <div class="chuan-dizhi"><span class="c-blue">亥</span></div>
+          <div class="chuan-tiangan"><span class="c-blue">癸</span></div>
+        </div>
+        <div class="chuan-item">
+          <div class="chuan-label">中</div>
+          <div class="chuan-extra">太常<br>太陰<br>貴人</div>
+          <div class="chuan-dizhi" style="font-size:13px;">
+            <span class="c-red">巳</span>
+            <span class="c-green">卯</span>
+            <span class="c-brown">未</span>
+          </div>
+        </div>
+        <div class="chuan-item">
+          <div class="chuan-label">末</div>
+          <div class="chuan-tianjiang">玄武</div>
+          <div class="chuan-dizhi"><span class="c-red">巳</span></div>
+          <div class="chuan-tiangan"><span class="c-red">丙</span></div>
+        </div>
+      </div>
+
+      <!-- 四课（从右到左排列） -->
+      <div class="sike">
+        <div class="ke-item">
+          <div class="ke-label">四</div>
+          <div class="ke-tj">天后</div>
+          <div class="ke-dz"><span class="c-brown">未</span></div>
+          <div class="ke-cg">己丁乙</div>
+        </div>
+        <div class="ke-item">
+          <div class="ke-label">三</div>
+          <div class="ke-tj">太陰</div>
+          <div class="ke-dz"><span class="c-green">卯</span></div>
+          <div class="ke-cg">乙</div>
+        </div>
+        <div class="ke-item">
+          <div class="ke-label">二</div>
+          <div class="ke-tj">太常</div>
+          <div class="ke-dz"><span class="c-red">巳</span></div>
+          <div class="ke-cg">丙戊庚</div>
+        </div>
+        <div class="ke-item">
+          <div class="ke-label">一</div>
+          <div class="ke-tj">貴人</div>
+          <div class="ke-dz"><span class="c-brown">丑</span></div>
+          <div class="ke-cg">己癸辛</div>
+        </div>
+      </div>
+
+      <!-- 天地盘 Grid 4x4（中心2x2，外围12宫） -->
+      <div class="tiandipan">
+        <div class="tdp-grid">
+          <!-- Row 1 顶行：巳午未申 -->
+          <div class="tdp-cell">
+            <div class="tj-name">朱雀</div>
+            <div class="tdp-dz c-red">巳</div>
+            <div class="tdp-sub">丙戊庚</div>
+          </div>
+          <div class="tdp-cell">
+            <div class="tj-name">螣蛇</div>
+            <div class="tdp-dz c-red">午</div>
+            <div class="tdp-sub">丁己</div>
+          </div>
+          <div class="tdp-cell">
+            <div class="tj-name">太常</div>
+            <div class="tdp-dz c-brown">未</div>
+            <div class="tdp-sub">己丁乙</div>
+          </div>
+          <div class="tdp-cell">
+            <div class="tj-name">白虎</div>
+            <div class="tdp-dz c-orange">申</div>
+            <div class="tdp-sub">庚壬戊</div>
+          </div>
+          <!-- Row 2：辰 + 中心 + 酉 -->
+          <div class="tdp-cell">
+            <div class="tj-name">勾陳</div>
+            <div class="tdp-dz c-brown">辰</div>
+            <div class="tdp-sub">戊乙癸</div>
+          </div>
+          <div class="tdp-center">
+            <div>癸酉日</div>
+            <div style="margin-top:2px;">第三課</div>
+            <div style="margin-top:2px; font-size:11px; font-weight:normal; color:#666;">遙克</div>
+          </div>
+          <div class="tdp-cell">
+            <div class="tj-name">天空</div>
+            <div class="tdp-dz c-orange">酉</div>
+            <div class="tdp-sub">庚</div>
+          </div>
+          <!-- Row 3：卯 + 中心 + 戌(空亡) -->
+          <div class="tdp-cell">
+            <div class="tj-name">六合</div>
+            <div class="tdp-dz c-green">卯</div>
+            <div class="tdp-sub">乙</div>
+          </div>
+          <div class="tdp-cell is-kong">
+            <div class="tj-name">青龍</div>
+            <div class="tdp-dz c-brown">戌</div>
+            <div class="tdp-sub">戊辛丁</div>
+          </div>
+          <!-- Row 4 底行：寅丑子亥(亥空亡) -->
+          <div class="tdp-cell">
+            <div class="tj-name">貴人</div>
+            <div class="tdp-dz c-green">寅</div>
+            <div class="tdp-sub">甲丙戊</div>
+          </div>
+          <div class="tdp-cell">
+            <div class="tj-name">天后</div>
+            <div class="tdp-dz c-brown">丑</div>
+            <div class="tdp-sub">己癸辛</div>
+          </div>
+          <div class="tdp-cell">
+            <div class="tj-name">太陰</div>
+            <div class="tdp-dz c-blue">子</div>
+            <div class="tdp-sub">癸</div>
+          </div>
+          <div class="tdp-cell is-kong">
+            <div class="tj-name">玄武</div>
+            <div class="tdp-dz c-blue">亥</div>
+            <div class="tdp-sub">壬甲</div>
+          </div>
+        </div>
+      </div>
+      <div class="tdp-hint">點擊12宮位和中宮可看更多信息</div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== Tab2: 輔助 ==================== -->
+<div class="tab-page page-assist">
+  <div class="header">
+    <div class="back" onclick="history.back()">&lt;</div>
+    <div class="title">輔助功能</div>
+    <div style="width:60px;"></div>
+  </div>
+
+  <!-- 3x3 功能按钮 -->
+  <div class="assist-grid">
+    <div class="assist-btn">用神提示</div>
+    <div class="assist-btn">地支提示</div>
+    <div class="assist-btn">旺衰長生</div>
+    <div class="assist-btn">寄宮</div>
+    <div class="assist-btn">通道</div>
+    <div class="assist-btn">行年等</div>
+    <div class="assist-btn">日辰提示</div>
+    <div class="assist-btn">畢法提示</div>
+    <div class="assist-btn">課體提示</div>
+  </div>
+
+  <!-- 用神提示卡片 -->
+  <div class="card">
+    <div class="card-header">用神提示</div>
+    <div class="card-body">
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+        <span style="font-size:13px; color:#555;">用神類別</span>
+        <div style="flex:1; border:1px solid #CCC; border-radius:4px; padding:6px 10px; font-size:13px; color:#333; display:flex; justify-content:space-between; align-items:center;">
+          <span>人體疾病</span>
+          <span style="color:var(--blue); font-size:10px;">▼</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 主要用神卡片 -->
+  <div class="card">
+    <div class="card-header">主要用神</div>
+    <div class="card-body">
+      <div style="font-size:14px;line-height:1.8;color:#333;">
+        【知识库】<b>六亲定位</b>：父母爻主文书、长辈、房屋；官鬼爻主公职、灾祸、丈夫；妻财爻主钱财、妻子；兄弟爻主同辈、竞争；子孙爻主子女、医药、解忧。<br>
+        <b>用神与类象</b>：年命看根基，日干看求测人，日支看事体。马星主动，墓神主困，空亡主虚而不实。<br>
+        【典籍来源：刘文元《大六壬录象完整记录》】
+      </div>
+    </div>
+  </div>
+
+  <!-- 主要判别方法卡片 -->
+  <div class="card">
+    <div class="card-header">主要判別方法</div>
+    <div class="card-body">
+      <div style="font-size:20px; font-weight:bold; color:#212121; margin-bottom:10px;">占病</div>
+      <div style="font-size:15px; line-height:1.8; color:#333;">
+        占病以日干為病人，日支為病症。又以天醫、地醫為用藥之神，以白虎為喪葬之神。初傳見白虎，主喪服之事；見天醫，主遇良醫。三傳生日，病易癒；剋日，病難痊。日干旺相，病人神氣清爽；日干休囚，病人形體羸弱。
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== Tab3: 神煞 ==================== -->
+<div class="tab-page page-shensha">
+  <div class="header">
+    <div class="back" onclick="history.back()">&lt;</div>
+    <div class="title">神煞信息</div>
+    <div style="width:60px;"></div>
+  </div>
+
+  <!-- 筛选行 -->
+  <div class="filter-row">
+    <div class="filter-label">神煞類別</div>
+    <div class="filter-value">歲煞</div>
+  </div>
+
+  <!-- 17行神煞列表 -->
+  <div class="shensha-list" style="padding:0; margin:0;">
+    <div class="ss-list-row">
+      <div class="ss-name c-red">歲德</div>
+      <div class="ss-dz c-red">丙</div>
+      <div class="ss-desc">入占則福集殃消</div>
+    </div>
+    <div class="ss-list-row">
+      <div class="ss-name c-orange">歲德合</div>
+      <div class="ss-dz c-orange">辛</div>
+      <div class="ss-desc">同歲德</div>
+    </div>
+    <div class="ss-list-row">
+      <div class="ss-name c-orange">天廷</div>
+      <div class="ss-dz c-orange">辰</div>
+      <div class="ss-desc">主事利於朝廷</div>
+    </div>
+    <div class="ss-list-row">
+      <div class="ss-name c-brown">歲合</div>
+      <div class="ss-dz c-brown">未</div>
+      <div class="ss-desc">合吉星為福</div>
+    </div>
+    <div class="ss-list-row">
+      <div class="ss-name c-blue">歲破</div>
+      <div class="ss-dz c-blue">子</div>
+      <div class="ss-desc">入占皆凶</div>
+    </div>
+    <div class="ss-list-row">
+      <div class="ss-name c-brown">歲墓</div>
+      <div class="ss-dz c-brown">丑</div>
+      <div class="ss-desc">暗昧抑塞</div>
+    </div>
+    <div class="ss-list-row">
+      <div class="ss-name c-red">歲刑</div>
+      <div class="ss-dz c-red">午</div>
+      <div class="ss-desc">主官非刑非</div>
+    </div>
+    <div class="ss-list-row">
+      <div class="ss-name c-blue">劫煞</div>
+      <div class="ss-dz c-blue">亥</div>
+      <div class="ss-desc">凡占皆凶</div>
+    </div>
+    <div class="ss-list-row">
+      <div class="ss-name c-blue">災煞</div>
+      <div class="ss-dz c-blue">子</div>
+      <div class="ss-desc">凡占皆凶</div>
+    </div>
+    <div class="ss-list-row">
+      <div class="ss-name c-brown">歲煞</div>
+      <div class="ss-dz c-brown">丑</div>
+      <div class="ss-desc">凡占皆凶</div>
+    </div>
+    <div class="ss-list-row">
+      <div class="ss-name c-brown">官符</div>
+      <div class="ss-dz c-brown">戌</div>
+      <div class="ss-desc">主官非</div>
+    </div>
+    <div class="ss-list-row">
+      <div class="ss-name c-green">將軍</div>
+      <div class="ss-dz c-green">卯</div>
+      <div class="ss-desc">主征伐</div>
+    </div>
+    <div class="ss-list-row">
+      <div class="ss-name c-blue">大耗</div>
+      <div class="ss-dz c-blue">子</div>
+      <div class="ss-desc">主破耗</div>
+    </div>
+    <div class="ss-list-row">
+      <div class="ss-name c-blue">小耗</div>
+      <div class="ss-dz c-blue">亥</div>
+      <div class="ss-desc">主破耗</div>
+    </div>
+    <div class="ss-list-row">
+      <div class="ss-name c-red">病符</div>
+      <div class="ss-dz c-red">巳</div>
+      <div class="ss-desc">主病</div>
+    </div>
+    <div class="ss-list-row">
+      <div class="ss-name c-orange">喪門</div>
+      <div class="ss-dz c-orange">申</div>
+      <div class="ss-desc">喪弔之事</div>
+    </div>
+    <div class="ss-list-row">
+      <div class="ss-name c-orange">吊客</div>
+      <div class="ss-dz c-orange">辰</div>
+      <div class="ss-desc">同喪門</div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== Tab4: 評註 ==================== -->
+<div class="tab-page page-pingzhu">
+  <div class="header">
+    <div class="back" onclick="history.back()">&lt;</div>
+    <div class="title">評註信息</div>
+    <div style="width:60px;"></div>
+  </div>
+
+  <!-- 卡片1：六壬全钤 -->
+  <div class="card" style="margin-top:12px;">
+    <div class="card-header">
+      <span>《六壬全鈐》 癸酉日第三課</span>
+      <div class="qmark">?</div>
+    </div>
+    <div class="card-body">
+      <div style="font-size:14px;line-height:1.8;color:#333;padding:4px 0;">
+        【知识库】<b>遥克法·蒿矢课</b>：四课无上下克，取遥克为用。初传亥为蒿矢，中传巳，末传巳。蒿矢主远射虚发，事有阻隔但终能通达。癸酉日，酉为日干之禄，亥为日马，三传亥巳巳，初传马星发动，主远行或信息传递之象。<br><br>
+        【典籍来源：刘文元《大六壬录象完整记录》】
+      </div>
+    </div>
+  </div>
+
+  <!-- 卡片2：御定六壬 -->
+  <div class="card">
+    <div class="card-header">
+      <span>《御定六壬》</span>
+      <div class="qmark">?</div>
+    </div>
+    <div class="card-body" style="padding:0;">
+      <!-- 6个小节 -->
+      <div class="pingzhu-section">課體</div>
+      <div style="font-size:14px;line-height:1.8;color:#333;padding:10px 14px;border-bottom:1px solid #F0F0F0;">
+        【知识库】此为遥克课，蒿矢课。四课无上下贼克，取日干遥克之神为用。癸酉日，干上神丑，支上神巳，日干遥克巳火，巳为初传。蒿矢者，如蒿草之箭，射之有劲而无力，主事有虚惊而无实害。<br>【典籍来源：刘文元《大六壬录象完整记录》】
+      </div>
+      <div class="pingzhu-section">課義</div>
+      <div style="font-size:14px;line-height:1.8;color:#333;padding:10px 14px;border-bottom:1px solid #F0F0F0;">
+        【知识库】四课阴阳判内外：日干两课为内事，日支两课为外事。此课干上丑为贵人，贵人临干，主得贵人相助。支上巳为太常，太常主饮食衣物，临支则家宅安吉。内外俱吉，然初传空亡，事有始无终之象。<br>【典籍来源：刘文元大六壬讲义】
+      </div>
+      <div class="pingzhu-section">解曰</div>
+      <div style="font-size:14px;line-height:1.8;color:#333;padding:10px 14px;border-bottom:1px solid #F0F0F0;">
+        【知识库】初传亥水发传，亥为日马，又为日干之禄，主财禄动。中传巳火，末传亦巳火，巳为日德，又为日支之生，主家宅有德气。然初传空亡，财禄虚而不实，需待填实之月方可应验。三传由水而火，先难后易之象。<br>【典籍来源：刘文元《大六壬录象完整记录》】
+      </div>
+      <div class="pingzhu-section">斷曰</div>
+      <div style="font-size:14px;line-height:1.8;color:#333;padding:10px 14px;border-bottom:1px solid #F0F0F0;">
+        【知识库】占断以日干旺衰为先。癸水生于午月，火旺水囚，日干衰弱。幸得月将未土生金，金生水，有通关之妙。贵人临干，青龙临支，上下有情。断曰：所求之事初有阻隔，中有贵人相助，终得成就。宜静不宜动，待时而动则吉。<br>【典籍来源：刘文元大六壬讲义】
+      </div>
+      <div class="pingzhu-section">分類占</div>
+      <div style="font-size:14px;line-height:1.8;color:#333;padding:10px 14px;border-bottom:1px solid #F0F0F0;">
+        【知识库】<b>占病</b>：日干癸水弱，亥水为药，白虎临申金，金生水，药力可济。然初传空亡，病有反复之象。<br>
+        <b>占出行</b>：日马亥水发动，利出行。然初传空亡，出门宜缓不宜急。<br>
+        <b>占婚姻</b>：干上贵人丑土，支上太常巳火，丑巳相生，婚姻有合。但需防巳亥相冲，有口舌之争。<br>【典籍来源：刘文元《大六壬录象完整记录》】
+      </div>
+      <div class="pingzhu-section">畢法云</div>
+      <div style="font-size:14px;line-height:1.8;color:#333;padding:10px 14px;">
+        【知识库】三传亥巳巳，亥为初传空亡，巳为中末传实。空亡主虚而不实，中末传实主后事可成。贵人临干，吉神护身，虽有阻隔，终得贵人扶持。初传空亡逢填实即应，巳亥相冲，主事情有变动之机。<br>【典籍来源：刘文元《大六壬录象完整记录》】
+    </div>
+  </div>
+</div>
+
+<!-- ==================== Tab5: 檔案 ==================== -->
+<div class="tab-page page-dangan">
+  <div class="header">
+    <div class="back" onclick="history.back()">&lt;</div>
+    <div class="title">檔案信息</div>
+    <div style="width:60px;"></div>
+  </div>
+
+  <!-- 新記錄信息卡片 -->
+  <div class="card" style="margin-top:12px;">
+    <div class="card-header">
+      <span>新記錄信息</span>
+      <div class="qmark">?</div>
+    </div>
+    <div class="card-body">
+      <div class="form-row">
+        <span class="form-label">卦名稱</span>
+        <input class="form-input" type="text" placeholder="請輸入卦名稱">
+      </div>
+      <div class="form-row">
+        <span class="form-label">起卦原因</span>
+        <input class="form-input" type="text" placeholder="請輸入起卦原因">
+      </div>
+      <div class="form-row" style="align-items:flex-start;">
+        <span class="form-label" style="padding-top:4px;">占驗結果及附註</span>
+        <textarea class="form-input" rows="3" placeholder="請輸入占驗結果及附註" style="resize:none; text-align:left; border-bottom:1px dotted #CCC;"></textarea>
+      </div>
+      <div class="btn-row" style="padding-top:16px;">
+        <button class="btn-blue-outline" onclick="void(0)">新建</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 参数信息卡片（白底浅灰边） -->
+  <div class="card-outline">
+    <div class="card-title">參數信息</div>
+    <div class="card-body">
+      <div class="form-row">
+        <span class="form-label">起課法</span>
+        <span class="form-value">正時起課</span>
+      </div>
+      <div class="form-row">
+        <span class="form-label">日期&時間</span>
+        <span class="form-value">2026-06-28 18:23</span>
+      </div>
+      <div class="form-row">
+        <span class="form-label">出生年&性別</span>
+        <span class="form-value">1980[男]</span>
+      </div>
+      <div class="form-row">
+        <span class="form-label">月將選取</span>
+        <span class="form-value">自動</span>
+      </div>
+      <div class="form-row">
+        <span class="form-label">貴人起法</span>
+        <span class="form-value">甲戊庚牛羊(壬癸蛇兔)</span>
+      </div>
+      <div class="form-row">
+        <span class="form-label">貴人選取</span>
+        <span class="form-value">自動</span>
+      </div>
+      <div class="form-row">
+        <span class="form-label">涉害取法</span>
+        <span class="form-value">根據深度</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 底部Tab栏（5个Tab） ==================== -->
+<div class="tab-bar">
+  <label for="tab-panel">盤面</label>
+  <label for="tab-assist">輔助</label>
+  <label for="tab-shensha">神煞</label>
+  <label for="tab-pingzhu">評註</label>
+  <label for="tab-dangan">檔案</label>
+</div>
+
+<!-- ==================== 底部固定4栏导航 ==================== -->
+<div class="bottom-nav">
+  <div class="nav-item active">
+    <div class="nav-icon">&#8962;</div>
+    <div>首頁</div>
+  </div>
+  <div class="nav-item">
+    <div class="nav-icon">&#9733;</div>
+    <div>AI</div>
+  </div>
+  <div class="nav-item">
+    <div class="nav-icon">&#9993;</div>
+    <div>信息</div>
+  </div>
+  <div class="nav-item">
+    <div class="nav-icon">&#9787;</div>
+    <div>個人中心</div>
+  </div>
+</div>
+
+</div><!-- /main-pages -->
+
+</body>
+</html>
