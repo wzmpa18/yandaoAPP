@@ -36,29 +36,37 @@ function doPaipan(){
   var guaType = 'xiaGua';
   var year = new Date().getFullYear();
 
-  // 尝试从页面读取选择值
-  var selSitting = document.getElementById('selMountain');
-  if(selSitting) sitting = selSitting.textContent.replace(/[山向]/g,'').trim() || '子';
-
-  var selJu = document.getElementById('selJu');
-  if(selJu) year = parseInt(selJu.textContent.match(/\d+/)) || year;
-
-  var selGua = document.getElementById('selGuaType');
-  if(selGua){
-    var gType = selGua.textContent.trim();
-    if(gType.indexOf('替') >= 0) guaType = 'tiGua';
+  // 从页面运值选择器读取(yunVal: "九运"等中文数字)
+  var yunEl = document.getElementById('yunVal');
+  if(yunEl){
+    var yunText = yunEl.textContent.trim();
+    var cn2num = {'一':1,'二':2,'三':3,'四':4,'五':5,'六':6,'七':7,'八':8,'九':9};
+    for(var k in cn2num){
+      if(yunText.indexOf(k) >= 0){
+        year = 1864 + (cn2num[k] - 1) * 20 + 10; // 运中间年份
+        break;
+      }
+    }
   }
 
-  var selYong = document.getElementById('selYongType');
-  if(selYong){
-    var yType = selYong.textContent.trim();
-    if(yType.indexOf('阴') >= 0) yongType = 'yin';
+  // 从山向选择器读取(shanVal: "子山午向")
+  var shanEl = document.getElementById('shanVal');
+  if(shanEl){
+    var shanText = shanEl.textContent.trim();
+    sitting = shanText.replace(/[山向].*/g,'').trim() || '子';
   }
 
-  // 读取水口
+  // 从下卦/替卦单选读取
+  var checkedRdo = document.querySelector('.rdo-item.checked');
+  if(checkedRdo){
+    var gText = checkedRdo.textContent.trim();
+    if(gText.indexOf('替') >= 0) guaType = 'tiGua';
+  }
+
+  // 从水口选择器读取(shuiVal: "水口在壬")
   var waterPort = '壬';
-  var selWater = document.getElementById('selWaterPort');
-  if(selWater) waterPort = selWater.textContent.replace('水口在','').trim() || '壬';
+  var shuiEl = document.getElementById('shuiVal');
+  if(shuiEl) waterPort = shuiEl.textContent.replace('水口在','').trim() || '壬';
 
   // 调用引擎计算
   var result = E.calculate(sitting, yongType, guaType, year);

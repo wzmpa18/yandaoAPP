@@ -59,7 +59,11 @@ var LIUSHEN_COLOR = {
 };
 
 // ============ 六亲 ============
+// DZ_WX使用数字(0-4对应WX数组), GONG_WUXING使用字符串, 需统一
 function getLiuQin(gongWuxing, zhiWuxing){
+  // 统一为字符串比较: WX=['木','火','土','金','水']
+  if(typeof zhiWuxing === 'number') zhiWuxing = WX[zhiWuxing] || zhiWuxing;
+  if(typeof gongWuxing === 'number') gongWuxing = WX[gongWuxing] || gongWuxing;
   var ganZhi = gongWuxing; // 卦宫五行
   var yao = zhiWuxing; // 爻地支五行
   if(ganZhi === yao) return '兄弟';
