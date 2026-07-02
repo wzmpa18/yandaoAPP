@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -361,7 +361,7 @@ body{max-width:1086px;margin:0 auto;min-height:100vh;position:relative;padding-b
 <input type="checkbox" id="itoggle">
 
 <!-- 新建资料页 -->
-<div class="ipage">
+<div class="ipage" id="inputPage">
   <div class="app-header home">
     <button class="hb" onclick="history.back()">&#9776;</button>
     <div class="ht">起六壬</div>
@@ -791,11 +791,25 @@ body{max-width:1086px;margin:0 auto;min-height:100vh;position:relative;padding-b
   </div>
   </div>
 </div>
+<script src="../utils/tri-input.js"></script>
+<script src="daliuren-engine.js"></script>
+<script src="daliuren-render.js"></script>
 <script>
 function setTab(el){document.querySelectorAll('.tab-bar label').forEach(function(l){l.classList.remove('on');});el.classList.add('on');}
 function showM(t){document.getElementById('mT').textContent=t;document.getElementById('cMod').classList.add('show');}
 function clsM(){document.getElementById('cMod').classList.remove('show');}
 document.querySelectorAll('.tradio').forEach(function(r){r.addEventListener('change',function(){var ls=document.querySelectorAll('.tab-bar label');var i=Array.from(document.querySelectorAll('.tradio')).indexOf(this);ls.forEach(function(l){l.classList.remove('on');});if(ls[i])ls[i].classList.add('on');});});
+function goResult(){
+  document.getElementById('inputPage').classList.add('hidden');
+  document.getElementById('resultPage').classList.add('show');
+  document.getElementById('resBar').style.display='flex';
+  window.scrollTo(0,0);
+  if(window.DaliurenRender) DaliurenRender.doPaipan();
+}
 </script>
+
+<!-- feedback system -->
+<link rel="stylesheet" href="../utils/feedback.css">
+<script src="../utils/feedback.js"></script>
 </body>
 </html>

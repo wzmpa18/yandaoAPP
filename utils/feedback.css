@@ -1,0 +1,436 @@
+/* ============================================================
+   全局异常捕获与反馈系统 - 弹窗样式
+   主题色：青绿色 #00BCB4
+   说明：独立样式，不依赖任何第三方库，不影响页面原有布局
+   ============================================================ */
+
+/* ---------- 全屏遮罩 ---------- */
+.fb-overlay{
+  position:fixed;
+  top:0;left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,.5);
+  z-index:9999;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:16px;
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  -webkit-tap-highlight-color:transparent;
+  animation:fbFadeIn .18s ease;
+}
+
+@keyframes fbFadeIn{
+  from{opacity:0;}
+  to{opacity:1;}
+}
+
+@keyframes fbSlideUp{
+  from{opacity:0;transform:translateY(20px) scale(.98);}
+  to{opacity:1;transform:translateY(0) scale(1);}
+}
+
+/* ---------- 弹窗容器 ---------- */
+.fb-modal{
+  background:#FFFFFF;
+  border-radius:12px;
+  width:100%;
+  max-width:480px;
+  max-height:80vh;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  box-shadow:0 8px 32px rgba(0,0,0,.18);
+  animation:fbSlideUp .22s ease;
+}
+
+/* ---------- 标题栏 ---------- */
+.fb-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:16px 20px;
+  border-bottom:1px solid #F0F0F0;
+  flex-shrink:0;
+}
+
+.fb-header .fb-title{
+  font-size:17px;
+  font-weight:bold;
+  color:#222222;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.fb-header .fb-title::before{
+  content:'';
+  width:4px;
+  height:18px;
+  background:#00BCB4;
+  border-radius:2px;
+}
+
+/* ---------- 关闭按钮 ---------- */
+.fb-close{
+  width:28px;
+  height:28px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-size:20px;
+  color:#707070;
+  border:none;
+  background:none;
+  border-radius:50%;
+  transition:background .15s,color .15s;
+  line-height:1;
+  padding:0;
+  flex-shrink:0;
+}
+
+.fb-close:hover{
+  background:#F2F2F2;
+  color:#222222;
+}
+
+.fb-close:active{
+  background:#E5E5E5;
+}
+
+/* ---------- 内容区 ---------- */
+.fb-body{
+  padding:20px;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  flex:1;
+}
+
+.fb-body .fb-label{
+  display:block;
+  font-size:14px;
+  font-weight:600;
+  color:#222222;
+  margin-bottom:8px;
+  margin-top:14px;
+}
+
+.fb-body .fb-label:first-child{
+  margin-top:0;
+}
+
+/* ---------- 文本框 ---------- */
+.fb-textarea{
+  width:100%;
+  min-height:96px;
+  padding:12px;
+  border:1px solid #E5E5E5;
+  border-radius:10px;
+  font-size:14px;
+  font-family:inherit;
+  color:#222222;
+  background:#FAFAFA;
+  resize:vertical;
+  outline:none;
+  transition:border-color .15s,background .15s;
+  line-height:1.6;
+  box-sizing:border-box;
+}
+
+.fb-textarea:focus{
+  border-color:#00BCB4;
+  background:#FFFFFF;
+}
+
+.fb-textarea::placeholder{
+  color:#B0B0B0;
+}
+
+/* ---------- 下拉框 ---------- */
+.fb-select{
+  width:100%;
+  padding:12px;
+  border:1px solid #E5E5E5;
+  border-radius:10px;
+  font-size:14px;
+  font-family:inherit;
+  color:#222222;
+  background:#FAFAFA;
+  outline:none;
+  cursor:pointer;
+  appearance:none;
+  -webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23707070' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 12px center;
+  background-size:12px;
+  padding-right:36px;
+  box-sizing:border-box;
+  transition:border-color .15s,background .15s;
+}
+
+.fb-select:focus{
+  border-color:#00BCB4;
+  background-color:#FFFFFF;
+}
+
+/* ---------- 主按钮 ---------- */
+.fb-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  padding:12px 24px;
+  border:none;
+  border-radius:10px;
+  background:#00BCB4;
+  color:#FFFFFF;
+  font-size:15px;
+  font-weight:600;
+  font-family:inherit;
+  cursor:pointer;
+  transition:opacity .15s,transform .1s;
+  -webkit-tap-highlight-color:transparent;
+  white-space:nowrap;
+}
+
+.fb-btn:hover{
+  opacity:.9;
+}
+
+.fb-btn:active{
+  transform:scale(.97);
+  opacity:.85;
+}
+
+/* ---------- 次要按钮（描边） ---------- */
+.fb-btn-outline{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  padding:12px 24px;
+  border:1px solid #E5E5E5;
+  border-radius:10px;
+  background:#FFFFFF;
+  color:#707070;
+  font-size:15px;
+  font-weight:500;
+  font-family:inherit;
+  cursor:pointer;
+  transition:background .15s,color .15s,transform .1s;
+  -webkit-tap-highlight-color:transparent;
+  white-space:nowrap;
+}
+
+.fb-btn-outline:hover{
+  background:#F8F8F8;
+  color:#222222;
+}
+
+.fb-btn-outline:active{
+  transform:scale(.97);
+}
+
+/* ---------- 按钮组 ---------- */
+.fb-actions{
+  display:flex;
+  gap:10px;
+  margin-top:20px;
+}
+
+.fb-actions .fb-btn,
+.fb-actions .fb-btn-outline{
+  flex:1;
+}
+
+/* ---------- 错误堆栈显示区 ---------- */
+.fb-error-stack{
+  margin-top:12px;
+  padding:12px;
+  background:#1E1E1E;
+  border-radius:10px;
+  color:#E8E8E8;
+  font-family:"SF Mono",Consolas,"Courier New",monospace;
+  font-size:12px;
+  line-height:1.6;
+  white-space:pre-wrap;
+  word-break:break-all;
+  max-height:200px;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+}
+
+/* ---------- 复制按钮 ---------- */
+.fb-copy-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  padding:6px 14px;
+  border:1px solid #00BCB4;
+  border-radius:16px;
+  background:rgba(0,188,180,.08);
+  color:#00BCB4;
+  font-size:13px;
+  font-weight:600;
+  font-family:inherit;
+  cursor:pointer;
+  transition:background .15s,opacity .15s,transform .1s;
+  -webkit-tap-highlight-color:transparent;
+  white-space:nowrap;
+}
+
+.fb-copy-btn:hover{
+  background:rgba(0,188,180,.16);
+}
+
+.fb-copy-btn:active{
+  transform:scale(.96);
+}
+
+.fb-copy-btn.fb-copied{
+  background:#00BCB4;
+  color:#FFFFFF;
+  opacity:1;
+}
+
+/* ---------- 环境信息表格 ---------- */
+.fb-info-grid{
+  width:100%;
+  border-collapse:collapse;
+  font-size:13px;
+  margin-top:8px;
+  background:#FAFAFA;
+  border-radius:10px;
+  overflow:hidden;
+}
+
+.fb-info-grid th,
+.fb-info-grid td{
+  padding:9px 12px;
+  border-bottom:1px solid #EFEFEF;
+  text-align:left;
+  vertical-align:top;
+  word-break:break-all;
+}
+
+.fb-info-grid th{
+  width:32%;
+  color:#707070;
+  font-weight:500;
+  background:#F4F4F4;
+}
+
+.fb-info-grid td{
+  color:#222222;
+}
+
+.fb-info-grid tr:last-child th,
+.fb-info-grid tr:last-child td{
+  border-bottom:none;
+}
+
+/* ---------- 截图上传 ---------- */
+.fb-upload{
+  margin-top:8px;
+}
+
+.fb-upload-input{
+  display:none;
+}
+
+.fb-upload-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:10px 18px;
+  border:1px dashed #00BCB4;
+  border-radius:10px;
+  background:rgba(0,188,180,.05);
+  color:#00BCB4;
+  font-size:14px;
+  font-weight:500;
+  font-family:inherit;
+  cursor:pointer;
+  transition:background .15s,transform .1s;
+  -webkit-tap-highlight-color:transparent;
+}
+
+.fb-upload-btn:hover{
+  background:rgba(0,188,180,.12);
+}
+
+.fb-upload-btn:active{
+  transform:scale(.97);
+}
+
+.fb-upload-list{
+  margin-top:8px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.fb-upload-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:8px 12px;
+  background:#F4F4F4;
+  border-radius:8px;
+  font-size:13px;
+  color:#222222;
+}
+
+.fb-upload-item .fb-upload-name{
+  flex:1;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  margin-right:8px;
+}
+
+.fb-upload-item .fb-upload-remove{
+  color:#FF3B30;
+  cursor:pointer;
+  font-size:16px;
+  flex-shrink:0;
+  border:none;
+  background:none;
+  padding:0 4px;
+  line-height:1;
+}
+
+/* ---------- 错误类型标识 ---------- */
+.fb-tag{
+  display:inline-block;
+  padding:2px 10px;
+  border-radius:12px;
+  font-size:12px;
+  font-weight:600;
+  margin-left:8px;
+}
+
+.fb-tag.crash{background:#FFEBEE;color:#C62828;}
+.fb-tag.promise{background:#FFF3E0;color:#E65100;}
+.fb-tag.resource{background:#FFF8E1;color:#F9A825;}
+.fb-tag.blank{background:#F3E5F5;color:#8E24AA;}
+
+/* ---------- 提示文字 ---------- */
+.fb-tip{
+  font-size:12px;
+  color:#B0B0B0;
+  margin-top:8px;
+  line-height:1.5;
+}
+
+/* ---------- 响应式 ---------- */
+@media(max-width:480px){
+  .fb-overlay{padding:12px;}
+  .fb-modal{max-height:88vh;}
+  .fb-header{padding:14px 16px;}
+  .fb-body{padding:16px;}
+  .fb-actions{flex-direction:column;}
+}
