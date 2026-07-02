@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>易学排盘</title>
+<style>
+:root{--teal:#00BCB4;--bg:#F8F8F8;--white:#FFFFFF;--dark:#222222;--gray:#707070;--lightgray:#E5E5E5;}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{width:100%;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;color:var(--dark);background:var(--bg);}
+body{max-width:960px;margin:0 auto;min-height:100vh;padding-bottom:70px;}
+
+/* 顶部返回栏 */
+.top-bar{height:70px;background:var(--teal);display:flex;align-items:center;padding:0 16px;position:sticky;top:0;z-index:10;}
+.top-bar .back-btn{width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:28px;color:#fff;margin-right:12px;border:none;background:none;}
+.top-bar .page-title{font-size:26px;font-weight:bold;color:#fff;}
+
+/* 卡片网格 */
+.card-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;padding:14px 16px;}
+.card{background:var(--white);border-radius:12px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.06);cursor:pointer;text-decoration:none;color:inherit;display:flex;align-items:center;gap:14px;transition:transform .15s;}
+.card:active{transform:scale(.97);}
+.card .card-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+.card .card-info{flex:1;}
+.card .card-name{font-size:17px;font-weight:bold;color:var(--dark);margin-bottom:4px;}
+.card .card-desc{font-size:13px;color:var(--gray);line-height:1.4;}
+.card .card-arrow{color:var(--gray);font-size:18px;}
+
+.card.liuyao .card-icon{background:#EEF2FF;color:#667eea;}
+.card.meihua .card-icon{background:#FFF0F3;color:#f5576c;}
+.card.qimen .card-icon{background:#E0F7FA;color:#00BCD4;}
+.card.ziwei .card-icon{background:#FFF8E1;color:#F9A825;}
+.card.xuankong .card-icon{background:#E8F5E9;color:#43A047;}
+.card.xiaoliuren .card-icon{background:#F3E5F5;color:#8E24AA;}
+.card.bazi .card-icon{background:#EFEBE9;color:#5D4037;}
+.card.daliuren .card-icon{background:#FFF3E0;color:#E65100;}
+
+/* 底部导航 */
+.bottom-nav{display:flex;background:#fff;border-top:1px solid var(--lightgray);position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:960px;z-index:100;height:60px;}
+.bottom-nav .bn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:var(--gray);font-size:12px;}
+.bottom-nav .bn-item .bn-icon{font-size:22px;margin-bottom:2px;}
+.bottom-nav .bn-item:first-child{color:var(--teal);}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <button class="back-btn" onclick="history.back()">←</button>
+  <span class="page-title">易学排盘</span>
+</div>
+
+<div class="card-grid">
+  <a class="card bazi" href="paiban/bazi-demo.html">
+    <div class="card-icon">命</div>
+    <div class="card-info">
+      <div class="card-name">八字排盘</div>
+      <div class="card-desc">四柱八字 · 大运流年 · 十神神煞 · 五行调候</div>
+    </div>
+    <span class="card-arrow">›</span>
+  </a>
+  <a class="card ziwei" href="paiban/ziwei-demo.html">
+    <div class="card-icon">⭐</div>
+    <div class="card-info">
+      <div class="card-name">紫微斗数</div>
+      <div class="card-desc">三合/飞星双模式 · 十二宫 · 四化飞星 · 大限流年</div>
+    </div>
+    <span class="card-arrow">›</span>
+  </a>
+  <a class="card daliuren" href="paiban/daliuren-demo.html">
+    <div class="card-icon">壬</div>
+    <div class="card-info">
+      <div class="card-name">大六壬</div>
+      <div class="card-desc">四课三传 · 天地盘 · 十二天将 · 贵人临方</div>
+    </div>
+    <span class="card-arrow">›</span>
+  </a>
+  <a class="card qimen" href="paiban/qimen-demo.html">
+    <div class="card-icon">⚔</div>
+    <div class="card-info">
+      <div class="card-name">奇门遁甲</div>
+      <div class="card-desc">阴阳遁 · 天地人神四盘 · 九星八门八神</div>
+    </div>
+    <span class="card-arrow">›</span>
+  </a>
+  <a class="card liuyao" href="paiban/liuyao-demo.html">
+    <div class="card-icon">☰</div>
+    <div class="card-info">
+      <div class="card-name">六爻</div>
+      <div class="card-desc">纳甲装卦 · 世应六亲 · 日月建 · 动变爻</div>
+    </div>
+    <span class="card-arrow">›</span>
+  </a>
+  <a class="card meihua" href="paiban/meihua-demo.html">
+    <div class="card-icon">🌸</div>
+    <div class="card-info">
+      <div class="card-name">梅花易数</div>
+      <div class="card-desc">先天起卦 · 体用生克 · 互变卦 · 卦象断辞</div>
+    </div>
+    <span class="card-arrow">›</span>
+  </a>
+  <a class="card xiaoliuren" href="paiban/xiaoliuren-demo.html">
+    <div class="card-icon">🎯</div>
+    <div class="card-info">
+      <div class="card-name">小六壬</div>
+      <div class="card-desc">大安留连速喜赤口小吉空亡 · 道家佛家起课</div>
+    </div>
+    <span class="card-arrow">›</span>
+  </a>
+  <a class="card xuankong" href="paiban/xuankong-demo.html">
+    <div class="card-icon">🧭</div>
+    <div class="card-info">
+      <div class="card-name">玄空飞星</div>
+      <div class="card-desc">九宫飞星 · 山向运星 · 排龙诀 · 下卦替卦</div>
+    </div>
+    <span class="card-arrow">›</span>
+  </a>
+</div>
+
+<div class="bottom-nav">
+  <div class="bn-item" onclick="location.href='index.html'">
+    <span class="bn-icon">🏠</span><span>首页</span>
+  </div>
+  <div class="bn-item"><span class="bn-icon">🤖</span><span>AI</span></div>
+  <div class="bn-item"><span class="bn-icon">💬</span><span>信息</span></div>
+  <div class="bn-item"><span class="bn-icon">👤</span><span>个人中心</span></div>
+</div>
+
+</body>
+</html>

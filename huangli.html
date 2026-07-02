@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>黄历查询</title>
+<style>
+:root{--teal:#00BCB4;--bg:#F8F8F8;--white:#FFFFFF;--dark:#222222;--gray:#707070;--lightgray:#E5E5E5;--gold:#D4A056;--red:#EA4335;}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{width:100%;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;color:var(--dark);background:var(--bg);}
+body{max-width:960px;margin:0 auto;min-height:100vh;padding-bottom:70px;}
+
+.top-bar{height:70px;background:var(--teal);display:flex;align-items:center;padding:0 16px;position:sticky;top:0;z-index:10;}
+.top-bar .back-btn{width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:28px;color:#fff;margin-right:12px;border:none;background:none;}
+.top-bar .page-title{font-size:26px;font-weight:bold;color:#fff;}
+
+.card{background:var(--white);border-radius:12px;padding:16px;margin:14px 16px;box-shadow:0 2px 8px rgba(0,0,0,.06);}
+.card-title{font-size:18px;font-weight:bold;color:var(--dark);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.card-title::before{content:'';width:4px;height:18px;background:var(--teal);border-radius:2px;}
+
+.info-table{width:100%;border-collapse:collapse;font-size:14px;}
+.info-table th,.info-table td{padding:10px 12px;border-bottom:1px solid var(--lightgray);text-align:left;}
+.info-table th{width:30%;color:var(--gray);font-weight:500;}
+.info-table td{color:var(--dark);}
+.info-table tr:nth-child(even){background:#FAFAFA;}
+
+.tag-list{display:flex;flex-wrap:wrap;gap:8px;}
+.tag{display:inline-block;padding:4px 12px;border-radius:14px;font-size:13px;font-weight:500;}
+.tag.yi{background:#E8F5E9;color:#2E7D32;}
+.tag.ji{background:#FFEBEE;color:#C62828;}
+
+.hour-table{width:100%;border-collapse:collapse;font-size:13px;}
+.hour-table th,.hour-table td{padding:8px 6px;border-bottom:1px solid var(--lightgray);text-align:center;}
+.hour-table th{background:var(--teal);color:#fff;font-weight:500;}
+.hour-table tr:nth-child(even){background:#FAFAFA;}
+.hour-table .good{color:#2E7D32;}
+.hour-table .bad{color:#C62828;}
+
+.bottom-nav{display:flex;background:#fff;border-top:1px solid var(--lightgray);position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:960px;z-index:100;height:60px;}
+.bottom-nav .bn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:var(--gray);font-size:12px;}
+.bottom-nav .bn-item .bn-icon{font-size:22px;margin-bottom:2px;}
+.bottom-nav .bn-item:first-child{color:var(--teal);}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <button class="back-btn" onclick="history.back()">←</button>
+  <span class="page-title">黄历查询</span>
+</div>
+
+<!-- 日期信息 -->
+<div class="card">
+  <div class="card-title">今日日期</div>
+  <table class="info-table">
+    <tr><th>公历</th><td>2026年7月2日 星期四</td></tr>
+    <tr><th>农历</th><td>丙午年 五月十八</td></tr>
+    <tr><th>干支</th><td>丙午年 甲午月 辛未日</td></tr>
+    <tr><th>生肖</th><td>马</td></tr>
+    <tr><th>节气</th><td>距夏至11天，距小暑5天</td></tr>
+    <tr><th>星座</th><td>巨蟹座</td></tr>
+  </table>
+</div>
+
+<!-- 宜忌 -->
+<div class="card">
+  <div class="card-title">宜忌事项</div>
+  <div style="margin-bottom:10px;">
+    <span style="font-weight:bold;color:#2E7D32;font-size:15px;">宜：</span>
+    <div class="tag-list" style="margin-top:8px;">
+      <span class="tag yi">祭祀</span><span class="tag yi">祈福</span><span class="tag yi">出行</span><span class="tag yi">嫁娶</span><span class="tag yi">纳采</span><span class="tag yi">开光</span><span class="tag yi">入宅</span><span class="tag yi">安床</span>
+    </div>
+  </div>
+  <div>
+    <span style="font-weight:bold;color:#C62828;font-size:15px;">忌：</span>
+    <div class="tag-list" style="margin-top:8px;">
+      <span class="tag ji">动土</span><span class="tag ji">破土</span><span class="tag ji">安葬</span><span class="tag ji">修造</span><span class="tag ji">开渠</span><span class="tag ji">伐木</span>
+    </div>
+  </div>
+</div>
+
+<!-- 吉神凶煞 -->
+<div class="card">
+  <div class="card-title">吉神凶煞</div>
+  <table class="info-table">
+    <tr><th>吉神</th><td>天德、月德、天喜、玉堂、司命、鸣吠</td></tr>
+    <tr><th>凶煞</th><td>月破、大耗、劫煞、灾煞、月煞、五虚</td></tr>
+    <tr><th>冲煞</th><td>冲牛（丑）煞西</td></tr>
+    <tr><th>胎神</th><td>仓库碓 外西北</td></tr>
+  </table>
+</div>
+
+<!-- 时辰吉凶 -->
+<div class="card">
+  <div class="card-title">时辰吉凶</div>
+  <table class="hour-table">
+    <thead>
+      <tr><th>时辰</th><th>时间</th><th>吉凶</th><th>神煞</th></tr>
+    </thead>
+    <tr><td>子时</td><td>23:00-01:00</td><td class="good">吉</td><td>天德</td></tr>
+    <tr><td>丑时</td><td>01:00-03:00</td><td class="bad">凶</td><td>刑冲</td></tr>
+    <tr><td>寅时</td><td>03:00-05:00</td><td class="good">吉</td><td>福德</td></tr>
+    <tr><td>卯时</td><td>05:00-07:00</td><td class="good">吉</td><td>玉堂</td></tr>
+    <tr><td>辰时</td><td>07:00-09:00</td><td class="bad">凶</td><td>天牢</td></tr>
+    <tr><td>巳时</td><td>09:00-11:00</td><td class="good">吉</td><td>司命</td></tr>
+    <tr><td>午时</td><td>11:00-13:00</td><td class="bad">凶</td><td>天刑</td></tr>
+    <tr><td>未时</td><td>13:00-15:00</td><td class="good">吉</td><td>明堂</td></tr>
+    <tr><td>申时</td><td>15:00-17:00</td><td class="bad">凶</td><td>朱雀</td></tr>
+    <tr><td>酉时</td><td>17:00-19:00</td><td class="good">吉</td><td>金匮</td></tr>
+    <tr><td>戌时</td><td>19:00-21:00</td><td class="bad">凶</td><td>白虎</td></tr>
+    <tr><td>亥时</td><td>21:00-23:00</td><td class="good">吉</td><td>天德</td></tr>
+  </table>
+</div>
+
+<div class="bottom-nav">
+  <div class="bn-item" onclick="location.href='index.html'">
+    <span class="bn-icon">🏠</span><span>首页</span>
+  </div>
+  <div class="bn-item"><span class="bn-icon">🤖</span><span>AI</span></div>
+  <div class="bn-item"><span class="bn-icon">💬</span><span>信息</span></div>
+  <div class="bn-item"><span class="bn-icon">👤</span><span>个人中心</span></div>
+</div>
+
+</body>
+</html>

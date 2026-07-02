@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>五运六气</title>
+<style>
+:root{--teal:#00BCB4;--bg:#F8F8F8;--white:#FFFFFF;--dark:#222222;--gray:#707070;--lightgray:#E5E5E5;--gold:#D4A056;}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{width:100%;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;color:var(--dark);background:var(--bg);}
+body{max-width:960px;margin:0 auto;min-height:100vh;padding-bottom:70px;}
+
+.top-bar{height:70px;background:var(--teal);display:flex;align-items:center;padding:0 16px;position:sticky;top:0;z-index:10;}
+.top-bar .back-btn{width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:28px;color:#fff;margin-right:12px;border:none;background:none;}
+.top-bar .page-title{font-size:26px;font-weight:bold;color:#fff;}
+
+.card{background:var(--white);border-radius:12px;padding:16px;margin:14px 16px;box-shadow:0 2px 8px rgba(0,0,0,.06);}
+.card-title{font-size:18px;font-weight:bold;color:var(--dark);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.card-title::before{content:'';width:4px;height:18px;background:var(--teal);border-radius:2px;}
+
+.info-table{width:100%;border-collapse:collapse;font-size:14px;}
+.info-table th,.info-table td{padding:10px 12px;border-bottom:1px solid var(--lightgray);text-align:left;}
+.info-table th{width:35%;color:var(--gray);font-weight:500;}
+.info-table td{color:var(--dark);}
+.info-table tr:nth-child(even){background:#FAFAFA;}
+
+.step-list{list-style:none;padding:0;}
+.step-list li{padding:10px 0;border-bottom:1px solid var(--lightgray);font-size:14px;line-height:1.6;display:flex;gap:10px;}
+.step-list li:last-child{border-bottom:none;}
+.step-list .step-num{width:24px;height:24px;border-radius:50%;background:var(--teal);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;flex-shrink:0;margin-top:2px;}
+.step-list .step-text{flex:1;}
+
+.advice-list{list-style:none;padding:0;}
+.advice-list li{padding:8px 0;font-size:14px;line-height:1.6;border-bottom:1px solid var(--lightgray);}
+.advice-list li:last-child{border-bottom:none;}
+.advice-list li::before{content:'•';color:var(--teal);font-weight:bold;margin-right:8px;}
+
+.bottom-nav{display:flex;background:#fff;border-top:1px solid var(--lightgray);position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:960px;z-index:100;height:60px;}
+.bottom-nav .bn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:var(--gray);font-size:12px;}
+.bottom-nav .bn-item .bn-icon{font-size:22px;margin-bottom:2px;}
+.bottom-nav .bn-item:first-child{color:var(--teal);}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <button class="back-btn" onclick="history.back()">←</button>
+  <span class="page-title">五运六气</span>
+</div>
+
+<!-- 岁运总览 -->
+<div class="card">
+  <div class="card-title">岁运总览</div>
+  <table class="info-table">
+    <tr><th>年份</th><td>2026年 丙午岁</td></tr>
+    <tr><th>岁运</th><td>水运太过（丙为阳干，丙辛化水）</td></tr>
+    <tr><th>司天</th><td>少阴君火（子午之岁，少阴司天）</td></tr>
+    <tr><th>在泉</th><td>阳明燥金（少阴司天则阳明在泉）</td></tr>
+    <tr><th>天符</th><td>岁运水运+少阴君火司天，非天符年</td></tr>
+    <tr><th>运气相合</th><td>运水克气火，运盛气衰，为不和之年</td></tr>
+  </table>
+</div>
+
+<!-- 主运客运 -->
+<div class="card">
+  <div class="card-title">主运 / 客运分步</div>
+  <table class="info-table">
+    <thead>
+      <tr><th>步序</th><th>主运</th><th>客运</th><th>时段</th></tr>
+    </thead>
+    <tr><td>初运</td><td>木运（风）</td><td>水运（寒）</td><td>大寒至春分</td></tr>
+    <tr><td>二运</td><td>火运（热）</td><td>木运（风）</td><td>春分至小满</td></tr>
+    <tr><td>三运</td><td>土运（湿）</td><td>火运（热）</td><td>小满至大暑</td></tr>
+    <tr><td>四运</td><td>金运（燥）</td><td>土运（湿）</td><td>大暑至秋分</td></tr>
+    <tr><td>五运</td><td>水运（寒）</td><td>金运（燥）</td><td>秋分至大寒</td></tr>
+  </table>
+</div>
+
+<!-- 六气六步 -->
+<div class="card">
+  <div class="card-title">六气六步</div>
+  <table class="info-table">
+    <thead>
+      <tr><th>步序</th><th>主气</th><th>客气</th><th>时段</th></tr>
+    </thead>
+    <tr><td>初之气</td><td>厥阴风木</td><td>太阳寒水</td><td>大寒至惊蛰</td></tr>
+    <tr><td>二之气</td><td>少阴君火</td><td>厥阴风木</td><td>春分至立夏</td></tr>
+    <tr><td>三之气</td><td>少阳相火</td><td>少阴君火</td><td>小满至小暑</td></tr>
+    <tr><td>四之气</td><td>太阴湿土</td><td>太阴湿土</td><td>大暑至白露</td></tr>
+    <tr><td>五之气</td><td>阳明燥金</td><td>少阳相火</td><td>秋分至立冬</td></tr>
+    <tr><td>终之气</td><td>太阳寒水</td><td>阳明燥金</td><td>小雪至小寒</td></tr>
+  </table>
+</div>
+
+<!-- 养生建议 -->
+<div class="card">
+  <div class="card-title">养生建议</div>
+  <ul class="advice-list">
+    <li>水运太过之年，寒气偏盛，宜温阳补肾，注意腰膝保暖</li>
+    <li>少阴君火司天，上半年气候偏热，需防心脑血管疾病</li>
+    <li>阳明燥金在泉，下半年燥气偏盛，宜润肺养阴</li>
+    <li>岁运克司天为不和，气候变化剧烈，注意适时增减衣物</li>
+    <li>三之气君火加临相火，盛夏需防暑热，注意清心安神</li>
+    <li>饮食宜清淡，多食黑色食物补肾，白色食物润肺</li>
+  </ul>
+</div>
+
+<div class="bottom-nav">
+  <div class="bn-item" onclick="location.href='index.html'">
+    <span class="bn-icon">🏠</span><span>首页</span>
+  </div>
+  <div class="bn-item"><span class="bn-icon">🤖</span><span>AI</span></div>
+  <div class="bn-item"><span class="bn-icon">💬</span><span>信息</span></div>
+  <div class="bn-item"><span class="bn-icon">👤</span><span>个人中心</span></div>
+</div>
+
+</body>
+</html>
