@@ -12,7 +12,7 @@
   --divider:#eee;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
-html,body{width:960px;margin:0 auto;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;color:var(--black);background:#fff;font-size:14px;line-height:1.6;}
+html,body{max-width:390px;margin:0 auto;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;color:var(--black);background:#fff;font-size:14px;line-height:1.6;}
 a{text-decoration:none;color:inherit;}
 img{max-width:100%;}
 
@@ -425,16 +425,36 @@ img{max-width:100%;}
   <div style="height:12px;background:var(--bg)"></div>
 
   <div class="tab-bar" style="position:relative">
-    <div class="vip-badge">VIP</div>
     <div class="t-item active">五行能量</div>
     <div class="t-item">五行个数</div>
     <div class="t-item">含藏干数</div>
   </div>
-  <div class="vip-content">
-    <div class="vip-desc">
-      五行能量综合计算了五行个数、干支比重、藏干深浅、宫位力量、刑冲破害合等因素影响后的量化结果，是喜用神判断的重要参考指标。
+  <div class="vip-content" style="padding:16px 20px;">
+    <div style="display:flex;justify-content:space-around;align-items:flex-end;height:120px;padding:10px 0;">
+      <div style="text-align:center;flex:1;">
+        <div style="height:80px;background:linear-gradient(to top,#2368B2,#4A90D9);border-radius:4px 4px 0 0;width:60%;margin:0 auto;"></div>
+        <div style="font-size:14px;color:#222;margin-top:4px;">水 80</div>
+      </div>
+      <div style="text-align:center;flex:1;">
+        <div style="height:50px;background:linear-gradient(to top,#34A853,#5CB85C);border-radius:4px 4px 0 0;width:60%;margin:0 auto;"></div>
+        <div style="font-size:14px;color:#222;margin-top:4px;">木 50</div>
+      </div>
+      <div style="text-align:center;flex:1;">
+        <div style="height:30px;background:linear-gradient(to top,#F1B232,#FFD54F);border-radius:4px 4px 0 0;width:60%;margin:0 auto;"></div>
+        <div style="font-size:14px;color:#222;margin-top:4px;">金 30</div>
+      </div>
+      <div style="text-align:center;flex:1;">
+        <div style="height:20px;background:linear-gradient(to top,#A67C52,#C49A6C);border-radius:4px 4px 0 0;width:60%;margin:0 auto;"></div>
+        <div style="font-size:14px;color:#222;margin-top:4px;">土 20</div>
+      </div>
+      <div style="text-align:center;flex:1;">
+        <div style="height:10px;background:linear-gradient(to top,#EA4335,#F6685E);border-radius:4px 4px 0 0;width:60%;margin:0 auto;"></div>
+        <div style="font-size:14px;color:#222;margin-top:4px;">火 10</div>
+      </div>
     </div>
-    <button class="vip-btn">开通VIP会员</button>
+    <div style="font-size:13px;color:#707070;text-align:center;padding:8px 0;border-top:1px solid #F0F0F0;">
+      五行能量综合了个数、比重、藏干深浅、宫位力量等因素
+    </div>
   </div>
 
   <div class="wuxing-bar">
@@ -574,10 +594,9 @@ img{max-width:100%;}
   <div class="book-section">
     <div class="book-banner">
       智能古籍参考
-      <div class="vip-corner">VIP会员</div>
     </div>
     <div class="book-list">
-      <div class="book-item locked">穷通宝鉴</div>
+      <div class="book-item unlocked">穷通宝鉴</div>
       <div class="book-item unlocked">滴天髓</div>
       <div class="book-item unlocked">三命通会</div>
       <div class="book-item unlocked">八字提要</div>

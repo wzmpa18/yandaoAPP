@@ -7,8 +7,8 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{width:100%;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;color:#1A1A1A;background:#F5EDE6;overflow-x:hidden;}
-/* 页面基准宽度1086px，居中显示，移动端满宽 */
-body{max-width:1086px;margin:0 auto;min-height:100vh;position:relative;padding-bottom:104px;background:#F5EDE6;}
+/* 页面基准宽度390px（手机标准宽度），居中显示 */
+body{max-width:390px;margin:0 auto;min-height:100vh;position:relative;padding-bottom:104px;background:#F5EDE6;}
 :root{
   --white:#FFFFFF;--dark:#333333;--blue:#2368B2;
   --main:#1A1A1A;--gray:#777777;--datebg:#EDE4D8;
@@ -50,7 +50,7 @@ body{max-width:1086px;margin:0 auto;min-height:100vh;position:relative;padding-b
 /* ===== 底部Tab栏 高44px ===== */
 .tab-bar{
   position:fixed;bottom:60px;left:50%;transform:translateX(-50%);
-  width:100%;max-width:1086px;height:44px;
+  width:100%;max-width:390px;height:44px;
   background:var(--white);display:flex;z-index:99;border-top:1px solid var(--bdr);
 }
 .tab-bar label{
@@ -66,7 +66,7 @@ body{max-width:1086px;margin:0 auto;min-height:100vh;position:relative;padding-b
 /* ===== 底部导航 高60px ===== */
 .bottom-nav{
   position:fixed;bottom:0;left:50%;transform:translateX(-50%);
-  width:100%;max-width:1086px;height:60px;
+  width:100%;max-width:390px;height:60px;
   background:var(--white);display:flex;z-index:100;border-top:1px solid var(--bdr);
 }
 .bottom-nav .ni{
@@ -92,60 +92,60 @@ body{max-width:1086px;margin:0 auto;min-height:100vh;position:relative;padding-b
 /* ===== 日期栏 ===== */
 .dbar{
   background:var(--datebg);padding:0;width:100%;
-  display:flex;align-items:stretch;height:128px;
+  display:flex;align-items:stretch;height:96px;
 }
 .dbl{display:flex;flex-direction:column;flex-shrink:0;}
 .dbl span{
-  background:var(--gblock);color:#fff;font-size:20px;font-weight:bold;
-  width:52px;flex:1;display:flex;align-items:center;justify-content:center;
+  background:var(--gblock);color:#fff;font-size:14px;font-weight:bold;
+  width:32px;flex:1;display:flex;align-items:center;justify-content:center;
   line-height:1;border-right:2px solid #fff;
 }
-.dbg{display:flex;flex:1;}
-.dbc{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px 0;}
-.dbc .tg{font-size:48px;font-weight:bold;line-height:1.1;}
-.dbc .dz{font-size:48px;font-weight:bold;line-height:1.1;}
-.dbc .dl{font-size:14px;color:var(--gray);line-height:1;margin-top:2px;}
-.dbi{text-align:right;font-size:14px;color:var(--gray);line-height:1.8;
-  flex-shrink:0;padding:6px 10px 6px 4px;display:flex;flex-direction:column;justify-content:center;}
-.dbi .d1{font-size:18px;color:var(--main);font-weight:500;line-height:1.4;}
+.dbg{display:flex;flex:1;min-width:0;}
+.dbc{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2px 0;min-width:0;}
+.dbc .tg{font-size:26px;font-weight:bold;line-height:1.1;}
+.dbc .dz{font-size:26px;font-weight:bold;line-height:1.1;}
+.dbc .dl{font-size:11px;color:var(--gray);line-height:1;margin-top:2px;}
+.dbi{text-align:right;font-size:11px;color:var(--gray);line-height:1.5;
+  flex-shrink:0;padding:4px 8px 4px 4px;display:flex;flex-direction:column;justify-content:center;max-width:150px;}
+.dbi .d1{font-size:13px;color:var(--main);font-weight:500;line-height:1.4;}
 
 /* ===== 主盘面 ===== */
 .panel{background:var(--white);border-top:1px solid var(--bdr);width:100%;}
-.pmain{display:flex;width:100%;}
-/* 左侧栏固定535px */
-.pl{width:535px;flex-shrink:0;border-right:1px solid var(--bdr);background:var(--white);}
-/* 右侧栏=1086-535=551px */
-.pr{width:551px;flex-shrink:0;background:var(--white);}
+.pmain{display:flex;flex-direction:column;width:100%;}
+/* 左栏满宽，单栏纵向布局 */
+.pl{width:100%;flex-shrink:0;border-right:none;border-bottom:1px solid var(--bdr);background:var(--white);}
+/* 右栏满宽 */
+.pr{width:100%;flex-shrink:0;background:var(--white);}
 
 /* 左栏横条标题 */
-.lht{background:var(--gblock);color:#fff;font-size:20px;font-weight:bold;padding:6px 4px;text-align:center;width:100%;}
-.lsub{font-size:22px;padding:8px 4px;text-align:center;font-weight:bold;line-height:1.4;}
+.lht{background:var(--gblock);color:#fff;font-size:16px;font-weight:bold;padding:6px 4px;text-align:center;width:100%;}
+.lsub{font-size:18px;padding:8px 4px;text-align:center;font-weight:bold;line-height:1.4;}
 
-/* 左栏行(竖排标签+内容) 统一高度42px */
-.lrow{display:flex;align-items:stretch;border-bottom:1px solid #E8E8E8;height:42px;width:100%;}
+/* 左栏行(竖排标签+内容) 统一高度38px */
+.lrow{display:flex;align-items:stretch;border-bottom:1px solid #E8E8E8;height:38px;width:100%;}
 .llab{
-  background:var(--gblock);color:#fff;font-size:18px;font-weight:bold;
-  writing-mode:vertical-rl;letter-spacing:3px;
-  width:70px;flex-shrink:0;
+  background:var(--gblock);color:#fff;font-size:14px;font-weight:bold;
+  writing-mode:vertical-rl;letter-spacing:2px;
+  width:48px;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;
   padding:4px 0;
 }
-.lval{flex:1;display:flex;align-items:center;justify-content:center;gap:0;position:relative;padding:2px 4px;}
-.lval .lc{font-size:32px;font-weight:bold;line-height:1.15;text-align:center;flex:1;}
+.lval{flex:1;display:flex;align-items:center;justify-content:center;gap:0;position:relative;padding:2px 4px;min-width:0;}
+.lval .lc{font-size:24px;font-weight:bold;line-height:1.15;text-align:center;flex:1;}
 .lval .lc.kbox{padding:2px 4px;flex:none;}
-.lval .lr{position:absolute;right:6px;font-size:28px;font-weight:bold;}
+.lval .lr{position:absolute;right:6px;font-size:20px;font-weight:bold;}
 
-/* 本命/行年 2字并排 每行42px */
-.bmrow{display:flex;align-items:stretch;border-bottom:1px solid var(--bdr);height:42px;width:100%;}
+/* 本命/行年 2字并排 每行38px */
+.bmrow{display:flex;align-items:stretch;border-bottom:1px solid var(--bdr);height:38px;width:100%;}
 .bmlab{
-  background:var(--gblock);color:#fff;font-size:18px;font-weight:bold;
-  writing-mode:vertical-rl;letter-spacing:3px;
-  width:70px;flex-shrink:0;
+  background:var(--gblock);color:#fff;font-size:14px;font-weight:bold;
+  writing-mode:vertical-rl;letter-spacing:2px;
+  width:48px;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;
 }
 .bmchars{display:flex;flex:1;}
 .bmchars span{
-  flex:1;text-align:center;font-size:32px;font-weight:bold;
+  flex:1;text-align:center;font-size:24px;font-weight:bold;
   border-right:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;
   padding:4px 0;line-height:1.1;
 }
@@ -153,26 +153,26 @@ body{max-width:1086px;margin:0 auto;min-height:100vh;position:relative;padding-b
 
 /* 月将 */
 .yj{padding:6px 0 8px;text-align:center;border-bottom:1px solid var(--bdr);height:auto;}
-.yj .yjl{font-size:22px;font-weight:bold;}
+.yj .yjl{font-size:16px;font-weight:bold;}
 .yj .yjc{
-  font-size:60px;font-weight:bold;color:var(--fire);
+  font-size:44px;font-weight:bold;color:var(--fire);
   text-decoration:underline;text-decoration-color:var(--fire);
   text-underline-offset:6px;line-height:1.1;margin-left:6px;
 }
 
-/* 自选神煞 每行40px */
-.zxt{font-size:22px;font-weight:bold;text-align:center;padding:10px 4px 6px;}
+/* 自选神煞 每行36px */
+.zxt{font-size:16px;font-weight:bold;text-align:center;padding:10px 4px 6px;}
 .zxlist{padding:0 0 8px;}
-.zxrow{display:flex;align-items:stretch;border-bottom:1px solid #E8E8E8;height:40px;}
+.zxrow{display:flex;align-items:stretch;border-bottom:1px solid #E8E8E8;height:36px;}
 .zxname{
-  background:var(--gblock);color:#fff;font-size:18px;font-weight:bold;
-  writing-mode:vertical-rl;letter-spacing:3px;
-  width:70px;flex-shrink:0;
+  background:var(--gblock);color:#fff;font-size:14px;font-weight:bold;
+  writing-mode:vertical-rl;letter-spacing:2px;
+  width:48px;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;
 }
-.zxc{flex:1;display:flex;align-items:center;padding-left:10px;font-size:32px;font-weight:bold;}
+.zxc{flex:1;display:flex;align-items:center;padding-left:10px;font-size:24px;font-weight:bold;}
 
-/* ===== 三传 5列×3行 总宽551px，列比85:95:191:95:85，三行等高 ===== */
+/* ===== 三传 5列×3行 列比1:1.118:2.247:1.118:1，三行等高 ===== */
 .sc{display:grid;grid-template-columns:1fr 1.118fr 2.247fr 1.118fr 1fr;grid-auto-rows:1fr;border-bottom:1px solid var(--bdr);width:100%;}
 .sc > div{
   border-right:1px solid var(--bdr);border-bottom:1px solid var(--bdr);
@@ -181,13 +181,13 @@ body{max-width:1086px;margin:0 auto;min-height:100vh;position:relative;padding-b
 .sc > div:nth-child(5n){border-right:none;}
 .sc > div:nth-child(n+11){border-bottom:none;}
 .sc .scl{
-  background:var(--gblock)!important;color:#fff;font-size:18px;font-weight:bold;
-  writing-mode:vertical-rl;letter-spacing:4px;padding:4px 0;
+  background:var(--gblock)!important;color:#fff;font-size:14px;font-weight:bold;
+  writing-mode:vertical-rl;letter-spacing:3px;padding:4px 0;
 }
-.sc .sclq{font-size:24px;font-weight:500;line-height:1;}
-.sc .scg{font-size:30px;font-weight:bold;line-height:1.1;}
-.sc .scdz{font-size:44px;font-weight:bold;line-height:1;}
-.sc .sctj{font-size:22px;font-weight:bold;color:#C87820;}
+.sc .sclq{font-size:18px;font-weight:500;line-height:1;}
+.sc .scg{font-size:22px;font-weight:bold;line-height:1.1;}
+.sc .scdz{font-size:32px;font-weight:bold;line-height:1;}
+.sc .sctj{font-size:16px;font-weight:bold;color:#C87820;}
 .sc .gray{background:var(--gbar)!important;}
 
 /* ===== 四课 4列×4行 每格均等，16格大小完全一致 ===== */
@@ -198,10 +198,10 @@ body{max-width:1086px;margin:0 auto;min-height:100vh;position:relative;padding-b
 }
 .sk > div:nth-child(4n){border-right:none;}
 .sk > div:nth-child(n+13){border-bottom:none;}
-.sk .skh{background:var(--gblock)!important;color:#fff;font-size:18px;font-weight:bold;padding:4px 0;}
-.sk .sktj{font-size:22px;font-weight:bold;padding:4px 0;}
-.sk .skss{font-size:44px;font-weight:bold;line-height:1;padding:2px 0;}
-.sk .skxs{font-size:30px;font-weight:bold;line-height:1;padding:2px 0;}
+.sk .skh{background:var(--gblock)!important;color:#fff;font-size:14px;font-weight:bold;padding:4px 0;}
+.sk .sktj{font-size:16px;font-weight:bold;padding:4px 0;}
+.sk .skss{font-size:30px;font-weight:bold;line-height:1;padding:2px 0;}
+.sk .skxs{font-size:22px;font-weight:bold;line-height:1;padding:2px 0;}
 
 /* ===== 天地盘 正方形 每格1/4宽 ===== */
 .tpw{border-top:1px solid var(--white);width:100%;}
@@ -211,22 +211,22 @@ body{max-width:1086px;margin:0 auto;min-height:100vh;position:relative;padding-b
   background:#fff;display:flex;flex-direction:column;align-items:center;
   position:relative;cursor:pointer;
 }
-.tp-top .ttj{font-size:18px;font-weight:bold;padding:3px 0 2px;text-align:center;width:100%;}
-.tp-side .ttj{width:100%;background:var(--gbar);text-align:center;padding:3px 0;font-size:18px;font-weight:bold;}
-.tdz{font-size:44px;font-weight:bold;line-height:1;margin:auto 0;padding:2px 0;}
-.tdp{position:absolute;right:4px;bottom:3px;font-size:16px;color:#444;line-height:1;font-weight:500;}
+.tp-top .ttj{font-size:13px;font-weight:bold;padding:3px 0 2px;text-align:center;width:100%;}
+.tp-side .ttj{width:100%;background:var(--gbar);text-align:center;padding:3px 0;font-size:13px;font-weight:bold;}
+.tdz{font-size:30px;font-weight:bold;line-height:1;margin:auto 0;padding:2px 0;}
+.tdp{position:absolute;right:3px;bottom:2px;font-size:12px;color:#444;line-height:1;font-weight:500;}
 .tcen{
   grid-column:2/4;grid-row:2/4;
   background:#fff;border-right:1px solid var(--bdr);border-bottom:1px solid var(--bdr);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   padding:6px 4px;cursor:pointer;
 }
-.tcen .cday{font-size:22px;font-weight:bold;}
-.tcen .cke{font-size:20px;margin:4px 0;font-weight:500;}
-.tcen .cfa{font-size:18px;color:#888;}
+.tcen .cday{font-size:18px;font-weight:bold;}
+.tcen .cke{font-size:16px;margin:4px 0;font-weight:500;}
+.tcen .cfa{font-size:14px;color:#888;}
 .tphint{padding:10px 6px;text-align:center;background:#fff;width:100%;}
-.tphint .hr{color:var(--fire);font-size:18px;font-weight:500;margin-bottom:4px;}
-.tphint .hg{color:#999;font-size:16px;line-height:1.8;}
+.tphint .hr{color:var(--fire);font-size:14px;font-weight:500;margin-bottom:4px;}
+.tphint .hg{color:#999;font-size:12px;line-height:1.8;}
 
 /* ===== 输入页 卡片圆角12px，padding10px，margin-bottom:12px ===== */
 .dbar2{background:var(--dark);height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-radius:12px 12px 0 0;}
@@ -292,15 +292,13 @@ body{max-width:1086px;margin:0 auto;min-height:100vh;position:relative;padding-b
 /* ===== 弹窗 ===== */
 .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;padding:20px;}
 .modal.show{display:flex;}
-.mbox{background:#fff;border-radius:12px;width:100%;max-width:500px;max-height:70vh;overflow-y:auto;padding:16px;position:relative;}
+.mbox{background:#fff;border-radius:12px;width:100%;max-width:350px;max-height:70vh;overflow-y:auto;padding:16px;position:relative;}
 .mtitle{font-size:20px;font-weight:bold;margin-bottom:12px;text-align:center;}
 .mclose{position:absolute;top:10px;right:14px;font-size:24px;color:#999;background:none;border:none;cursor:pointer;}
 
-/* 移动端适配：屏幕小于1086px时保持535:551比例，满宽显示 */
-@media (max-width:1086px){
+/* 移动端适配：屏幕小于390px时满宽显示 */
+@media (max-width:390px){
   body{max-width:100%;}
-  .pl{width:49.26%;}
-  .pr{width:50.74%;flex:0 0 50.74%;}
   .tab-bar,.bottom-nav{max-width:100%;}
 }
 
@@ -421,7 +419,7 @@ body{max-width:1086px;margin:0 auto;min-height:100vh;position:relative;padding-b
 
   <div class="panel">
     <div class="pmain">
-      <!-- 左栏 535px -->
+      <!-- 左栏（满宽 单栏） -->
       <div class="pl">
         <div class="lht">求测人</div>
         <div class="lsub">猴(1980) 男</div>
@@ -458,7 +456,7 @@ body{max-width:1086px;margin:0 auto;min-height:100vh;position:relative;padding-b
         </div>
       </div>
 
-      <!-- 右栏 551px -->
+      <!-- 右栏（满宽 单栏） -->
       <div class="pr">
         <!-- 三传 -->
         <div class="sc">
