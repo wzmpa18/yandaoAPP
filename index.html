@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -6,178 +6,281 @@
 <title>中医命理</title>
 <style>
 :root{
-  --teal:#00BCB4;--bg:#F8F8F8;--white:#FFFFFF;--dark:#222222;
-  --gray:#707070;--lightgray:#E5E5E5;--red:#FF3B30;--gold:#D4A056;
+  --teal:#00BCB4;--teal-dark:#009B94;--bg:#F8F8F8;--white:#FFFFFF;
+  --dark:#222222;--gray:#707070;--lightgray:#E5E5E5;
+  --gold:#D4A056;--gold-light:#E8C884;
+  --wood:#34A853;--fire:#EA4335;--earth:#A67C52;--metal:#F1B232;--water:#2368B2;
+  --green:#34A853;--red:#EA4335;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{width:100%;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;color:var(--dark);background:var(--bg);}
-body{max-width:390px;margin:0 auto;min-height:100vh;padding-bottom:70px;}
+body{max-width:390px;margin:0 auto;min-height:100vh;padding-bottom:64px;}
 
-/* 顶部栏 */
-.top-bar{height:60px;background:var(--teal);display:flex;align-items:center;justify-content:space-between;padding:0 16px;position:sticky;top:0;z-index:10;}
-.top-bar h1{font-size:22px;font-weight:bold;color:#fff;letter-spacing:2px;}
-.top-bar .share-btn{width:36px;height:36px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;cursor:pointer;border-radius:50%;background:rgba(255,255,255,.2);}
-
-/* 大卡片容器 */
-.big-card{background:var(--white);border-radius:12px;padding:16px;margin:14px 16px;box-shadow:0 2px 8px rgba(0,0,0,.06);}
-.big-card-title{font-size:18px;font-weight:bold;color:var(--dark);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
-.big-card-title::before{content:'';width:4px;height:18px;background:var(--teal);border-radius:2px;}
-
-/* 小卡片网格 */
-.small-card-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
-.small-card-grid.col3{grid-template-columns:repeat(3,1fr);}
-.small-card{background:var(--bg);border-radius:10px;padding:14px 8px;text-align:center;cursor:pointer;text-decoration:none;color:inherit;display:block;transition:transform .15s,box-shadow .15s;}
-.small-card:active{transform:scale(.96);box-shadow:0 1px 4px rgba(0,0,0,.08);}
-.small-card .sc-icon{font-size:28px;margin-bottom:8px;display:block;}
-.small-card .sc-name{font-size:14px;font-weight:600;color:var(--dark);margin-bottom:2px;}
-.small-card .sc-desc{font-size:11px;color:var(--gray);line-height:1.4;}
-
-/* 横向通栏卡片（白色底色，青绿点缀） */
-.banner-card{background:var(--white);margin:0 16px 14px;padding:16px 20px;border-radius:12px;cursor:pointer;text-decoration:none;display:flex;align-items:center;gap:14px;box-shadow:0 2px 8px rgba(0,0,0,.06);color:inherit;}
-.banner-card .bc-icon{font-size:32px;flex-shrink:0;}
-.banner-card .bc-info{flex:1;}
-.banner-card .bc-title{font-size:17px;font-weight:bold;color:var(--dark);margin-bottom:4px;display:flex;align-items:center;gap:8px;}
-.banner-card .bc-title::before{content:'';width:4px;height:18px;background:var(--teal);border-radius:2px;}
-.banner-card .bc-desc{font-size:13px;color:var(--gray);line-height:1.5;}
-.banner-card .bc-arrow{font-size:22px;color:var(--teal);}
-
-/* 底部导航 */
-.bottom-nav{display:flex;background:#fff;border-top:1px solid var(--lightgray);position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:390px;z-index:100;height:60px;}
-.bottom-nav .bn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:var(--gray);font-size:12px;transition:color .2s;}
-.bottom-nav .bn-item.active{color:var(--teal);}
-.bottom-nav .bn-item .bn-icon{font-size:22px;margin-bottom:2px;}
-
-@media(max-width:480px){
-  .small-card-grid{grid-template-columns:repeat(4,1fr);gap:6px;}
-  .small-card{padding:10px 4px;}
-  .small-card .sc-icon{font-size:22px;}
-  .small-card .sc-name{font-size:12px;}
+/* ===== 第1部分：五运六气+子午流注 ===== */
+.hero-section{
+  background:linear-gradient(135deg,var(--teal) 0%,var(--teal-dark) 100%);
+  padding:16px 14px 14px;color:#fff;border-radius:0 0 16px 16px;
 }
+.hero-title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.hero-title{font-size:18px;font-weight:bold;letter-spacing:1px;}
+.hero-date{font-size:12px;opacity:.85;}
+.wylq-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.wylq-item{background:rgba(255,255,255,.15);border-radius:10px;padding:8px 10px;}
+.wylq-item .wylq-label{font-size:11px;opacity:.8;margin-bottom:2px;}
+.wylq-item .wylq-val{font-size:15px;font-weight:600;}
+.meridian-bar{
+  background:rgba(0,0,0,.2);border-radius:10px;padding:8px 12px;
+  display:flex;align-items:center;gap:8px;
+}
+.meridian-icon{font-size:20px;flex-shrink:0;}
+.meridian-text{flex:1;font-size:13px;line-height:1.4;}
+.meridian-text .mt-label{font-size:11px;opacity:.7;}
+.meridian-text .mt-name{font-size:15px;font-weight:600;}
+.meridian-tip{font-size:12px;opacity:.85;margin-top:2px;}
+
+/* ===== 第2部分：两大导航按钮 ===== */
+.nav-buttons{display:flex;gap:10px;padding:14px 14px 4px;}
+.nav-btn{
+  flex:1;height:80px;border-radius:14px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;cursor:pointer;text-decoration:none;
+  color:#fff;font-weight:bold;transition:transform .15s;position:relative;overflow:hidden;
+}
+.nav-btn:active{transform:scale(.96);}
+.nav-btn.yixue{background:linear-gradient(135deg,#00BCB4,#009B94);}
+.nav-btn.zhongyi{background:linear-gradient(135deg,#34A853,#2E7D32);}
+.nav-btn .nb-icon{font-size:28px;margin-bottom:4px;}
+.nav-btn .nb-text{font-size:18px;letter-spacing:2px;}
+.nav-btn .nb-sub{font-size:11px;opacity:.8;font-weight:400;margin-top:2px;}
+
+/* ===== 通用卡片 ===== */
+.card{background:var(--white);border-radius:12px;margin:10px 14px;padding:12px 14px;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+.card-title{font-size:16px;font-weight:bold;color:var(--dark);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.card-title::before{content:'';width:3px;height:16px;background:var(--teal);border-radius:2px;}
+
+/* ===== 第3部分：地母经 ===== */
+.dimujing-poem{
+  font-family:"STKaiti","KaiTi",serif;font-size:15px;line-height:2;
+  color:#5D4037;text-align:center;padding:6px 0;
+  background:linear-gradient(180deg,#FFF8E7,#FFF3D9);border-radius:8px;padding:10px;
+}
+.dimujing-desc{font-size:13px;color:var(--gray);margin-top:8px;line-height:1.6;}
+.dimujing-tag{
+  display:inline-block;font-size:11px;padding:2px 8px;border-radius:4px;
+  background:#FFF0F0;color:var(--red);font-weight:500;margin-right:6px;
+}
+
+/* ===== 第4部分：八字对标 ===== */
+.sizhu-info{display:flex;gap:6px;margin-bottom:10px;}
+.sizhu-pill{
+  flex:1;text-align:center;background:#F5F5F5;border-radius:8px;padding:6px 4px;
+}
+.sizhu-pill .sp-label{font-size:10px;color:var(--gray);}
+.sizhu-pill .sp-val{font-size:14px;font-weight:bold;color:var(--dark);margin-top:2px;}
+.fortune-row{display:flex;gap:8px;}
+.fortune-item{
+  flex:1;background:#F8F8F8;border-radius:8px;padding:8px;text-align:center;
+}
+.fortune-item .fi-icon{font-size:20px;margin-bottom:4px;}
+.fortune-item .fi-label{font-size:11px;color:var(--gray);margin-bottom:2px;}
+.fortune-item .fi-val{font-size:13px;font-weight:600;}
+.fortune-item.ji .fi-val{color:var(--red);}
+.fortune-item.xiong .fi-val{color:var(--gray);}
+.fortune-item.ji2 .fi-val{color:var(--gold);}
+.bazi-prompt{text-align:center;padding:16px 0;}
+.bazi-prompt .bp-text{font-size:14px;color:var(--gray);margin-bottom:10px;line-height:1.6;}
+.bazi-prompt .bp-btn{
+  display:inline-block;padding:8px 24px;background:var(--teal);color:#fff;
+  border-radius:20px;font-size:14px;font-weight:600;cursor:pointer;border:none;
+}
+
+/* ===== 第5部分：今日宜忌 ===== */
+.yiji-row{display:flex;gap:10px;}
+.yiji-col{flex:1;}
+.yiji-col .yj-head{
+  font-size:14px;font-weight:bold;text-align:center;padding:6px;border-radius:6px;margin-bottom:6px;
+}
+.yiji-col.yi .yj-head{background:#E8F5E9;color:var(--green);}
+.yiji-col.ji .yj-head{background:#FFEBEE;color:var(--red);}
+.yiji-col .yj-items{font-size:13px;color:var(--dark);line-height:1.8;text-align:center;}
+.pengzu-row{
+  margin-top:8px;padding-top:8px;border-top:1px solid #F0F0F0;
+  font-size:12px;color:var(--gray);line-height:1.6;
+}
+
+/* ===== 第6部分：底部导航 ===== */
+.bottom-nav{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:390px;height:60px;background:#fff;
+  display:flex;border-top:1px solid var(--lightgray);z-index:100;
+}
+.bn-item{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:2px;text-decoration:none;color:var(--gray);font-size:11px;cursor:pointer;
+}
+.bn-item.active{color:var(--teal);}
+.bn-item .bn-icon{font-size:22px;line-height:1;}
 </style>
 </head>
 <body>
 
-<!-- 顶部栏 -->
-<div class="top-bar">
-  <h1>中医命理</h1>
-  <div class="share-btn" onclick="shareApp()">↗</div>
-</div>
-
-<!-- ===== 易学专区 ===== -->
-<div class="big-card" style="margin-top:14px;">
-  <div class="big-card-title">易学排盘</div>
-  <div class="small-card-grid">
-    <a class="small-card" href="yixue.html#bazi">
-      <span class="sc-icon">命</span>
-      <div class="sc-name">八字排盘</div>
-      <div class="sc-desc">四柱·大运</div>
-    </a>
-    <a class="small-card" href="yixue.html#ziwei">
-      <span class="sc-icon">⭐</span>
-      <div class="sc-name">紫微斗数</div>
-      <div class="sc-desc">十二宫·四化</div>
-    </a>
-    <a class="small-card" href="yixue.html#qimen">
-      <span class="sc-icon">⚔</span>
-      <div class="sc-name">奇门遁甲</div>
-      <div class="sc-desc">八门·九星</div>
-    </a>
-    <a class="small-card" href="yixue.html#liuyao">
-      <span class="sc-icon">☰</span>
-      <div class="sc-name">六爻</div>
-      <div class="sc-desc">纳甲·世应</div>
-    </a>
-    <a class="small-card" href="yixue.html#meihua">
-      <span class="sc-icon">🌸</span>
-      <div class="sc-name">梅花易数</div>
-      <div class="sc-desc">体用·生克</div>
-    </a>
-    <a class="small-card" href="yixue.html#daliuren">
-      <span class="sc-icon">壬</span>
-      <div class="sc-name">大六壬</div>
-      <div class="sc-desc">四课·三传</div>
-    </a>
-    <a class="small-card" href="yixue.html#xiaoliuren">
-      <span class="sc-icon">🎯</span>
-      <div class="sc-name">小六壬</div>
-      <div class="sc-desc">掌诀·六神</div>
-    </a>
-    <a class="small-card" href="yixue.html#xuankong">
-      <span class="sc-icon">🧭</span>
-      <div class="sc-name">玄空飞星</div>
-      <div class="sc-desc">九宫·山向</div>
-    </a>
+<!-- ===== 第1部分：五运六气 + 子午流注 ===== -->
+<div class="hero-section">
+  <div class="hero-title-row">
+    <div class="hero-title">五运六气 · 子午流注</div>
+    <div class="hero-date" id="todayDate"></div>
+  </div>
+  <div class="wylq-grid">
+    <div class="wylq-item">
+      <div class="wylq-label">大运(年运)</div>
+      <div class="wylq-val">水运太过</div>
+    </div>
+    <div class="wylq-item">
+      <div class="wylq-label">司天 / 在泉</div>
+      <div class="wylq-val">少阴君火 / 阳明燥金</div>
+    </div>
+  </div>
+  <div class="meridian-bar" id="meridianBar">
+    <span class="meridian-icon">🫀</span>
+    <div class="meridian-text">
+      <div class="mt-label">子午流注 · 当前时辰经络</div>
+      <div class="mt-name" id="meridianName">心经当令</div>
+      <div class="meridian-tip" id="meridianTip">宜午休养心，避免剧烈运动</div>
+    </div>
   </div>
 </div>
 
-<!-- ===== 中医专区 ===== -->
-<div class="big-card">
-  <div class="big-card-title">中医工具</div>
-  <div class="small-card-grid col3">
-    <a class="small-card" href="zhongyi-zone.html#jingluo">
-      <span class="sc-icon">🧬</span>
-      <div class="sc-name">经络查询</div>
-      <div class="sc-desc">十二正经·奇经八脉</div>
-    </a>
-    <a class="small-card" href="zhongyi-zone.html#tcm">
-      <span class="sc-icon">🌿</span>
-      <div class="sc-name">中医问诊</div>
-      <div class="sc-desc">药材·方剂·问诊</div>
-    </a>
-    <a class="small-card" href="zhongyi-zone.html#zhongyi-study">
-      <span class="sc-icon">📚</span>
-      <div class="sc-name">中医学习</div>
-      <div class="sc-desc">理论·开方·题库</div>
-    </a>
+<!-- ===== 第2部分：两大导航按钮 ===== -->
+<div class="nav-buttons">
+  <a class="nav-btn yixue" href="yixue.html">
+    <span class="nb-icon">☯</span>
+    <span class="nb-text">易学</span>
+    <span class="nb-sub">八字·紫微·奇门·六爻</span>
+  </a>
+  <a class="nav-btn zhongyi" href="zhongyi-zone.html">
+    <span class="nb-icon">⚛</span>
+    <span class="nb-text">中医</span>
+    <span class="nb-sub">经络·方剂·问诊·学习</span>
+  </a>
+</div>
+
+<!-- ===== 第3部分：地母经今日吉凶 ===== -->
+<div class="card">
+  <div class="card-title">地母经 · 丙午年</div>
+  <div class="dimujing-poem">
+    丙午年来大水淹，高低禾稻总皆空。<br>
+    饥荒亦是当年定，疾病逢秋害老翁。
+  </div>
+  <div class="dimujing-desc">
+    <span class="dimujing-tag">水患</span>
+    <span class="dimujing-tag">秋季防病</span>
+    丙午年水运太过，全年需防水患洪涝。秋季金水相生，老者尤需注意肺肾疾病。宜培土制水，健脾利湿。
   </div>
 </div>
 
-<!-- ===== 五运六气 ===== -->
-<a class="banner-card" href="wuyunliuqi.html">
-  <div class="bc-icon">🌏</div>
-  <div class="bc-info">
-    <div class="bc-title">五运六气</div>
-    <div class="bc-desc">2026丙午岁 · 水运太过 · 少阴君火司天 · 阳明燥金在泉</div>
+<!-- ===== 第4部分：八字今日对标 ===== -->
+<div class="card">
+  <div class="card-title">今日运势对标</div>
+  <div class="sizhu-info">
+    <div class="sizhu-pill">
+      <div class="sp-label">流年</div>
+      <div class="sp-val">丙午</div>
+    </div>
+    <div class="sizhu-pill">
+      <div class="sp-label">流月</div>
+      <div class="sp-val">甲午</div>
+    </div>
+    <div class="sizhu-pill">
+      <div class="sp-label">流日</div>
+      <div class="sp-val">辛未</div>
+    </div>
+    <div class="sizhu-pill">
+      <div class="sp-label">建除</div>
+      <div class="sp-val">危日</div>
+    </div>
   </div>
-  <div class="bc-arrow">›</div>
-</a>
-
-<!-- ===== 黄历查询 ===== -->
-<a class="banner-card" href="huangli.html">
-  <div class="bc-icon">📜</div>
-  <div class="bc-info">
-    <div class="bc-title">黄历查询</div>
-    <div class="bc-desc">农历五月十八 · 丙午年甲午月辛未日 · 宜祭祀祈福 · 忌动土破土</div>
+  <div id="baziFortune">
+    <div class="bazi-prompt">
+      <div class="bp-text">输入您的生辰八字，获取个性化<br>流年流月流日吉凶对标</div>
+      <a class="bp-btn" href="paiban/bazi-demo.html">排八字</a>
+    </div>
   </div>
-  <div class="bc-arrow">›</div>
-</a>
+</div>
 
-<!-- 底部导航 -->
+<!-- ===== 第5部分：今日宜忌 ===== -->
+<div class="card">
+  <div class="card-title">今日宜忌 · 辛未日</div>
+  <div class="yiji-row">
+    <div class="yiji-col yi">
+      <div class="yj-head">宜</div>
+      <div class="yj-items">祭祀 祈福 开光<br>出行 解除 沐浴</div>
+    </div>
+    <div class="yiji-col ji">
+      <div class="yj-head">忌</div>
+      <div class="yj-items">动土 破土 嫁娶<br>安葬 行丧 开渠</div>
+    </div>
+  </div>
+  <div class="pengzu-row">
+    <strong>彭祖百忌：</strong>辛不合酱主人不尝，未不服药毒气入肠<br>
+    <strong>胎神占方：</strong>厨灶炉外东北<br>
+    <strong>二十八宿：</strong>尾星造作益荣昌，婚姻添喜喜重重
+  </div>
+</div>
+
+<!-- ===== 第6部分：底部导航 ===== -->
 <div class="bottom-nav">
-  <div class="bn-item active">
-    <span class="bn-icon">🏠</span>
-    <span>首页</span>
-  </div>
-  <div class="bn-item">
-    <span class="bn-icon">🤖</span>
-    <span>AI</span>
-  </div>
-  <div class="bn-item">
-    <span class="bn-icon">💬</span>
-    <span>信息</span>
-  </div>
-  <div class="bn-item">
-    <span class="bn-icon">👤</span>
-    <span>个人中心</span>
-  </div>
+  <a class="bn-item active" href="index.html">
+    <span class="bn-icon">🏠</span><span>主页</span>
+  </a>
+  <a class="bn-item" href="ai.html">
+    <span class="bn-icon">🤖</span><span>AI</span>
+  </a>
+  <a class="bn-item" href="#" onclick="alert('消息功能开发中');return false;">
+    <span class="bn-icon">💬</span><span>信息</span>
+  </a>
+  <a class="bn-item" href="profile.html">
+    <span class="bn-icon">👤</span><span>个人中心</span>
+  </a>
 </div>
 
 <script>
-function shareApp(){ alert('分享功能开发中'); }
+// 显示今日日期
+(function(){
+  var now = new Date();
+  var months = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
+  var days = ['周日','周一','周二','周三','周四','周五','周六'];
+  document.getElementById('todayDate').textContent =
+    now.getFullYear()+'年'+months[now.getMonth()]+now.getDate()+'日 '+days[now.getDay()];
+})();
+
+// 子午流注 - 根据当前时辰显示经络
+(function(){
+  var meridians = [
+    {name:'胆经当令',tip:'宜安眠养胆，胆气虚者易恐惧',icon:'🫀'},
+    {name:'肝经当令',tip:'宜深睡养肝，肝血不足易怒',icon:'🌿'},
+    {name:'肺经当令',tip:'宜深睡养肺，肺气不足易咳',icon:'🫁'},
+    {name:'大肠经当令',tip:'宜起床排便，饮温水排毒',icon:'💧'},
+    {name:'胃经当令',tip:'宜进早餐，养胃气',icon:'🍚'},
+    {name:'脾经当令',tip:'宜运动助消化，忌久坐',icon:'💪'},
+    {name:'心经当令',tip:'宜午休养心，避免剧烈运动',icon:'🫀'},
+    {name:'小肠经当令',tip:'宜吸收营养，忌生冷',icon:'🍎'},
+    {name:'膀胱经当令',tip:'宜饮水排毒，多运动',icon:'💧'},
+    {name:'肾经当令',tip:'宜休息养肾，忌劳累',icon:'🫘'},
+    {name:'心包经当令',tip:'宜放松心情，听听音乐',icon:'🎵'},
+    {name:'三焦经当令',tip:'宜安睡养百脉，准备入睡',icon:'🌙'}
+  ];
+  var h = new Date().getHours();
+  var idx = Math.floor((h + 1) / 2) % 12;
+  var m = meridians[idx];
+  document.getElementById('meridianName').textContent = m.name;
+  document.getElementById('meridianTip').textContent = m.tip;
+  document.querySelector('.meridian-icon').textContent = m.icon;
+})();
 </script>
 
 <!-- feedback system -->
 <link rel="stylesheet" href="utils/feedback.css">
 <script src="utils/feedback.js"></script>
+<!-- AI config -->
+<script src="utils/ai-config.js"></script>
 </body>
 </html>

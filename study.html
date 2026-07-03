@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>学习中心 - 中医命理</title>
+<style>
+:root{
+  --teal:#00BCB4;--teal-dark:#009B94;--bg:#F8F8F8;--white:#FFFFFF;
+  --dark:#222222;--gray:#707070;--lightgray:#E5E5E5;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{width:100%;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;color:var(--dark);background:var(--bg);}
+body{max-width:390px;margin:0 auto;min-height:100vh;padding-bottom:70px;}
+
+/* ===== 顶部白色标题栏 ===== */
+.top-bar{
+  height:50px;background:var(--white);display:flex;align-items:center;
+  padding:0 12px;position:sticky;top:0;z-index:20;border-bottom:1px solid var(--lightgray);
+}
+.top-bar .back-btn{
+  width:32px;height:32px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:24px;color:var(--dark);border:none;background:none;margin-right:6px;
+  line-height:1;
+}
+.top-bar .page-title{font-size:18px;font-weight:bold;color:var(--dark);letter-spacing:1px;}
+
+/* ===== 顶部Tab切换 ===== */
+.tab-bar{
+  display:flex;background:var(--white);padding:8px 14px;gap:8px;
+  position:sticky;top:50px;z-index:15;border-bottom:1px solid var(--lightgray);
+}
+.tab{
+  flex:1;text-align:center;padding:9px 0;border-radius:8px;
+  font-size:15px;font-weight:600;color:var(--gray);cursor:pointer;
+  background:#F2F2F2;transition:all .2s;
+}
+.tab.active{background:var(--teal);color:#fff;}
+
+/* ===== 区块通用 ===== */
+.section{padding:14px 14px 0;}
+.section-title{
+  font-size:16px;font-weight:bold;color:var(--dark);margin-bottom:10px;
+  display:flex;align-items:center;gap:6px;
+}
+.section-title::before{content:'';width:3px;height:16px;background:var(--teal);border-radius:2px;display:inline-block;}
+.section-title .st-sub{font-size:12px;color:var(--gray);font-weight:400;margin-left:4px;}
+
+/* ===== 书籍卡片 ===== */
+.book-card{
+  background:var(--white);border-radius:12px;padding:12px 14px;
+  box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:10px;
+}
+.book-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;}
+.book-name{font-size:16px;font-weight:bold;color:var(--dark);flex-shrink:0;}
+.book-intro{font-size:12px;color:var(--gray);text-align:right;}
+.book-foot{display:flex;justify-content:flex-end;border-top:1px solid #F2F2F2;padding-top:10px;margin-top:10px;}
+.read-btn{
+  display:inline-block;padding:5px 18px;background:var(--teal);color:#fff;
+  border-radius:16px;font-size:13px;font-weight:500;border:none;cursor:pointer;transition:opacity .15s;
+}
+.read-btn:active{opacity:.85;}
+
+/* ===== 占位卡片 ===== */
+.placeholder-card{
+  background:var(--white);border-radius:12px;padding:26px 16px;text-align:center;
+  color:var(--gray);font-size:13px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);
+  border:1px dashed var(--lightgray);
+}
+.placeholder-card .ph-icon{font-size:30px;margin-bottom:8px;opacity:.5;}
+
+/* ===== 模拟考试 ===== */
+.exam-box{
+  background:var(--white);border-radius:12px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.06);
+}
+.exam-box-title{font-size:15px;font-weight:bold;color:var(--dark);margin-bottom:10px;}
+.exam-btn{
+  display:flex;align-items:center;justify-content:space-between;width:100%;
+  padding:11px 14px;background:#F8F8F8;border-radius:10px;margin-bottom:8px;
+  border:1px solid var(--lightgray);cursor:pointer;font-size:14px;color:var(--dark);
+  font-family:inherit;transition:background .15s;
+}
+.exam-btn:last-child{margin-bottom:0;}
+.exam-btn:active{background:#EFEFEF;}
+.exam-btn .eb-level{color:var(--teal);font-weight:600;}
+.exam-btn .eb-arrow{color:var(--gray);}
+
+/* ===== 方剂分类 ===== */
+.category-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.category-btn{
+  background:var(--white);border-radius:10px;padding:12px 4px;text-align:center;
+  font-size:13px;font-weight:500;color:var(--dark);cursor:pointer;
+  border:1px solid var(--lightgray);transition:.15s;
+}
+.category-btn:active{background:var(--teal);color:#fff;border-color:var(--teal);}
+.category-btn .cb-icon{font-size:18px;display:block;margin-bottom:3px;}
+
+/* ===== 资格考试卡片 ===== */
+.exam-card{
+  background:var(--white);border-radius:12px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.06);
+  margin-bottom:10px;
+}
+.exam-card .ec-head{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+.exam-card .ec-icon{width:30px;height:30px;border-radius:8px;background:#E0F7FA;color:var(--teal-dark);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.exam-card .ec-title{font-size:15px;font-weight:bold;color:var(--dark);}
+.exam-card .ec-desc{font-size:12px;color:var(--gray);line-height:1.6;margin-bottom:10px;}
+.exam-card .ec-btn{
+  display:inline-block;padding:6px 18px;background:var(--teal);color:#fff;
+  border-radius:16px;font-size:13px;font-weight:500;border:none;cursor:pointer;transition:opacity .15s;
+}
+.exam-card .ec-btn:active{opacity:.85;}
+
+/* ===== 底部导航 ===== */
+.bottom-nav{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:390px;height:60px;background:#fff;
+  display:flex;border-top:1px solid var(--lightgray);z-index:100;
+}
+.bn-item{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:2px;text-decoration:none;color:var(--gray);font-size:11px;cursor:pointer;
+}
+.bn-item.active{color:var(--teal);}
+.bn-item .bn-icon{font-size:22px;line-height:1;}
+
+/* ===== Toast ===== */
+.toast{
+  position:fixed;top:64px;left:50%;transform:translateX(-50%);
+  background:rgba(0,0,0,.8);color:#fff;padding:9px 20px;border-radius:20px;
+  font-size:13px;z-index:999;pointer-events:none;opacity:0;transition:opacity .3s;max-width:90%;text-align:center;
+}
+.toast.show{opacity:1;}
+</style>
+</head>
+<body>
+
+<!-- ===== 顶部白色标题栏 ===== -->
+<header class="top-bar">
+  <button class="back-btn" onclick="history.back()">←</button>
+  <span class="page-title">学习中心</span>
+</header>
+
+<!-- ===== 顶部Tab切换 ===== -->
+<div class="tab-bar">
+  <div class="tab active" data-tab="yixue" onclick="switchTab('yixue')">易学</div>
+  <div class="tab" data-tab="zhongyi" onclick="switchTab('zhongyi')">中医</div>
+</div>
+
+<!-- ===== 易学 Tab 内容 ===== -->
+<div class="tab-content" id="yixue">
+
+  <!-- 古籍经典 -->
+  <div class="section">
+    <div class="section-title">古籍经典 <span class="st-sub">易学命理典籍</span></div>
+
+    <div class="book-card">
+      <div class="book-head">
+        <span class="book-name">周易原文</span>
+        <span class="book-intro">易经卦辞·爻辞原文</span>
+      </div>
+      <div class="book-foot">
+        <button class="read-btn" onclick="toast('《周易原文》内容整理中')">阅读 →</button>
+      </div>
+    </div>
+
+    <div class="book-card">
+      <div class="book-head">
+        <span class="book-name">滴天髓</span>
+        <span class="book-intro">命理经典·任铁樵注</span>
+      </div>
+      <div class="book-foot">
+        <button class="read-btn" onclick="toast('《滴天髓》内容整理中')">阅读 →</button>
+      </div>
+    </div>
+
+    <div class="book-card">
+      <div class="book-head">
+        <span class="book-name">穷通宝鉴</span>
+        <span class="book-intro">调候用神·月令取用</span>
+      </div>
+      <div class="book-foot">
+        <button class="read-btn" onclick="toast('《穷通宝鉴》内容整理中')">阅读 →</button>
+      </div>
+    </div>
+
+    <div class="book-card">
+      <div class="book-head">
+        <span class="book-name">三命通会</span>
+        <span class="book-intro">命理百科·万民英</span>
+      </div>
+      <div class="book-foot">
+        <button class="read-btn" onclick="toast('《三命通会》内容整理中')">阅读 →</button>
+      </div>
+    </div>
+
+    <div class="book-card">
+      <div class="book-head">
+        <span class="book-name">子平真诠</span>
+        <span class="book-intro">格局用神·沈孝瞻</span>
+      </div>
+      <div class="book-foot">
+        <button class="read-btn" onclick="toast('《子平真诠》内容整理中')">阅读 →</button>
+      </div>
+    </div>
+
+    <div class="book-card">
+      <div class="book-head">
+        <span class="book-name">渊海子平</span>
+        <span class="book-intro">命理入门·徐升</span>
+      </div>
+      <div class="book-foot">
+        <button class="read-btn" onclick="toast('《渊海子平》内容整理中')">阅读 →</button>
+      </div>
+    </div>
+
+    <div class="book-card">
+      <div class="book-head">
+        <span class="book-name">梅花易数</span>
+        <span class="book-intro">邵雍象数·先天易</span>
+      </div>
+      <div class="book-foot">
+        <button class="read-btn" onclick="toast('《梅花易数》内容整理中')">阅读 →</button>
+      </div>
+    </div>
+
+    <div class="book-card">
+      <div class="book-head">
+        <span class="book-name">奇门遁甲秘笈大全</span>
+        <span class="book-intro">三式之首·遁甲术</span>
+      </div>
+      <div class="book-foot">
+        <button class="read-btn" onclick="toast('《奇门遁甲秘笈大全》内容整理中')">阅读 →</button>
+      </div>
+    </div>
+
+    <div class="book-card">
+      <div class="book-head">
+        <span class="book-name">大六壬指南</span>
+        <span class="book-intro">三式之冠·壬占术</span>
+      </div>
+      <div class="book-foot">
+        <button class="read-btn" onclick="toast('《大六壬指南》内容整理中')">阅读 →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 视频教程 -->
+  <div class="section">
+    <div class="section-title">视频教程 <span class="st-sub">名师讲解</span></div>
+    <div class="placeholder-card">
+      <div class="ph-icon">▶</div>
+      <div>视频教程制作中，敬请期待</div>
+    </div>
+  </div>
+
+  <!-- 模拟考试 -->
+  <div class="section">
+    <div class="section-title">模拟考试 <span class="st-sub">命理等级测评</span></div>
+    <div class="exam-box">
+      <div class="exam-box-title">命理等级考试</div>
+      <button class="exam-btn" onclick="toast('初级考试开发中')">
+        <span><span class="eb-level">初级</span> · 入门基础测评</span>
+        <span class="eb-arrow">›</span>
+      </button>
+      <button class="exam-btn" onclick="toast('中级考试开发中')">
+        <span><span class="eb-level">中级</span> · 进阶实战测评</span>
+        <span class="eb-arrow">›</span>
+      </button>
+      <button class="exam-btn" onclick="toast('高级考试开发中')">
+        <span><span class="eb-level">高级</span> · 名家精研测评</span>
+        <span class="eb-arrow">›</span>
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===== 中医 Tab 内容 ===== -->
+<div class="tab-content" id="zhongyi" style="display:none;">
+
+  <!-- 中医古籍 -->
+  <div class="section">
+    <div class="section-title">中医古籍 <span class="st-sub">经典医籍</span></div>
+
+    <div class="book-card">
+      <div class="book-head">
+        <span class="book-name">黄帝内经</span>
+        <span class="book-intro">素问+灵枢·医经之祖</span>
+      </div>
+      <div class="book-foot">
+        <button class="read-btn" onclick="toast('《黄帝内经》内容整理中')">阅读 →</button>
+      </div>
+    </div>
+
+    <div class="book-card">
+      <div class="book-head">
+        <span class="book-name">伤寒论</span>
+        <span class="book-intro">张仲景·六经辨证</span>
+      </div>
+      <div class="book-foot">
+        <button class="read-btn" onclick="toast('《伤寒论》内容整理中')">阅读 →</button>
+      </div>
+    </div>
+
+    <div class="book-card">
+      <div class="book-head">
+        <span class="book-name">金匮要略</span>
+        <span class="book-intro">杂病证治·张仲景</span>
+      </div>
+      <div class="book-foot">
+        <button class="read-btn" onclick="toast('《金匮要略》内容整理中')">阅读 →</button>
+      </div>
+    </div>
+
+    <div class="book-card">
+      <div class="book-head">
+        <span class="book-name">温病条辨</span>
+        <span class="book-intro">三焦辨证·吴鞠通</span>
+      </div>
+      <div class="book-foot">
+        <button class="read-btn" onclick="toast('《温病条辨》内容整理中')">阅读 →</button>
+      </div>
+    </div>
+
+    <div class="book-card">
+      <div class="book-head">
+        <span class="book-name">本草纲目</span>
+        <span class="book-intro">李时珍·本草大成</span>
+      </div>
+      <div class="book-foot">
+        <button class="read-btn" onclick="toast('《本草纲目》内容整理中')">阅读 →</button>
+      </div>
+    </div>
+
+    <div class="book-card">
+      <div class="book-head">
+        <span class="book-name">濒湖脉学</span>
+        <span class="book-intro">二十七脉·李时珍</span>
+      </div>
+      <div class="book-foot">
+        <button class="read-btn" onclick="toast('《濒湖脉学》内容整理中')">阅读 →</button>
+      </div>
+    </div>
+
+    <div class="book-card">
+      <div class="book-head">
+        <span class="book-name">针灸甲乙经</span>
+        <span class="book-intro">针灸学祖本·皇甫谧</span>
+      </div>
+      <div class="book-foot">
+        <button class="read-btn" onclick="toast('《针灸甲乙经》内容整理中')">阅读 →</button>
+      </div>
+    </div>
+
+    <div class="book-card">
+      <div class="book-head">
+        <span class="book-name">汤头歌诀</span>
+        <span class="book-intro">方剂歌诀·汪昂</span>
+      </div>
+      <div class="book-foot">
+        <button class="read-btn" onclick="toast('《汤头歌诀》内容整理中')">阅读 →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 方剂学习 -->
+  <div class="section">
+    <div class="section-title">方剂学习 <span class="st-sub">按分类研习</span></div>
+    <div class="category-grid">
+      <div class="category-btn" onclick="toast('解表剂学习中')"><span class="cb-icon">🌿</span>解表剂</div>
+      <div class="category-btn" onclick="toast('清热剂学习中')"><span class="cb-icon">❄</span>清热剂</div>
+      <div class="category-btn" onclick="toast('补益剂学习中')"><span class="cb-icon">✚</span>补益剂</div>
+      <div class="category-btn" onclick="toast('理气剂学习中')"><span class="cb-icon">♨</span>理气剂</div>
+      <div class="category-btn" onclick="toast('理血剂学习中')"><span class="cb-icon">♥</span>理血剂</div>
+      <div class="category-btn" onclick="toast('祛湿剂学习中')"><span class="cb-icon">💧</span>祛湿剂</div>
+      <div class="category-btn" onclick="toast('和解剂学习中')"><span class="cb-icon">☯</span>和解剂</div>
+      <div class="category-btn" onclick="toast('温里剂学习中')"><span class="cb-icon">🔥</span>温里剂</div>
+      <div class="category-btn" onclick="toast('安神剂学习中')"><span class="cb-icon">🌙</span>安神剂</div>
+    </div>
+  </div>
+
+  <!-- 资格考试 -->
+  <div class="section">
+    <div class="section-title">资格考试 <span class="st-sub">模拟训练</span></div>
+
+    <div class="exam-card">
+      <div class="ec-head">
+        <div class="ec-icon">🏥</div>
+        <div class="ec-title">中医执业医师资格考试模拟</div>
+      </div>
+      <div class="ec-desc">国家中医执业医师资格考试全真模拟，涵盖中医基础、方剂、针灸与临床辨证。</div>
+      <button class="ec-btn" onclick="toast('模拟练习即将开放')">模拟练习 →</button>
+    </div>
+
+    <div class="exam-card">
+      <div class="ec-head">
+        <div class="ec-icon">💊</div>
+        <div class="ec-title">中药师资格考试模拟</div>
+      </div>
+      <div class="ec-desc">执业中药师资格考试模拟练习，涵盖中药学、中药鉴定、中药药剂等专业知识。</div>
+      <button class="ec-btn" onclick="toast('模拟练习即将开放')">模拟练习 →</button>
+    </div>
+
+    <div class="exam-card">
+      <div class="ec-head">
+        <div class="ec-icon">📋</div>
+        <div class="ec-title">中医助理医师模拟</div>
+      </div>
+      <div class="ec-desc">中医执业助理医师资格考试模拟训练，基础理论结合临床实操综合测评。</div>
+      <button class="ec-btn" onclick="toast('模拟练习即将开放')">模拟练习 →</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===== 底部导航栏 ===== -->
+<nav class="bottom-nav">
+  <a class="bn-item" href="index.html">
+    <span class="bn-icon">🏠</span><span>主页</span>
+  </a>
+  <a class="bn-item" href="ai.html">
+    <span class="bn-icon">🤖</span><span>AI</span>
+  </a>
+  <a class="bn-item active" href="study.html">
+    <span class="bn-icon">📚</span><span>学习</span>
+  </a>
+  <a class="bn-item" href="profile.html">
+    <span class="bn-icon">👤</span><span>个人中心</span>
+  </a>
+</nav>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===== Tab 切换 ===== */
+function switchTab(tab){
+  document.querySelectorAll('.tab').forEach(function(t){
+    t.classList.toggle('active', t.getAttribute('data-tab')===tab);
+  });
+  document.querySelectorAll('.tab-content').forEach(function(c){
+    c.style.display = (c.id===tab) ? 'block' : 'none';
+  });
+  // 切换后回到顶部内容区
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+/* ===== Toast 提示 ===== */
+var toastTimer = null;
+function toast(msg){
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ el.classList.remove('show'); }, 2000);
+}
+</script>
+
+<!-- feedback system -->
+<link rel="stylesheet" href="utils/feedback.css">
+<script src="utils/feedback.js"></script>
+</body>
+</html>

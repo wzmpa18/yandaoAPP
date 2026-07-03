@@ -28,7 +28,7 @@ body{max-width:390px;margin:0 auto;min-height:100vh;padding-bottom:70px;}
 .card.zhongyi .card-icon{background:#FFF3E0;color:#E65100;}
 
 .bottom-nav{display:flex;background:#fff;border-top:1px solid var(--lightgray);position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:390px;z-index:100;height:60px;}
-.bottom-nav .bn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:var(--gray);font-size:12px;}
+.bottom-nav .bn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:var(--gray);font-size:12px;text-decoration:none;}
 .bottom-nav .bn-item .bn-icon{font-size:22px;margin-bottom:2px;}
 .bottom-nav .bn-item:first-child{color:var(--teal);}
 </style>
@@ -68,12 +68,18 @@ body{max-width:390px;margin:0 auto;min-height:100vh;padding-bottom:70px;}
 </div>
 
 <div class="bottom-nav">
-  <div class="bn-item" onclick="location.href='index.html'">
-    <span class="bn-icon">🏠</span><span>首页</span>
-  </div>
-  <div class="bn-item"><span class="bn-icon">🤖</span><span>AI</span></div>
-  <div class="bn-item"><span class="bn-icon">💬</span><span>信息</span></div>
-  <div class="bn-item"><span class="bn-icon">👤</span><span>个人中心</span></div>
+  <a class="bn-item" href="index.html">
+    <span class="bn-icon">🏠</span><span>主页</span>
+  </a>
+  <a class="bn-item" href="ai.html">
+    <span class="bn-icon">🤖</span><span>AI</span>
+  </a>
+  <a class="bn-item" href="study.html">
+    <span class="bn-icon">📖</span><span>学习</span>
+  </a>
+  <a class="bn-item" href="profile.html">
+    <span class="bn-icon">👤</span><span>个人中心</span>
+  </a>
 </div>
 
 

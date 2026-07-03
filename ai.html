@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta name="theme-color" content="#00BCB4">
+<title>AI智能助手 - 中医命理</title>
+<style>
+:root{
+  --teal:#00BCB4;--teal-dark:#009B94;--bg:#F8F8F8;--white:#FFFFFF;
+  --dark:#222222;--gray:#707070;--lightgray:#E5E5E5;--placeholder:#B0B0B0;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html{height:100%;}
+html,body{
+  width:100%;height:100%;
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  color:var(--dark);background:var(--bg);
+}
+body{max-width:390px;margin:0 auto;overflow:hidden;display:flex;flex-direction:column;height:100vh;}
+
+/* 隐藏 ai-config 自动注入的浮动按钮（本页即为AI页面） */
+.aicc-fab{display:none !important;}
+
+/* ===== 顶部标题栏 ===== */
+.top-bar{
+  height:50px;background:#fff;flex-shrink:0;position:relative;z-index:10;
+  display:flex;align-items:center;justify-content:space-between;padding:0 12px;
+  border-bottom:1px solid #F0F0F0;
+}
+.top-bar .back-btn{
+  width:34px;height:34px;display:flex;align-items:center;justify-content:center;
+  background:none;border:none;cursor:pointer;color:var(--dark);font-size:22px;line-height:1;
+}
+.top-bar .title{font-size:17px;font-weight:600;color:var(--dark);}
+.top-bar .setting-btn{
+  width:34px;height:34px;display:flex;align-items:center;justify-content:center;
+  background:none;border:none;cursor:pointer;color:var(--gray);
+}
+
+/* ===== AI提供者选择器 ===== */
+.provider-bar{
+  display:flex;gap:8px;padding:10px 14px;background:#fff;flex-shrink:0;
+  border-bottom:1px solid #F0F0F0;
+}
+.provider-tab{
+  flex:1;padding:7px 0;text-align:center;border-radius:18px;font-size:13px;font-weight:600;
+  border:1px solid #E5E5E5;background:#FAFAFA;color:var(--gray);cursor:pointer;
+  transition:all .15s;font-family:inherit;
+}
+.provider-tab:active{transform:scale(.96);}
+.provider-tab.active{
+  background:var(--teal);border-color:var(--teal);color:#fff;
+  box-shadow:0 2px 8px rgba(0,188,180,.3);
+}
+
+/* ===== 对话区域 ===== */
+.chat-area{
+  flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 12px;
+  display:flex;flex-direction:column;gap:14px;
+}
+.msg-row{
+  display:flex;align-items:flex-start;gap:8px;max-width:100%;
+  animation:msgIn .25s ease;
+}
+.msg-row.user{flex-direction:row-reverse;}
+@keyframes msgIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.msg-avatar{
+  width:34px;height:34px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;
+}
+.msg-avatar.ai{background:var(--teal);color:#fff;}
+.msg-avatar.user{background:#E0E0E0;color:#555;}
+.msg-content{display:flex;flex-direction:column;max-width:78%;}
+.msg-row.user .msg-content{align-items:flex-end;}
+.msg-bubble{
+  padding:10px 14px;border-radius:14px;font-size:14px;line-height:1.65;
+  word-break:break-word;white-space:pre-wrap;
+}
+.msg-row.ai .msg-bubble{
+  background:#fff;color:var(--dark);border-top-left-radius:4px;
+  box-shadow:0 1px 3px rgba(0,0,0,.05);
+}
+.msg-row.user .msg-bubble{
+  background:var(--teal);color:#fff;border-top-right-radius:4px;
+}
+
+/* 思考中动画 */
+.thinking-wrap{display:inline-flex;align-items:center;gap:6px;}
+.thinking-text{font-size:14px;color:var(--gray);}
+.thinking-dots{display:inline-flex;gap:3px;}
+.thinking-dots i{
+  width:6px;height:6px;border-radius:50%;background:var(--teal);
+  display:inline-block;animation:thinkBounce 1.2s infinite ease-in-out;
+}
+.thinking-dots i:nth-child(2){animation-delay:.15s;}
+.thinking-dots i:nth-child(3){animation-delay:.3s;}
+@keyframes thinkBounce{
+  0%,60%,100%{opacity:.3;transform:translateY(0);}
+  30%{opacity:1;transform:translateY(-5px);}
+}
+
+/* ===== 快捷问题按钮 ===== */
+.quick-bar{
+  display:flex;gap:8px;padding:8px 14px;background:#fff;flex-shrink:0;
+  border-top:1px solid #F0F0F0;overflow-x:auto;-webkit-overflow-scrolling:touch;
+}
+.quick-bar::-webkit-scrollbar{display:none;}
+.quick-btn{
+  flex-shrink:0;padding:6px 14px;border-radius:16px;font-size:13px;font-weight:500;
+  border:1px solid var(--teal);background:rgba(0,188,180,.08);color:var(--teal);
+  cursor:pointer;white-space:nowrap;font-family:inherit;transition:all .12s;
+}
+.quick-btn:active{transform:scale(.94);background:rgba(0,188,180,.18);}
+
+/* ===== 底部输入栏 ===== */
+.input-bar{
+  display:flex;align-items:flex-end;gap:10px;padding:8px 12px;background:#fff;flex-shrink:0;
+  border-top:1px solid #F0F0F0;
+}
+.input-wrap{flex:1;}
+.input-bar textarea{
+  width:100%;border:1px solid #E5E5E5;border-radius:20px;padding:9px 16px;font-size:14px;
+  font-family:inherit;resize:none;outline:none;max-height:80px;min-height:40px;line-height:1.5;
+  background:#FAFAFA;color:var(--dark);transition:border-color .15s,background .15s;
+}
+.input-bar textarea:focus{border-color:var(--teal);background:#fff;}
+.input-bar textarea::placeholder{color:var(--placeholder);}
+.send-btn{
+  width:40px;height:40px;border-radius:50%;background:var(--teal);color:#fff;border:none;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;
+  transition:all .15s;box-shadow:0 2px 8px rgba(0,188,180,.35);
+}
+.send-btn:active{transform:scale(.9);}
+.send-btn:disabled{opacity:.45;box-shadow:none;cursor:not-allowed;}
+
+/* 导航占位 + 底部导航 */
+.nav-spacer{height:60px;flex-shrink:0;}
+.bottom-nav{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:390px;height:60px;background:#fff;
+  display:flex;border-top:1px solid var(--lightgray);z-index:100;
+}
+.bn-item{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:2px;text-decoration:none;color:var(--gray);font-size:11px;cursor:pointer;
+}
+.bn-item.active{color:var(--teal);}
+.bn-item .bn-icon{font-size:22px;line-height:1;}
+</style>
+</head>
+<body>
+
+<!-- ===== 顶部标题栏 ===== -->
+<header class="top-bar">
+  <button class="back-btn" onclick="history.back()" aria-label="返回">&#8592;</button>
+  <span class="title">AI智能助手</span>
+  <button class="setting-btn" id="settingBtn" aria-label="设置">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+  </button>
+</header>
+
+<!-- ===== AI提供者选择器 ===== -->
+<div class="provider-bar" id="providerBar">
+  <button class="provider-tab" data-provider="doubao">豆包</button>
+  <button class="provider-tab" data-provider="deepseek">言道</button>
+  <button class="provider-tab" data-provider="hunyuan">混元</button>
+</div>
+
+<!-- ===== 对话区域 ===== -->
+<div class="chat-area" id="chatArea">
+  <!-- 欢迎消息 -->
+  <div class="msg-row ai">
+    <div class="msg-avatar ai">AI</div>
+    <div class="msg-content">
+      <div class="msg-bubble">您好，我是中医命理AI助手，可以为您解答易学、中医方面的问题。请问有什么可以帮您？</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 快捷问题按钮 ===== -->
+<div class="quick-bar">
+  <button class="quick-btn" data-q="今日运势如何？请从流日角度简要分析。">今日运势</button>
+  <button class="quick-btn" data-q="请为我做一次八字解析，分析整体命局特点。">八字解析</button>
+  <button class="quick-btn" data-q="请介绍当前时辰对应的经络养生方法。">经络养生</button>
+  <button class="quick-btn" data-q="请介绍一些常用的中医方剂及其功效。">方剂咨询</button>
+</div>
+
+<!-- ===== 底部输入栏 ===== -->
+<div class="input-bar">
+  <div class="input-wrap">
+    <textarea id="msgInput" rows="1" placeholder="请输入您的问题..."></textarea>
+  </div>
+  <button class="send-btn" id="sendBtn" aria-label="发送">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+  </button>
+</div>
+
+<!-- 导航占位（为固定底部导航留出空间） -->
+<div class="nav-spacer"></div>
+
+<!-- ===== 底部导航栏 ===== -->
+<nav class="bottom-nav">
+  <a class="bn-item" href="index.html">
+    <span class="bn-icon">&#127968;</span><span>主页</span>
+  </a>
+  <a class="bn-item active" href="ai.html">
+    <span class="bn-icon">&#129302;</span><span>AI</span>
+  </a>
+  <a class="bn-item" href="study.html">
+    <span class="bn-icon">&#128214;</span><span>学习</span>
+  </a>
+  <a class="bn-item" href="profile.html">
+    <span class="bn-icon">&#128100;</span><span>个人中心</span>
+  </a>
+</nav>
+
+<!-- AI配置 -->
+<script src="utils/ai-config.js"></script>
+<script>
+(function(){
+  'use strict';
+
+  /* ===== 常量 ===== */
+  // 中医命理通用系统提示词
+  var SYSTEM_PROMPT = '你是中医命理AI助手，精通易学（八字命理、紫微斗数、奇门遁甲、六爻纳甲、梅花易数、大六壬、玄空飞星、小六壬等）与中医（经络穴位、方剂配伍、养生调理、五运六气、子午流注等）领域。请用专业、中正、通俗易懂的语言回答用户问题，结构清晰，分点阐述。注意提醒用户理性参考，AI内容不作为医疗或人生决策的唯一依据。';
+
+  /* ===== DOM 引用 ===== */
+  var chatArea  = document.getElementById('chatArea');
+  var msgInput  = document.getElementById('msgInput');
+  var sendBtn   = document.getElementById('sendBtn');
+  var providerBar = document.getElementById('providerBar');
+  var settingBtn  = document.getElementById('settingBtn');
+
+  /* ===== 状态 ===== */
+  var chatHistory = []; // [{role:'user'|'assistant', content:'...'}]
+  var isSending = false;
+
+  /* ===== 工具函数 ===== */
+
+  // 简单 HTML 转义，防止 XSS
+  function escapeHtml(str){
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  // 转义后保留换行，用于 innerHTML 安全渲染
+  function formatContent(text){
+    return escapeHtml(text).replace(/\n/g, '<br>');
+  }
+
+  function scrollToEnd(){
+    chatArea.scrollTop = chatArea.scrollHeight;
+  }
+
+  /* ===== 消息渲染 ===== */
+  /**
+   * 创建一条消息并添加到对话区域
+   * @param {string} role    - 'user' | 'assistant'
+   * @param {string} content - 文本内容
+   * @returns {object} 消息句柄，含 setText / appendText / setThinking
+   */
+  function addMessage(role, content){
+    var row = document.createElement('div');
+    row.className = 'msg-row ' + (role === 'user' ? 'user' : 'ai');
+
+    var avatar = document.createElement('div');
+    avatar.className = 'msg-avatar ' + (role === 'user' ? 'user' : 'ai');
+    avatar.textContent = role === 'user' ? '我' : 'AI';
+
+    var contentWrap = document.createElement('div');
+    contentWrap.className = 'msg-content';
+
+    var bubble = document.createElement('div');
+    bubble.className = 'msg-bubble';
+    bubble.innerHTML = formatContent(content);
+
+    contentWrap.appendChild(bubble);
+    row.appendChild(avatar);
+    row.appendChild(contentWrap);
+    chatArea.appendChild(row);
+    scrollToEnd();
+
+    return {
+      element: row,
+      bubble: bubble,
+      // 整体替换文本
+      setText: function(text){
+        bubble.innerHTML = formatContent(text);
+        scrollToEnd();
+      },
+      // 流式追加文本片段
+      appendText: function(text){
+        bubble.innerHTML += formatContent(text);
+        scrollToEnd();
+      },
+      // 显示"思考中"临时状态
+      setThinking: function(){
+        bubble.innerHTML =
+          '<span class="thinking-wrap">' +
+            '<span class="thinking-text">AI正在思考中</span>' +
+            '<span class="thinking-dots"><i></i><i></i><i></i></span>' +
+          '</span>';
+        scrollToEnd();
+      }
+    };
+  }
+
+  /* ===== 提供者切换 ===== */
+  function renderProviderTabs(){
+    var tabs = providerBar.querySelectorAll('.provider-tab');
+    var current = (window.AIConfig && AIConfig.currentProvider) || 'hunyuan';
+    for (var i = 0; i < tabs.length; i++){
+      if (tabs[i].getAttribute('data-provider') === current){
+        tabs[i].classList.add('active');
+      } else {
+        tabs[i].classList.remove('active');
+      }
+    }
+  }
+
+  function switchProvider(id){
+    if (window.AIConfig && AIConfig.switchProvider){
+      AIConfig.switchProvider(id);
+    }
+    renderProviderTabs();
+  }
+
+  /* ===== 发送按钮状态 ===== */
+  function setSending(flag){
+    isSending = flag;
+    sendBtn.disabled = flag;
+  }
+
+  /* ===== 核心发送逻辑 ===== */
+  function send(){
+    var text = msgInput.value.trim();
+    if (!text || isSending) return;
+
+    // 1. 渲染用户消息
+    addMessage('user', text);
+    chatHistory.push({ role: 'user', content: text });
+
+    // 2. 清空输入框并重置高度
+    msgInput.value = '';
+    autoResize();
+
+    // 3. 禁用发送按钮
+    setSending(true);
+
+    // 4. 添加"AI正在思考中..."临时消息
+    var aiMsg = addMessage('assistant', '');
+    aiMsg.setThinking();
+
+    // 5. 检查 AIConfig 是否可用
+    if (!window.AIConfig || !AIConfig.chat){
+      aiMsg.setText('AI配置未加载，请检查 utils/ai-config.js 是否正确引入。');
+      setSending(false);
+      return;
+    }
+
+    // 6. 组装消息列表（系统提示 + 最近历史，限制长度避免超出上下文）
+    var messages = [{ role: 'system', content: SYSTEM_PROMPT }];
+    var hist = chatHistory.slice(-20); // 最近 20 条
+    for (var i = 0; i < hist.length; i++){
+      messages.push({ role: hist[i].role, content: hist[i].content });
+    }
+
+    var receivedAny = false;
+
+    // 7. 调用 AIConfig.chat（流式输出）
+    AIConfig.chat(messages, function(full){
+      // 完成回调（流式结束或一次性返回）
+      setSending(false);
+      if (full){
+        aiMsg.setText(full);
+      } else if (!receivedAny){
+        aiMsg.setText('(AI 未返回内容，请重试或更换AI提供者)');
+        return;
+      }
+      // 将最终回复写入历史
+      var finalText = full || (aiMsg.bubble.innerText || '');
+      if (finalText){
+        chatHistory.push({ role: 'assistant', content: finalText });
+      }
+    }, function(err){
+      // 错误回调
+      setSending(false);
+      var msg = (err && err.message) ? err.message : String(err);
+      if (/Failed to fetch|NetworkError|TypeError/i.test(msg)){
+        msg = '网络请求失败，可能是接口跨域(CORS)限制或网络异常，请检查网络或在允许跨域的环境下使用。';
+      }
+      aiMsg.setText('请求失败：' + msg);
+    }, {
+      stream: true,
+      onChunk: function(chunk){
+        // 首次收到内容时清空"思考中"动画
+        if (!receivedAny){
+          aiMsg.bubble.innerHTML = '';
+          receivedAny = true;
+        }
+        aiMsg.appendText(chunk);
+      },
+      onDone: function(){
+        setSending(false);
+      }
+    });
+  }
+
+  /* ===== 输入框自适应高度 ===== */
+  function autoResize(){
+    msgInput.style.height = 'auto';
+    msgInput.style.height = Math.min(msgInput.scrollHeight, 80) + 'px';
+  }
+
+  /* ===== 事件绑定 ===== */
+
+  // 提供者标签切换
+  providerBar.addEventListener('click', function(e){
+    var tab = e.target.closest('.provider-tab');
+    if (!tab) return;
+    switchProvider(tab.getAttribute('data-provider'));
+  });
+
+  // 快捷按钮 - 自动填入输入框
+  var quickBtns = document.querySelectorAll('.quick-btn');
+  for (var i = 0; i < quickBtns.length; i++){
+    (function(btn){
+      btn.addEventListener('click', function(){
+        msgInput.value = btn.getAttribute('data-q');
+        autoResize();
+        msgInput.focus();
+      });
+    })(quickBtns[i]);
+  }
+
+  // 发送按钮
+  sendBtn.addEventListener('click', send);
+
+  // 输入框：Enter 发送，Shift+Enter 换行
+  msgInput.addEventListener('keydown', function(e){
+    if (e.key === 'Enter' && !e.shiftKey){
+      e.preventDefault();
+      send();
+    }
+  });
+
+  // 输入框自适应
+  msgInput.addEventListener('input', autoResize);
+
+  // 设置按钮 - 高亮提示提供者选择器
+  settingBtn.addEventListener('click', function(){
+    providerBar.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    providerBar.style.transition = 'background .3s';
+    providerBar.style.background = 'rgba(0,188,180,.12)';
+    setTimeout(function(){ providerBar.style.background = ''; }, 600);
+  });
+
+  /* ===== 初始化 ===== */
+  renderProviderTabs();
+  autoResize();
+})();
+</script>
+</body>
+</html>
