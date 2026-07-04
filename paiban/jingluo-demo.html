@@ -12,7 +12,7 @@
   --font-main:'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif;
   --radius:12px;--shadow:0 2px 6px rgba(0,0,0,.05);
 }
-body{font-family:var(--font-main);background:var(--bg);color:var(--ink);font-size:14px;max-width:480px;margin:0 auto;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+body{font-family:var(--font-main);background:var(--bg);color:var(--ink);font-size:14px;max-width:390px;margin:0 auto;height:100vh;display:flex;flex-direction:column;overflow:hidden}
 
 /* HEADER */
 .header{display:flex;align-items:center;padding:0 14px;background:var(--teal);color:#FFF;min-height:44px;flex-shrink:0;position:relative}
@@ -21,6 +21,25 @@ body{font-family:var(--font-main);background:var(--bg);color:var(--ink);font-siz
 .header .back-btn svg{width:22px;height:22px}
 .header .title{font-size:16px;font-weight:700;margin-left:4px;letter-spacing:1px}
 .header .subtitle{font-size:11px;opacity:.8;margin-left:auto}
+
+/* SEARCH BAR */
+.search-bar{display:flex;align-items:center;background:var(--card);padding:6px 12px;gap:6px;border-bottom:1px solid var(--rule);flex-shrink:0}
+.search-bar input{flex:1;border:1.5px solid var(--rule);border-radius:18px;padding:5px 12px;font-size:12px;font-family:inherit;outline:none;background:var(--bg);color:var(--ink)}
+.search-bar input:focus{border-color:var(--teal)}
+.search-bar .sbtn{background:var(--teal);color:#FFF;border:none;border-radius:16px;padding:5px 12px;font-size:11px;cursor:pointer;font-family:inherit;white-space:nowrap}
+.search-results{max-height:200px;overflow-y:auto;background:var(--card);border-bottom:1px solid var(--rule);flex-shrink:0;display:none}
+.search-results.show{display:block}
+.sr-item{padding:8px 14px;font-size:12px;border-bottom:1px solid var(--rule);cursor:pointer}
+.sr-item:active{background:var(--teal-bg)}
+.sr-item .sr-name{font-weight:700;color:var(--teal-d)}
+.sr-item .sr-meridian{font-size:10px;color:var(--muted);margin-top:2px}
+
+/* BOTTOM NAV */
+.bottom-nav{display:flex;background:var(--card);border-top:1px solid var(--rule);flex-shrink:0;padding-bottom:max(4px,env(safe-area-inset-bottom))}
+.bottom-nav .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;color:var(--muted);cursor:pointer;gap:2px;padding:4px 0;text-decoration:none}
+.bottom-nav .nav-item.active{color:var(--teal)}
+.bottom-nav .nav-item .nav-icon{font-size:18px}
+.bottom-nav .nav-item .nav-ai{background:var(--teal);color:#FFF;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:16px;margin-top:-6px;box-shadow:0 2px 6px rgba(0,191,165,.4)}
 
 /* MAIN CONTENT */
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
@@ -36,7 +55,7 @@ body{font-family:var(--font-main);background:var(--bg);color:var(--ink);font-siz
 .meridian-chip.yang{color:#E53935}
 
 /* BOTTOM PANEL */
-.bottom-panel{background:var(--card);padding:10px 14px 14px;border-top:1px solid var(--rule);flex-shrink:0;max-height:140px;overflow-y:auto}
+.bottom-panel{background:var(--card);padding:10px 14px 14px;border-top:1px solid var(--rule);flex-shrink:0;max-height:200px;overflow-y:auto}
 .bottom-panel .bp-title{font-size:13px;font-weight:700;color:var(--teal-d);margin-bottom:6px;letter-spacing:1px}
 .bottom-panel .bp-info{font-size:12px;color:var(--ink2);line-height:1.6}
 .bottom-panel .bp-points{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
@@ -64,6 +83,12 @@ body{font-family:var(--font-main);background:var(--bg);color:var(--ink);font-siz
   <span class="subtitle">2D动态 · 十二正经</span>
 </div>
 
+<div class="search-bar">
+  <input type="text" id="searchInput" placeholder="搜索经络或穴位名称，如：合谷、肺经..." oninput="handleSearch()">
+  <button class="sbtn" onclick="handleSearch()">搜索</button>
+</div>
+<div class="search-results" id="searchResults"></div>
+
 <div class="main">
   <div class="canvas-wrap">
     <canvas id="meridianCanvas"></canvas>
@@ -81,6 +106,13 @@ body{font-family:var(--font-main);background:var(--bg);color:var(--ink);font-siz
   </div>
 </div>
 
+<div class="bottom-nav">
+  <a class="nav-item" href="../index.html"><span class="nav-icon">&#127968;</span>主页</a>
+  <a class="nav-item" href="../ai.html"><span class="nav-ai">AI</span></a>
+  <a class="nav-item active" href="jingluo-demo.html"><span class="nav-icon">&#128214;</span>学习</a>
+  <a class="nav-item" href="../profile.html"><span class="nav-icon">&#128100;</span>个人中心</a>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -90,76 +122,198 @@ const WX = { 木:'#34A853', 火:'#EA4335', 土:'#A67C52', 金:'#F1B232', 水:'#2
 const MERIDIANS = [
   { id:'lung', name:'手太阴肺经', type:'yin', hand:'手', zangfu:'肺', element:'金', dir:'胸→手', points:11,
     time:'寅时(3-5)', color:WX.金,
-    pathDesc:'起于中焦，下络大肠，还循胃口，上膈属肺，从肺系横出腋下',
-    indications:'咳嗽、气喘、胸闷、咽喉肿痛、手臂内侧前缘疼痛',
-    fullPoints:['中府','云门','天府','侠白','尺泽','孔最','列缺','经渠','太渊','鱼际','少商'] },
-  { id:'heart', name:'手少阴心经', type:'yin', hand:'手', zangfu:'心', element:'火', dir:'胸→手', points:9,
-    time:'午时(11-13)', color:WX.火,
-    pathDesc:'起于心中，出属心系，下膈络小肠，其支脉从心系上挟咽喉，系目系',
-    indications:'心悸、心痛、失眠、健忘、癫狂',
-    fullPoints:['极泉','少海','通里','神门','少府','少冲'] },
-  { id:'pc', name:'手厥阴心包经', type:'yin', hand:'手', zangfu:'心包', element:'火', dir:'胸→手', points:9,
-    time:'戌时(19-21)', color:WX.火,
-    pathDesc:'起于胸中，出属心包，下膈历络三焦',
-    indications:'心痛、心悸、胸闷、心烦、癫狂、胃痛呕吐',
-    fullPoints:['天池','曲泽','内关','大陵','劳宫','中冲'] },
-  { id:'spleen', name:'足太阴脾经', type:'yin', hand:'足', zangfu:'脾', element:'土', dir:'足→胸', points:21,
-    time:'巳时(9-11)', color:WX.土,
-    pathDesc:'起于大趾内侧端，沿足内侧赤白肉际上行，经内踝前，沿小腿内侧上行',
-    indications:'腹胀、泄泻、食少、倦怠、月经不调、崩漏',
-    fullPoints:['隐白','大都','太白','公孙','三阴交','阴陵泉','血海','大横'] },
-  { id:'kidney', name:'足少阴肾经', type:'yin', hand:'足', zangfu:'肾', element:'水', dir:'足→胸', points:27,
-    time:'酉时(17-19)', color:WX.水,
-    pathDesc:'起于小趾之下，斜走足心，出于然骨之下，循内踝之后，别入跟中',
-    indications:'遗精、阳痿、月经不调、腰痛、耳鸣、耳聋',
-    fullPoints:['涌泉','然谷','太溪','大钟','照海','复溜','阴谷'] },
-  { id:'liver', name:'足厥阴肝经', type:'yin', hand:'足', zangfu:'肝', element:'木', dir:'足→胸', points:14,
-    time:'丑时(1-3)', color:WX.木,
-    pathDesc:'起于大趾丛毛之际，上循足跗上廉，去内踝一寸，上踝八寸交出太阴之后',
-    indications:'胸胁胀痛、疝气、月经不调、遗尿、头痛眩晕',
-    fullPoints:['大敦','行间','太冲','中封','蠡沟','曲泉','章门','期门'] },
-  { id:'li', name:'手阳明大肠经', type:'yang', hand:'手', zangfu:'大肠', element:'金', dir:'手→头', points:20,
+    pathDesc:'起于中焦，下络大肠，还循胃口，上膈属肺，从肺系横出腋下，下循臑内，行少阴心主之前，下肘中，循臂内上骨下廉，入寸口，上鱼，循鱼际，出大指之端',
+    indications:'咳嗽、气喘、胸闷、咽喉肿痛、手臂内侧前缘疼痛、咳血',
+    startPoint:'中府', endPoint:'少商',
+    fullPoints:['中府','云门','天府','侠白','尺泽','孔最','列缺','经渠','太渊','鱼际','少商'],
+    keyPoints:[
+      {name:'中府', loc:'胸前壁外上方，前正中线旁开6寸，平第1肋间隙处'},
+      {name:'尺泽', loc:'肘横纹中，肱二头肌腱桡侧凹陷处'},
+      {name:'孔最', loc:'前臂桡侧缘，腕横纹上7寸'},
+      {name:'列缺', loc:'桡骨茎突上方，腕横纹上1.5寸，简便取穴：两手虎口交叉，食指尖所指凹陷处'},
+      {name:'太渊', loc:'腕掌侧横纹桡侧，桡动脉搏动处'},
+      {name:'鱼际', loc:'手拇指本节（第1掌指关节）后凹陷处，约第1掌骨中点桡侧'},
+      {name:'少商', loc:'手拇指末节桡侧，距指甲角0.1寸处'}
+    ] },
+  { id:'largeintestine', name:'手阳明大肠经', type:'yang', hand:'手', zangfu:'大肠', element:'金', dir:'手→头', points:20,
     time:'卯时(5-7)', color:WX.金,
-    pathDesc:'起于食指桡侧端，沿手臂外侧前缘上行至肩，入缺盆，络肺，下膈属大肠',
-    indications:'头痛、牙痛、鼻衄、咽喉肿痛、腹痛泄泻',
-    fullPoints:['商阳','二间','三间','合谷','阳溪','偏历','手三里','曲池','肩髃','迎香'] },
-  { id:'si', name:'手太阳小肠经', type:'yang', hand:'手', zangfu:'小肠', element:'火', dir:'手→头', points:19,
-    time:'未时(13-15)', color:WX.火,
-    pathDesc:'起于小指尺侧端，沿手臂外侧后缘上行，绕肩胛，入缺盆，络心，下膈属小肠',
-    indications:'耳聋、目黄、颊肿、咽喉肿痛、肩臂外侧后缘疼痛',
-    fullPoints:['少泽','后溪','腕骨','养老','支正','小海','听宫'] },
-  { id:'sj', name:'手少阳三焦经', type:'yang', hand:'手', zangfu:'三焦', element:'火', dir:'手→头', points:23,
-    time:'亥时(21-23)', color:WX.火,
-    pathDesc:'起于无名指尺侧端，沿手臂外侧中间上行，入缺盆，布膻中，散络心包，下膈属三焦',
-    indications:'耳聋、耳鸣、目赤肿痛、偏头痛、肩臂外侧痛',
-    fullPoints:['关冲','中渚','阳池','外关','支沟','翳风','丝竹空'] },
+    pathDesc:'起于食指桡侧端（商阳），沿食指桡侧向上，经合谷，行于上肢外侧前缘，上走肩，入缺盆，络肺，下膈属大肠；其支脉从缺盆上颈贯颊，入下齿中，还出挟口，交人中，左之右，右之左，上挟鼻孔',
+    indications:'头痛、牙痛、鼻衄、咽喉肿痛、腹痛泄泻、面瘫、热病',
+    startPoint:'商阳', endPoint:'迎香',
+    fullPoints:['商阳','二间','三间','合谷','阳溪','偏历','温溜','下廉','上廉','手三里','曲池','肘髎','手五里','臂臑','肩髃','巨骨','天鼎','扶突','口禾髎','迎香'],
+    keyPoints:[
+      {name:'商阳', loc:'食指末节桡侧，距指甲角0.1寸处'},
+      {name:'合谷', loc:'手背第1、2掌骨间，第2掌骨桡侧的中点处（简便取穴：拇食指并拢，虎口隆起最高点）'},
+      {name:'曲池', loc:'屈肘成直角，肘横纹外侧端与肱骨外上髁连线中点处'},
+      {name:'手三里', loc:'前臂背面桡侧，阳溪与曲池连线上，肘横纹下2寸'},
+      {name:'肩髃', loc:'肩部三角肌上，肩峰前下方凹陷处'},
+      {name:'迎香', loc:'鼻翼旁开0.5寸，鼻唇沟中'}
+    ] },
   { id:'stomach', name:'足阳明胃经', type:'yang', hand:'足', zangfu:'胃', element:'土', dir:'头→足', points:45,
     time:'辰时(7-9)', color:WX.土,
-    pathDesc:'起于鼻翼旁，上行至鼻根部，下行入上齿龈，环绕口唇，沿下颌角上行至额角',
-    indications:'胃痛、腹胀、呕吐、消谷善饥、口眼歪斜',
-    fullPoints:['四白','地仓','颊车','下关','头维','天枢','足三里','上巨虚','丰隆','内庭'] },
+    pathDesc:'起于鼻翼旁（迎香），上行至鼻根部，入上齿龈，环绕口唇，沿下颌角上行至额角；主干沿颈下行入缺盆，过膈属胃络脾；从缺盆下行经胸腹至腹股沟；下肢支从腹股沟下行，沿大腿前外侧、胫骨外侧至足背，止于第2趾外侧端',
+    indications:'胃痛、腹胀、呕吐、消谷善饥、口眼歪斜、水肿、咽喉肿痛、热病',
+    startPoint:'承泣', endPoint:'厉兑',
+    fullPoints:['承泣','四白','巨髎','地仓','大迎','颊车','下关','头维','人迎','水突','气舍','缺盆','气户','库房','屋翳','膺窗','乳中','乳根','不容','承满','梁门','关门','太乙','滑肉门','天枢','外陵','大巨','水道','归来','气冲','髀关','伏兔','阴市','梁丘','犊鼻','足三里','上巨虚','条口','下巨虚','丰隆','解溪','冲阳','陷谷','内庭','厉兑'],
+    keyPoints:[
+      {name:'承泣', loc:'面部瞳孔直下，眼球与眶下缘之间'},
+      {name:'四白', loc:'面部瞳孔直下，眶下孔凹陷处'},
+      {name:'地仓', loc:'面部口角外侧，上直瞳孔'},
+      {name:'颊车', loc:'面颊部下颌角前上方约一横指，咀嚼时咬肌隆起处'},
+      {name:'天枢', loc:'腹中部，脐中旁开2寸'},
+      {name:'足三里', loc:'小腿前外侧，犊鼻下3寸，距胫骨前缘一横指'},
+      {name:'丰隆', loc:'小腿前外侧，外踝尖上8寸，条口外，距胫骨前缘二横指'},
+      {name:'内庭', loc:'足背第2、3趾间，趾蹼缘后方赤白肉际处'}
+    ] },
+  { id:'spleen', name:'足太阴脾经', type:'yin', hand:'足', zangfu:'脾', element:'土', dir:'足→胸', points:21,
+    time:'巳时(9-11)', color:WX.土,
+    pathDesc:'起于足大趾内侧端（隐白），沿足内侧赤白肉际上行，经内踝前，沿小腿内侧上行，交出足厥阴肝经之前，上行经大腿内侧前缘入腹，属脾络胃，上膈，挟咽，连舌本，散舌下；支脉从胃别上膈，注心中',
+    indications:'腹胀、泄泻、食少、倦怠、月经不调、崩漏、水肿、黄疸',
+    startPoint:'隐白', endPoint:'大包',
+    fullPoints:['隐白','大都','太白','公孙','商丘','三阴交','漏谷','地机','阴陵泉','血海','箕门','冲门','府舍','腹结','大横','腹哀','食窦','天溪','胸乡','周荣','大包'],
+    keyPoints:[
+      {name:'隐白', loc:'足大趾末节内侧，距趾甲角0.1寸'},
+      {name:'太白', loc:'足内侧缘，足第1跖骨小头后下方凹陷处'},
+      {name:'公孙', loc:'足内侧缘，第1跖骨基底前下方凹陷处'},
+      {name:'三阴交', loc:'小腿内侧，足内踝尖上3寸，胫骨内侧缘后方'},
+      {name:'阴陵泉', loc:'小腿内侧，胫骨内侧髁后下方凹陷处'},
+      {name:'血海', loc:'大腿内侧，髌底内侧端上2寸，股内侧肌内侧缘'},
+      {name:'大横', loc:'腹中部，脐中旁开4寸'}
+    ] },
+  { id:'heart', name:'手少阴心经', type:'yin', hand:'手', zangfu:'心', element:'火', dir:'胸→手', points:9,
+    time:'午时(11-13)', color:WX.火,
+    pathDesc:'起于心中，出属心系，下膈络小肠；其支脉从心系上挟咽喉，系目系；其直行者从心系上行至肺，下出腋下，循上臂内侧后缘，行手太阴肺经和手厥阴心包经之后，下肘内，循臂内后缘，抵掌后锐骨之端，入掌内后廉，循小指内出其端',
+    indications:'心悸、心痛、失眠、健忘、癫狂、咽干、手臂内侧后缘疼痛',
+    startPoint:'极泉', endPoint:'少冲',
+    fullPoints:['极泉','青灵','少海','灵道','通里','阴郄','神门','少府','少冲'],
+    keyPoints:[
+      {name:'极泉', loc:'腋窝顶点，腋动脉搏动处'},
+      {name:'少海', loc:'肘横纹内侧端与肱骨内上髁连线的中点处'},
+      {name:'通里', loc:'前臂掌侧，腕横纹上1寸，尺侧腕屈肌腱桡侧缘'},
+      {name:'阴郄', loc:'前臂掌侧，腕横纹上0.5寸，尺侧腕屈肌腱桡侧缘'},
+      {name:'神门', loc:'腕掌侧横纹尺侧端，尺侧腕屈肌腱桡侧凹陷处'},
+      {name:'少冲', loc:'手小指末节桡侧，距指甲角0.1寸'}
+    ] },
+  { id:'smallintestine', name:'手太阳小肠经', type:'yang', hand:'手', zangfu:'小肠', element:'火', dir:'手→头', points:19,
+    time:'未时(13-15)', color:WX.火,
+    pathDesc:'起于手小指尺侧端（少泽），沿手背尺侧、上肢外侧后缘上行，出肩关节绕肩胛，交肩上，入缺盆，络心，下膈抵胃属小肠；其支脉从缺盆沿颈上颊，至目外眦，转入耳中；另一支脉从颊分出，上行目眶下，抵鼻旁，至目内眦',
+    indications:'耳聋、目黄、颊肿、咽喉肿痛、肩臂外侧后缘疼痛、腹痛',
+    startPoint:'少泽', endPoint:'听宫',
+    fullPoints:['少泽','前谷','后溪','腕骨','阳谷','养老','支正','小海','肩贞','臑俞','天宗','秉风','曲垣','肩外俞','肩中俞','天窗','天容','颧髎','听宫'],
+    keyPoints:[
+      {name:'少泽', loc:'手小指末节尺侧，距指甲角0.1寸'},
+      {name:'后溪', loc:'手尺侧第5掌指关节后，掌横纹头赤白肉际'},
+      {name:'养老', loc:'前臂背面尺侧，尺骨小头近端桡侧凹陷处'},
+      {name:'天宗', loc:'肩胛部，冈下窝中央凹陷处'},
+      {name:'听宫', loc:'面部耳屏前，下颌骨髁状突后缘，张口凹陷处'}
+    ] },
   { id:'bladder', name:'足太阳膀胱经', type:'yang', hand:'足', zangfu:'膀胱', element:'水', dir:'头→足', points:67,
     time:'申时(15-17)', color:WX.水,
-    pathDesc:'起于目内眦，上额交巅，入络脑，下行项后，挟脊抵腰，络肾属膀胱',
-    indications:'小便不利、遗尿、癫狂、头痛、目痛、腰背痛',
-    fullPoints:['睛明','攒竹','风门','肺俞','心俞','肝俞','脾俞','肾俞','委中','承山','昆仑','至阴'] },
-  { id:'gb', name:'足少阳胆经', type:'yang', hand:'足', zangfu:'胆', element:'木', dir:'头→足', points:44,
+    pathDesc:'起于目内眦（睛明），上额交巅，支脉从巅至耳上角；直行者从巅入络脑，还出别下项，挟脊抵腰，络肾属膀胱；支脉从腰下贯臀入腘中；另一支脉从项循肩胛内，挟脊下行至腰，经臀下入腘中，贯踹内，出外踝后，至小趾外侧端',
+    indications:'小便不利、遗尿、癫狂、头痛、目痛、腰背痛、下肢后侧疼痛',
+    startPoint:'睛明', endPoint:'至阴',
+    fullPoints:['睛明','攒竹','眉冲','曲差','五处','承光','通天','络却','玉枕','天柱','大杼','风门','肺俞','厥阴俞','心俞','督俞','膈俞','肝俞','胆俞','脾俞','胃俞','三焦俞','肾俞','气海俞','大肠俞','关元俞','小肠俞','膀胱俞','中膂俞','白环俞','上髎','次髎','中髎','下髎','会阳','承扶','殷门','浮郄','委阳','委中','附分','魄户','膏肓','神堂','譩譆','膈关','魂门','阳纲','意舍','胃仓','肓门','志室','胞肓','秩边','合阳','承筋','承山','飞扬','跗阳','昆仑','仆参','申脉','金门','京骨','束骨','足通谷','至阴'],
+    keyPoints:[
+      {name:'睛明', loc:'面部目内眦稍上方凹陷处'},
+      {name:'攒竹', loc:'面部眉头陷中，眶上切迹处'},
+      {name:'风门', loc:'背部第2胸椎棘突下，旁开1.5寸'},
+      {name:'肺俞', loc:'背部第3胸椎棘突下，旁开1.5寸'},
+      {name:'心俞', loc:'背部第5胸椎棘突下，旁开1.5寸'},
+      {name:'肝俞', loc:'背部第9胸椎棘突下，旁开1.5寸'},
+      {name:'脾俞', loc:'背部第11胸椎棘突下，旁开1.5寸'},
+      {name:'肾俞', loc:'腰部第2腰椎棘突下，旁开1.5寸'},
+      {name:'委中', loc:'腘窝横纹中点'},
+      {name:'承山', loc:'小腿后面正中，腓肠肌肌腹下方凹陷处'},
+      {name:'昆仑', loc:'足部外踝后方，外踝尖与跟腱之间凹陷处'},
+      {name:'至阴', loc:'足小趾末节外侧，距趾甲角0.1寸'}
+    ] },
+  { id:'kidney', name:'足少阴肾经', type:'yin', hand:'足', zangfu:'肾', element:'水', dir:'足→胸', points:27,
+    time:'酉时(17-19)', color:WX.水,
+    pathDesc:'起于足小趾之下，斜走足心（涌泉），出于然骨之下，循内踝之后，别入跟中，上踹内，出腘内廉，上股内后廉，贯脊属肾络膀胱；其直行者从肾上贯肝膈，入肺中，循喉咙，挟舌本；支脉从肺出络心，注胸中',
+    indications:'遗精、阳痿、月经不调、腰痛、耳鸣、耳聋、水肿、咳血',
+    startPoint:'涌泉', endPoint:'俞府',
+    fullPoints:['涌泉','然谷','太溪','大钟','水泉','照海','复溜','交信','筑宾','阴谷','横骨','大赫','气穴','四满','中注','肓俞','商曲','石关','阴都','腹通谷','幽门','步廊','神封','灵墟','神藏','彧中','俞府'],
+    keyPoints:[
+      {name:'涌泉', loc:'足底部，足趾跖屈时足前凹陷处，约足底前1/3与后2/3交界处'},
+      {name:'然谷', loc:'足内侧缘，足舟骨粗隆下方凹陷处'},
+      {name:'太溪', loc:'足内侧，内踝后方，内踝尖与跟腱之间凹陷处'},
+      {name:'照海', loc:'足内侧，内踝尖直下凹陷处'},
+      {name:'复溜', loc:'小腿内侧，太溪上2寸，跟腱前缘'},
+      {name:'阴谷', loc:'腘窝内侧，屈膝时半腱肌与半膜肌之间凹陷处'}
+    ] },
+  { id:'pc', name:'手厥阴心包经', type:'yin', hand:'手', zangfu:'心包', element:'火', dir:'胸→手', points:9,
+    time:'戌时(19-21)', color:WX.火,
+    pathDesc:'起于胸中，出属心包络，下膈历络三焦；其支脉从胸出胁，当腋下3寸处上行至腋下，循上臂内侧，行手太阴肺经和手少阴心经之间，入肘中，下臂行两筋之间，入掌中，至中指端；支脉从掌中分出，循无名指至其尺侧端',
+    indications:'心痛、心悸、胸闷、心烦、癫狂、胃痛呕吐、上肢内侧疼痛',
+    startPoint:'天池', endPoint:'中冲',
+    fullPoints:['天池','天泉','曲泽','郄门','间使','内关','大陵','劳宫','中冲'],
+    keyPoints:[
+      {name:'天池', loc:'胸部第4肋间隙，前正中线旁开1寸'},
+      {name:'曲泽', loc:'肘横纹中，肱二头肌腱尺侧凹陷处'},
+      {name:'内关', loc:'前臂掌侧，腕横纹上2寸，掌长肌腱与桡侧腕屈肌腱之间'},
+      {name:'大陵', loc:'腕掌侧横纹中点，掌长肌腱与桡侧腕屈肌腱之间'},
+      {name:'劳宫', loc:'手掌心，第2、3掌骨之间偏第3掌骨，握拳时中指尖所指处'},
+      {name:'中冲', loc:'手中指末节尖端中央'}
+    ] },
+  { id:'triplejiao', name:'手少阳三焦经', type:'yang', hand:'手', zangfu:'三焦', element:'火', dir:'手→头', points:23,
+    time:'亥时(21-23)', color:WX.火,
+    pathDesc:'起于无名指尺侧端（关冲），沿手背至上肢外侧中间上行，过肘上肩，入缺盆，布膻中，散络心包，下膈属三焦；支脉从膻中上行出缺盆，上项系耳后，出耳上角，下颊至目眶下；另一支脉从耳后入耳中，出走耳前，至目外眦',
+    indications:'耳聋、耳鸣、目赤肿痛、偏头痛、咽喉肿痛、肩臂外侧痛',
+    startPoint:'关冲', endPoint:'丝竹空',
+    fullPoints:['关冲','液门','中渚','阳池','外关','支沟','会宗','三阳络','四渎','天井','清冷渊','消泺','臑会','肩髎','天髎','天牖','翳风','瘈脉','颅息','角孙','耳门','耳和髎','丝竹空'],
+    keyPoints:[
+      {name:'关冲', loc:'手无名指末节尺侧，距指甲角0.1寸'},
+      {name:'中渚', loc:'手背部第4、5掌骨间，掌指关节后方凹陷处'},
+      {name:'外关', loc:'前臂背侧，腕背横纹上2寸，尺骨与桡骨之间'},
+      {name:'支沟', loc:'前臂背侧，腕背横纹上3寸，尺骨与桡骨之间'},
+      {name:'翳风', loc:'耳垂后方，乳突与下颌骨边缘之间凹陷处'},
+      {name:'丝竹空', loc:'面部眉梢外侧凹陷处'}
+    ] },
+  { id:'gallbladder', name:'足少阳胆经', type:'yang', hand:'足', zangfu:'胆', element:'木', dir:'头→足', points:44,
     time:'子时(23-1)', color:WX.木,
-    pathDesc:'起于目外眦，上行至额角，下耳后，沿颈侧下行，入缺盆',
-    indications:'口苦、目眩、偏头痛、胁痛、疟疾',
-    fullPoints:['听会','风池','肩井','环跳','风市','阳陵泉','悬钟','足临泣'] }
+    pathDesc:'起于目外眦（瞳子髎），上抵额角，下耳后，循颈行手少阳之前，至肩上交出手少阳之后，入缺盆；支脉从耳后入耳中，出走耳前至目外眦后方；其直行者从缺盆下行腋下，循胸过季胁，下行至髀枢，沿大腿外侧下行至膝外侧，经腓骨前下至足外踝前，沿足背入第4趾外侧端',
+    indications:'口苦、目眩、偏头痛、胁痛、疟疾、下肢外侧疼痛',
+    startPoint:'瞳子髎', endPoint:'足窍阴',
+    fullPoints:['瞳子髎','听会','上关','颔厌','悬颅','悬厘','曲鬓','率谷','天冲','浮白','头窍阴','完骨','本神','阳白','头临泣','目窗','正营','承灵','脑空','风池','肩井','渊腋','辄筋','日月','京门','带脉','五枢','维道','居髎','环跳','风市','中渎','膝阳关','阳陵泉','阳交','外丘','光明','阳辅','悬钟','丘墟','足临泣','地五会','侠溪','足窍阴'],
+    keyPoints:[
+      {name:'瞳子髎', loc:'面部目外眦旁，眶外侧缘处'},
+      {name:'听会', loc:'面部耳屏间切迹前方，下颌骨髁状突后缘'},
+      {name:'风池', loc:'项部枕骨下，胸锁乳突肌与斜方肌上端之间凹陷处'},
+      {name:'肩井', loc:'肩部大椎与肩峰连线中点'},
+      {name:'环跳', loc:'股骨大转子最凸点与骶管裂孔连线的外1/3与内2/3交界处'},
+      {name:'风市', loc:'大腿外侧中线，直立垂手中指尖所指处'},
+      {name:'阳陵泉', loc:'小腿外侧，腓骨小头前下方凹陷处'},
+      {name:'悬钟', loc:'小腿外侧，外踝尖上3寸，腓骨前缘'},
+      {name:'足临泣', loc:'足背第4、5跖骨结合部前方凹陷处'}
+    ] },
+  { id:'liver', name:'足厥阴肝经', type:'yin', hand:'足', zangfu:'肝', element:'木', dir:'足→胸', points:14,
+    time:'丑时(1-3)', color:WX.木,
+    pathDesc:'起于足大趾爪甲后丛毛之际（大敦），上循足跗上廉，去内踝一寸，上踝八寸，交出足太阴之后，上腘内廉，循股阴入毛中，过阴器，抵小腹，挟胃属肝络胆，上贯膈，布胁肋，循喉咙之后，上入颃颡，连目系，上出额，与督脉会于巅；支脉从目系下颊里，环唇内',
+    indications:'胸胁胀痛、疝气、月经不调、遗尿、小便不利、头痛眩晕、目赤肿痛',
+    startPoint:'大敦', endPoint:'期门',
+    fullPoints:['大敦','行间','太冲','中封','蠡沟','中都','膝关','曲泉','阴包','足五里','阴廉','急脉','章门','期门'],
+    keyPoints:[
+      {name:'大敦', loc:'足大趾末节外侧，距趾甲角0.1寸'},
+      {name:'行间', loc:'足背第1、2趾间，趾蹼缘后方赤白肉际处'},
+      {name:'太冲', loc:'足背第1、2跖骨结合部前方凹陷处'},
+      {name:'中封', loc:'足背内踝前，胫骨前肌腱内侧凹陷处'},
+      {name:'蠡沟', loc:'小腿内侧，足内踝尖上5寸，胫骨内侧中央'},
+      {name:'曲泉', loc:'膝内侧，屈膝时膝关节内侧横纹头上方凹陷处'},
+      {name:'章门', loc:'侧腹部第11肋游离端下方'},
+      {name:'期门', loc:'胸部第6肋间隙，前正中线旁开4寸'}
+    ] }
 ];
 
 /* ==================== EXTRA TCM DATA ==================== */
 const QI_JING_BA_MAI = [
-  { name:'任脉', desc:'起于小腹内，下出会阴，向前上行于胸腹正中，经咽喉至承浆。主胞胎，为阴脉之海。', keyPts:['关元','气海','神阙','中脘','膻中'] },
-  { name:'督脉', desc:'起于小腹内，下出会阴，向后上行于脊柱正中，经头顶至上唇。主阳气，为阳脉之海。', keyPts:['长强','命门','至阳','大椎','百会'] },
-  { name:'冲脉', desc:'起于小腹内，下出会阴，与足少阴经并行。为血海，主月经。', keyPts:[] },
-  { name:'带脉', desc:'起于季胁，环腰一周。约束诸经。', keyPts:[] },
-  { name:'阴跷脉', desc:'主肢节运动与眼睑开合。', keyPts:[] },
-  { name:'阳跷脉', desc:'主肢节运动与眼睑开合。', keyPts:[] },
-  { name:'阴维脉', desc:'维系全身阴经。', keyPts:[] },
-  { name:'阳维脉', desc:'维系全身阳经。', keyPts:[] }
+  { name:'任脉', desc:'起于小腹内，下出会阴，向前上行于胸腹正中，经咽喉至承浆。总任一身之阴，为阴脉之海，主胞胎。', keyPts:['中极','关元','气海','神阙','中神阙','中脘','膻中','天突','承浆'] },
+  { name:'督脉', desc:'起于小腹内，下出会阴，向后上行于脊柱正中，经头顶至上唇。总督一身之阳，为阳脉之海。', keyPts:['长强','腰俞','命门','至阳','大椎','风府','百会','人中'] },
+  { name:'冲脉', desc:'起于小腹内，下出会阴，与足少阴经并行，上行至目下。为血海，主月经，又称十二经脉之海。', keyPts:['气穴','四满','中注','肓俞','商曲','石关'] },
+  { name:'带脉', desc:'起于季胁，环腰一周，如束带状。约束纵行诸经，主调经带。', keyPts:['带脉','五枢','维道'] },
+  { name:'阴跷脉', desc:'起于足跟内侧，随足少阴经上行至目内眦。主肢体运动与眼睑开合，司目之开阖。', keyPts:['照海','交信','睛明'] },
+  { name:'阳跷脉', desc:'起于足跟外侧，随足太阳经上行至目内眦。主肢体运动与眼睑开合，司目之开阖。', keyPts:['申脉','跗阳','睛明'] },
+  { name:'阴维脉', desc:'起于足少阴经筑宾穴，上行至颈，与任脉交于天突。维系全身阴经，主营阴。', keyPts:['筑宾','冲门','府舍','天突'] },
+  { name:'阳维脉', desc:'起于足太阳经金门穴，上行至颈，与督脉交于哑门。维系全身阳经，主卫阳。', keyPts:['金门','阳交','肩井','哑门'] }
 ];
 
 const JING_LUO_BIAN_ZHENG = [
@@ -338,13 +492,13 @@ function getMeridianPath(id, cx, cy, scale) {
     liver: [ // 足厥阴肝经: foot → leg inner → chest → ribs
       {x: -16, y: 200}, {x: -14, y: 165}, {x: -12, y: 125}, {x: -8, y: 85}, {x: -4, y: 45}, {x: 0, y: 5}, {x: 4, y: -45}, {x: 6, y: -95}
     ],
-    li: [ // 手阳明大肠经: hand → arm outer → face
+    largeintestine: [ // 手阳明大肠经: hand → arm outer → face
       {x: 55, y: 15}, {x: 50, y: -10}, {x: 42, y: -40}, {x: 30, y: -70}, {x: 20, y: -100}, {x: 10, y: -130}, {x: 5, y: -155}
     ],
-    si: [ // 手太阳小肠经: hand → arm outer → face
+    smallintestine: [ // 手太阳小肠经: hand → arm outer → face
       {x: 48, y: 15}, {x: 44, y: -10}, {x: 36, y: -40}, {x: 24, y: -70}, {x: 14, y: -100}, {x: 6, y: -130}, {x: 2, y: -155}
     ],
-    sj: [ // 手少阳三焦经: hand → arm outer → head
+    triplejiao: [ // 手少阳三焦经: hand → arm outer → head
       {x: 52, y: 15}, {x: 48, y: -10}, {x: 40, y: -40}, {x: 28, y: -70}, {x: 18, y: -100}, {x: 8, y: -130}, {x: 4, y: -155}
     ],
     stomach: [ // 足阳明胃经: face → trunk → leg outer
@@ -353,7 +507,7 @@ function getMeridianPath(id, cx, cy, scale) {
     bladder: [ // 足太阳膀胱经: head → back → leg → foot
       {x: 0, y: -180}, {x: -2, y: -140}, {x: -4, y: -80}, {x: -6, y: -20}, {x: -8, y: 40}, {x: -10, y: 80}, {x: -14, y: 130}, {x: -16, y: 180}, {x: -18, y: 205}
     ],
-    gb: [ // 足少阳胆经: head → side → leg outer
+    gallbladder: [ // 足少阳胆经: head → side → leg outer
       {x: 6, y: -175}, {x: 12, y: -140}, {x: 18, y: -95}, {x: 22, y: -40}, {x: 24, y: 10}, {x: 26, y: 60}, {x: 24, y: 110}, {x: 22, y: 160}, {x: 20, y: 200}
     ]
   };
@@ -499,7 +653,7 @@ function updateBottomPanel() {
     panel.innerHTML = `
       <div class="bp-title">奇经八脉</div>
       <div class="bp-info" style="font-size:11px;line-height:1.5">
-        ${QI_JING_BA_MAI.map(q => `<span style="font-weight:700;color:var(--teal-d)">${q.name}</span>：${q.desc}`).join('<br>')}
+        ${QI_JING_BA_MAI.map(q => `<span style="font-weight:700;color:var(--teal-d)">${q.name}</span>：${q.desc}<br><span style="font-size:10px;color:var(--muted)">主要穴位：${q.keyPts.join('·')}</span>`).join('<br>')}
       </div>`;
     return;
   }
@@ -508,12 +662,66 @@ function updateBottomPanel() {
     <div class="bp-title" style="color:${m.color}">${m.name}（${m.hand}${m.type==='yin'?'阴':'阳'}经）</div>
     <div class="bp-info" style="font-size:11px;line-height:1.6">
       <span style="font-weight:700">所属脏腑</span>：${m.zangfu}　|　<span style="font-weight:700">五行</span>：${m.element}　|　<span style="font-weight:700">当令</span>：${m.time}<br>
+      <span style="font-weight:700">穴位数</span>：${m.points}穴　|　<span style="font-weight:700">起穴</span>：${m.startPoint}　|　<span style="font-weight:700">止穴</span>：${m.endPoint}<br>
       <span style="font-weight:700">循行</span>：${m.pathDesc}<br>
       <span style="font-weight:700">主治</span>：${m.indications}
     </div>
+    <div style="margin-top:6px;font-size:10px;font-weight:700;color:var(--teal-d)">主要穴位定位（点击查看详情）：</div>
     <div class="bp-points">
-      ${m.fullPoints.map(p => `<span class="bp-point">${p}</span>`).join('')}
-    </div>`;
+      ${m.keyPoints.map(p => `<span class="bp-point" onclick="showPointDetail('${m.id}','${p.name}')">${p.name}</span>`).join('')}
+    </div>
+    <div style="margin-top:4px;font-size:9px;color:var(--muted)">共${m.fullPoints.length}穴：${m.fullPoints.join('·')}</div>`;
+}
+
+function showPointDetail(meridianId, pointName) {
+  const m = MERIDIANS.find(m => m.id === meridianId);
+  if (!m) return;
+  const pt = m.keyPoints.find(p => p.name === pointName);
+  if (!pt) return;
+  showToast(`${pt.name}穴（${m.name}）\n定位：${pt.loc}`);
+}
+
+/* ==================== SEARCH ==================== */
+function handleSearch() {
+  const q = document.getElementById('searchInput').value.trim();
+  const results = document.getElementById('searchResults');
+  if (!q) { results.classList.remove('show'); results.innerHTML = ''; return; }
+  const matches = [];
+  MERIDIANS.forEach(m => {
+    if (m.name.includes(q) || m.zangfu.includes(q)) {
+      matches.push({ type:'meridian', meridian:m, name:m.name, sub:`${m.zangfu}经 · ${m.points}穴 · 起穴${m.startPoint} · 止穴${m.endPoint}` });
+    }
+    m.fullPoints.forEach(pt => {
+      if (pt.includes(q)) {
+        const kp = m.keyPoints.find(k => k.name === pt);
+        matches.push({ type:'point', meridian:m, name:pt, sub:`${m.name}` + (kp ? ' · ' + kp.loc : '') });
+      }
+    });
+  });
+  if (matches.length === 0) {
+    results.innerHTML = '<div class="sr-item" style="color:var(--muted)">未找到匹配结果</div>';
+  } else {
+    results.innerHTML = matches.slice(0, 30).map(r => `
+      <div class="sr-item" onclick="searchSelect('${r.meridian.id}','${r.name}')">
+        <div class="sr-name">${r.name}</div>
+        <div class="sr-meridian">${r.sub}</div>
+      </div>
+    `).join('');
+  }
+  results.classList.add('show');
+}
+
+function searchSelect(meridianId, name) {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('searchResults').classList.remove('show');
+  selectMeridian(meridianId);
+  const m = MERIDIANS.find(m => m.id === meridianId);
+  if (m) {
+    const kp = m.keyPoints.find(k => k.name === name);
+    if (kp) {
+      setTimeout(() => showToast(`${kp.name}穴（${m.name}）\n定位：${kp.loc}`), 300);
+    }
+  }
 }
 
 /* ==================== INIT ==================== */

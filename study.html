@@ -49,8 +49,9 @@ body{max-width:390px;margin:0 auto;min-height:100vh;padding-bottom:70px;}
 /* ===== 书籍卡片 ===== */
 .book-card{
   background:var(--white);border-radius:12px;padding:12px 14px;
-  box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:10px;
+  box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:10px;cursor:pointer;transition:background .15s;
 }
+.book-card:active{background:#FAFAFA;}
 .book-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;}
 .book-name{font-size:16px;font-weight:bold;color:var(--dark);flex-shrink:0;}
 .book-intro{font-size:12px;color:var(--gray);text-align:right;}
@@ -110,6 +111,108 @@ body{max-width:390px;margin:0 auto;min-height:100vh;padding-bottom:70px;}
 }
 .exam-card .ec-btn:active{opacity:.85;}
 
+/* ===== 书籍内容展示区 ===== */
+#bookContent{
+  margin:14px 14px 0;background:var(--white);border-radius:12px;
+  box-shadow:0 2px 8px rgba(0,0,0,.1);overflow:hidden;
+}
+.bc-header{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:14px;border-bottom:1px solid var(--lightgray);
+}
+.bc-header-left{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0;}
+.bc-title{font-size:17px;font-weight:bold;color:var(--dark);}
+.bc-intro{font-size:12px;color:var(--gray);}
+.bc-close{
+  width:28px;height:28px;border-radius:50%;background:#F2F2F2;
+  border:none;font-size:18px;color:var(--gray);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;line-height:1;transition:background .15s;
+}
+.bc-close:active{background:#E5E5E5;}
+.bc-body{
+  padding:14px;max-height:62vh;overflow-y:auto;
+  -webkit-overflow-scrolling:touch;font-size:14px;line-height:1.85;color:#333;
+}
+.bc-body h4{
+  font-size:14px;font-weight:bold;color:var(--teal-dark);
+  margin:16px 0 8px;padding-left:8px;border-left:3px solid var(--teal);
+}
+.bc-body h4:first-child{margin-top:0;}
+.bc-body p{margin-bottom:8px;text-align:justify;}
+.bc-body blockquote{
+  background:#F0FAFA;border-left:3px solid var(--teal);
+  padding:10px 12px;margin:8px 0;border-radius:0 6px 6px 0;
+  font-size:13px;color:#444;line-height:1.8;
+}
+.bc-body blockquote .bq-label{
+  display:inline-block;font-size:11px;color:var(--teal-dark);font-weight:600;margin-bottom:4px;
+}
+.bc-body ul{padding-left:18px;margin:6px 0;}
+.bc-body li{margin-bottom:5px;line-height:1.7;}
+.bc-body .bc-tag{
+  display:inline-block;font-size:11px;color:var(--teal-dark);background:#E0F7FA;
+  padding:2px 8px;border-radius:10px;margin-bottom:10px;
+}
+
+/* ===== 考试弹窗 ===== */
+#examModal{
+  position:fixed;top:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:390px;height:100%;background:rgba(0,0,0,.5);
+  z-index:200;display:none;align-items:flex-end;justify-content:center;
+}
+.exam-sheet{
+  width:100%;max-height:90vh;background:#fff;border-radius:16px 16px 0 0;
+  display:flex;flex-direction:column;overflow:hidden;animation:slideUp .25s ease;
+}
+@keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+.exam-sheet-head{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:14px 16px;border-bottom:1px solid var(--lightgray);flex-shrink:0;
+}
+.exam-sheet-title{font-size:16px;font-weight:bold;color:var(--dark);flex:1;}
+.exam-sheet-body{padding:14px 16px;overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1;}
+.exam-result{
+  text-align:center;padding:16px;background:#E0F7FA;border-radius:10px;margin-bottom:14px;
+}
+.exam-result .er-score{font-size:32px;font-weight:bold;color:var(--teal-dark);line-height:1.2;}
+.exam-result .er-text{font-size:13px;color:var(--gray);margin-top:4px;}
+.eq-item{margin-bottom:18px;}
+.eq-q{font-size:14px;font-weight:600;color:var(--dark);margin-bottom:8px;line-height:1.6;}
+.eq-q .eq-no{color:var(--teal);margin-right:4px;}
+.eq-opt{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;
+  border-radius:8px;margin-bottom:6px;background:#F8F8F8;font-size:13px;
+  color:var(--dark);cursor:pointer;transition:.15s;border:1px solid transparent;
+}
+.eq-opt:active{background:#EFEFEF;}
+.eq-opt.selected{background:#E0F7FA;border-color:var(--teal);}
+.eq-opt .eq-radio{
+  width:20px;height:20px;border-radius:50%;border:2px solid #ccc;
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  font-size:11px;color:#fff;transition:.15s;font-weight:600;
+}
+.eq-opt.selected .eq-radio{background:var(--teal);border-color:var(--teal);}
+.eq-opt.correct{background:#E8F5E9;border-color:#4CAF50;}
+.eq-opt.correct .eq-radio{background:#4CAF50;border-color:#4CAF50;}
+.eq-opt.wrong{background:#FFEBEE;border-color:#F44336;}
+.eq-opt.wrong .eq-radio{background:#F44336;border-color:#F44336;}
+.eq-explain{
+  font-size:12px;color:#555;margin-top:6px;padding:8px 10px;
+  background:#FFF8E1;border-radius:6px;display:none;line-height:1.7;
+}
+.eq-explain.show{display:block;}
+.exam-sheet-foot{
+  padding:12px 16px;border-top:1px solid var(--lightgray);
+  display:flex;gap:10px;flex-shrink:0;
+}
+.exam-sheet-foot button{
+  flex:1;padding:11px 0;border-radius:10px;font-size:14px;font-weight:600;
+  border:none;cursor:pointer;font-family:inherit;transition:opacity .15s;
+}
+.exam-sheet-foot button:active{opacity:.85;}
+.btn-check{background:var(--teal);color:#fff;}
+.btn-close{background:#F2F2F2;color:var(--gray);}
+
 /* ===== 底部导航 ===== */
 .bottom-nav{
   position:fixed;bottom:0;left:50%;transform:translateX(-50%);
@@ -153,93 +256,93 @@ body{max-width:390px;margin:0 auto;min-height:100vh;padding-bottom:70px;}
   <div class="section">
     <div class="section-title">古籍经典 <span class="st-sub">易学命理典籍</span></div>
 
-    <div class="book-card">
+    <div class="book-card" onclick="showBook('zhouyi')">
       <div class="book-head">
         <span class="book-name">周易原文</span>
         <span class="book-intro">易经卦辞·爻辞原文</span>
       </div>
       <div class="book-foot">
-        <button class="read-btn" onclick="toast('《周易原文》内容整理中')">阅读 →</button>
+        <button class="read-btn">阅读 →</button>
       </div>
     </div>
 
-    <div class="book-card">
+    <div class="book-card" onclick="showBook('ditiansui')">
       <div class="book-head">
         <span class="book-name">滴天髓</span>
         <span class="book-intro">命理经典·任铁樵注</span>
       </div>
       <div class="book-foot">
-        <button class="read-btn" onclick="toast('《滴天髓》内容整理中')">阅读 →</button>
+        <button class="read-btn">阅读 →</button>
       </div>
     </div>
 
-    <div class="book-card">
+    <div class="book-card" onclick="showBook('qiongtong')">
       <div class="book-head">
         <span class="book-name">穷通宝鉴</span>
         <span class="book-intro">调候用神·月令取用</span>
       </div>
       <div class="book-foot">
-        <button class="read-btn" onclick="toast('《穷通宝鉴》内容整理中')">阅读 →</button>
+        <button class="read-btn">阅读 →</button>
       </div>
     </div>
 
-    <div class="book-card">
+    <div class="book-card" onclick="showBook('sanming')">
       <div class="book-head">
         <span class="book-name">三命通会</span>
         <span class="book-intro">命理百科·万民英</span>
       </div>
       <div class="book-foot">
-        <button class="read-btn" onclick="toast('《三命通会》内容整理中')">阅读 →</button>
+        <button class="read-btn">阅读 →</button>
       </div>
     </div>
 
-    <div class="book-card">
+    <div class="book-card" onclick="showBook('ziping')">
       <div class="book-head">
         <span class="book-name">子平真诠</span>
         <span class="book-intro">格局用神·沈孝瞻</span>
       </div>
       <div class="book-foot">
-        <button class="read-btn" onclick="toast('《子平真诠》内容整理中')">阅读 →</button>
+        <button class="read-btn">阅读 →</button>
       </div>
     </div>
 
-    <div class="book-card">
+    <div class="book-card" onclick="showBook('yuanhai')">
       <div class="book-head">
         <span class="book-name">渊海子平</span>
         <span class="book-intro">命理入门·徐升</span>
       </div>
       <div class="book-foot">
-        <button class="read-btn" onclick="toast('《渊海子平》内容整理中')">阅读 →</button>
+        <button class="read-btn">阅读 →</button>
       </div>
     </div>
 
-    <div class="book-card">
+    <div class="book-card" onclick="showBook('meihua')">
       <div class="book-head">
         <span class="book-name">梅花易数</span>
         <span class="book-intro">邵雍象数·先天易</span>
       </div>
       <div class="book-foot">
-        <button class="read-btn" onclick="toast('《梅花易数》内容整理中')">阅读 →</button>
+        <button class="read-btn">阅读 →</button>
       </div>
     </div>
 
-    <div class="book-card">
+    <div class="book-card" onclick="showBook('qimen')">
       <div class="book-head">
         <span class="book-name">奇门遁甲秘笈大全</span>
         <span class="book-intro">三式之首·遁甲术</span>
       </div>
       <div class="book-foot">
-        <button class="read-btn" onclick="toast('《奇门遁甲秘笈大全》内容整理中')">阅读 →</button>
+        <button class="read-btn">阅读 →</button>
       </div>
     </div>
 
-    <div class="book-card">
+    <div class="book-card" onclick="showBook('daliuren')">
       <div class="book-head">
         <span class="book-name">大六壬指南</span>
         <span class="book-intro">三式之冠·壬占术</span>
       </div>
       <div class="book-foot">
-        <button class="read-btn" onclick="toast('《大六壬指南》内容整理中')">阅读 →</button>
+        <button class="read-btn">阅读 →</button>
       </div>
     </div>
   </div>
@@ -282,83 +385,83 @@ body{max-width:390px;margin:0 auto;min-height:100vh;padding-bottom:70px;}
   <div class="section">
     <div class="section-title">中医古籍 <span class="st-sub">经典医籍</span></div>
 
-    <div class="book-card">
+    <div class="book-card" onclick="showBook('neijing')">
       <div class="book-head">
         <span class="book-name">黄帝内经</span>
         <span class="book-intro">素问+灵枢·医经之祖</span>
       </div>
       <div class="book-foot">
-        <button class="read-btn" onclick="toast('《黄帝内经》内容整理中')">阅读 →</button>
+        <button class="read-btn">阅读 →</button>
       </div>
     </div>
 
-    <div class="book-card">
+    <div class="book-card" onclick="showBook('shanghan')">
       <div class="book-head">
         <span class="book-name">伤寒论</span>
         <span class="book-intro">张仲景·六经辨证</span>
       </div>
       <div class="book-foot">
-        <button class="read-btn" onclick="toast('《伤寒论》内容整理中')">阅读 →</button>
+        <button class="read-btn">阅读 →</button>
       </div>
     </div>
 
-    <div class="book-card">
+    <div class="book-card" onclick="showBook('jingui')">
       <div class="book-head">
         <span class="book-name">金匮要略</span>
         <span class="book-intro">杂病证治·张仲景</span>
       </div>
       <div class="book-foot">
-        <button class="read-btn" onclick="toast('《金匮要略》内容整理中')">阅读 →</button>
+        <button class="read-btn">阅读 →</button>
       </div>
     </div>
 
-    <div class="book-card">
+    <div class="book-card" onclick="showBook('wenbing')">
       <div class="book-head">
         <span class="book-name">温病条辨</span>
         <span class="book-intro">三焦辨证·吴鞠通</span>
       </div>
       <div class="book-foot">
-        <button class="read-btn" onclick="toast('《温病条辨》内容整理中')">阅读 →</button>
+        <button class="read-btn">阅读 →</button>
       </div>
     </div>
 
-    <div class="book-card">
+    <div class="book-card" onclick="showBook('bencao')">
       <div class="book-head">
         <span class="book-name">本草纲目</span>
         <span class="book-intro">李时珍·本草大成</span>
       </div>
       <div class="book-foot">
-        <button class="read-btn" onclick="toast('《本草纲目》内容整理中')">阅读 →</button>
+        <button class="read-btn">阅读 →</button>
       </div>
     </div>
 
-    <div class="book-card">
+    <div class="book-card" onclick="showBook('binhu')">
       <div class="book-head">
         <span class="book-name">濒湖脉学</span>
         <span class="book-intro">二十七脉·李时珍</span>
       </div>
       <div class="book-foot">
-        <button class="read-btn" onclick="toast('《濒湖脉学》内容整理中')">阅读 →</button>
+        <button class="read-btn">阅读 →</button>
       </div>
     </div>
 
-    <div class="book-card">
+    <div class="book-card" onclick="showBook('zhenjiu')">
       <div class="book-head">
         <span class="book-name">针灸甲乙经</span>
         <span class="book-intro">针灸学祖本·皇甫谧</span>
       </div>
       <div class="book-foot">
-        <button class="read-btn" onclick="toast('《针灸甲乙经》内容整理中')">阅读 →</button>
+        <button class="read-btn">阅读 →</button>
       </div>
     </div>
 
-    <div class="book-card">
+    <div class="book-card" onclick="showBook('tangtou')">
       <div class="book-head">
         <span class="book-name">汤头歌诀</span>
         <span class="book-intro">方剂歌诀·汪昂</span>
       </div>
       <div class="book-foot">
-        <button class="read-btn" onclick="toast('《汤头歌诀》内容整理中')">阅读 →</button>
+        <button class="read-btn">阅读 →</button>
       </div>
     </div>
   </div>
@@ -389,7 +492,7 @@ body{max-width:390px;margin:0 auto;min-height:100vh;padding-bottom:70px;}
         <div class="ec-title">中医执业医师资格考试模拟</div>
       </div>
       <div class="ec-desc">国家中医执业医师资格考试全真模拟，涵盖中医基础、方剂、针灸与临床辨证。</div>
-      <button class="ec-btn" onclick="toast('模拟练习即将开放')">模拟练习 →</button>
+      <button class="ec-btn" onclick="showExam('yishi')">模拟练习 →</button>
     </div>
 
     <div class="exam-card">
@@ -398,7 +501,7 @@ body{max-width:390px;margin:0 auto;min-height:100vh;padding-bottom:70px;}
         <div class="ec-title">中药师资格考试模拟</div>
       </div>
       <div class="ec-desc">执业中药师资格考试模拟练习，涵盖中药学、中药鉴定、中药药剂等专业知识。</div>
-      <button class="ec-btn" onclick="toast('模拟练习即将开放')">模拟练习 →</button>
+      <button class="ec-btn" onclick="showExam('yaoshi')">模拟练习 →</button>
     </div>
 
     <div class="exam-card">
@@ -407,10 +510,37 @@ body{max-width:390px;margin:0 auto;min-height:100vh;padding-bottom:70px;}
         <div class="ec-title">中医助理医师模拟</div>
       </div>
       <div class="ec-desc">中医执业助理医师资格考试模拟训练，基础理论结合临床实操综合测评。</div>
-      <button class="ec-btn" onclick="toast('模拟练习即将开放')">模拟练习 →</button>
+      <button class="ec-btn" onclick="showExam('zhuli')">模拟练习 →</button>
     </div>
   </div>
 
+</div>
+
+<!-- ===== 书籍内容展示区 ===== -->
+<div id="bookContent" style="display:none;">
+  <div class="bc-header">
+    <div class="bc-header-left">
+      <span class="bc-title" id="bcTitle"></span>
+      <span class="bc-intro" id="bcIntro"></span>
+    </div>
+    <button class="bc-close" onclick="closeBook()">×</button>
+  </div>
+  <div class="bc-body" id="bcBody"></div>
+</div>
+
+<!-- ===== 考试弹窗 ===== -->
+<div id="examModal">
+  <div class="exam-sheet">
+    <div class="exam-sheet-head">
+      <span class="exam-sheet-title" id="examSheetTitle"></span>
+      <button class="bc-close" onclick="closeExam()">×</button>
+    </div>
+    <div class="exam-sheet-body" id="examSheetBody"></div>
+    <div class="exam-sheet-foot">
+      <button class="btn-check" id="examCheckBtn" onclick="onCheckBtn()">提交答案</button>
+      <button class="btn-close" onclick="closeExam()">关闭</button>
+    </div>
+  </div>
 </div>
 
 <!-- ===== 底部导航栏 ===== -->
@@ -433,6 +563,864 @@ body{max-width:390px;margin:0 auto;min-height:100vh;padding-bottom:70px;}
 <div class="toast" id="toast"></div>
 
 <script>
+/* ===== 古籍内容数据 ===== */
+var booksData = {
+
+  /* ========== 易学古籍 ========== */
+
+  zhouyi: {
+    title: '周易原文',
+    intro: '群经之首·大道之源',
+    content:
+      '<span class="bc-tag">群经之首</span>'+
+      '<p>《周易》是中国最古老的典籍之一，由《经》与《传》两部分组成。《经》主要是六十四卦的卦象、卦辞和爻辞，相传伏羲画八卦，周文王演六十四卦并作卦辞，周公旦作爻辞，孔子作《十翼》传解。周易是中华文化的总源头，涵盖哲学、占卜、天文、历法诸学。</p>'+
+      '<h4>乾卦（第一卦）</h4>'+
+      '<blockquote><span class="bq-label">卦辞原文</span>乾：元，亨，利，贞。</blockquote>'+
+      '<blockquote><span class="bq-label">爻辞原文</span>'+
+      '初九：潜龙勿用。<br>'+
+      '九二：见龙在田，利见大人。<br>'+
+      '九三：君子终日乾乾，夕惕若厉，无咎。<br>'+
+      '九四：或跃在渊，无咎。<br>'+
+      '九五：飞龙在天，利见大人。<br>'+
+      '上九：亢龙有悔。<br>'+
+      '用九：见群龙无首，吉。</blockquote>'+
+      '<p>乾卦象天，六爻皆阳，主刚健中正。初九潜藏待时，九五飞腾得位，上九穷极必反，体现了事物发展盛衰消长的规律。</p>'+
+      '<h4>坤卦（第二卦）</h4>'+
+      '<blockquote><span class="bq-label">卦辞原文</span>坤：元，亨，利牝马之贞。君子有攸往，先迷后得主，利。西南得朋，东北丧朋。安贞，吉。</blockquote>'+
+      '<p>坤卦象地，六爻皆阴，主柔顺承载。"利牝马之贞"取牝马柔顺而健行之象，君子行事当先迷后得，以柔顺为正。</p>'+
+      '<h4>六十四卦名（上经三十卦）</h4>'+
+      '<p>乾、坤、屯、蒙、需、讼、师、比、小畜、履、泰、否、同人、大有、谦、豫、随、蛊、临、观、噬嗑、贲、剥、复、无妄、大畜、颐、大过、坎、离。</p>'+
+      '<h4>六十四卦名（下经三十四卦）</h4>'+
+      '<p>咸、恒、遁、大壮、晋、明夷、家人、睽、蹇、解、损、益、夬、姤、萃、升、困、井、革、鼎、震、艮、渐、归妹、丰、旅、巽、兑、涣、节、中孚、小过、既济、未济。</p>'+
+      '<h4>核心思想</h4>'+
+      '<blockquote><span class="bq-label">系辞传</span>一阴一阳之谓道。继之者善也，成之者性也。仁者见之谓之仁，知者见之谓之知，百姓日用而不知，故君子之道鲜矣。</blockquote>'+
+      '<p>周易以阴阳变化为核心，推演万物消长之理，既是占筮之书，也是哲学经典，影响后世数千年。</p>'
+  },
+
+  ditiansui: {
+    title: '滴天髓',
+    intro: '命理经典·京图撰·刘伯温注·任铁樵阐微',
+    content:
+      '<span class="bc-tag">子平命理高峰</span>'+
+      '<p>《滴天髓》相传为明代京图所撰，刘伯温（刘基）作注，清代任铁樵为之阐微，是命理学经典中的高峰。全书以阴阳五行生克制化为纲领，强调"气机"流通，主张五行生化有情方为贵格，被视为子平命理的最高心法。</p>'+
+      '<h4>通神论·天道</h4>'+
+      '<blockquote><span class="bq-label">开篇原文</span>欲识三元万法宗，先观帝载与神功。</blockquote>'+
+      '<p>刘伯温注：三元者，天元、地元、人元也。万法宗者，言诸般命理之法皆以此为宗。帝载即阴阳二气，神功即造化之妙。观命先观阴阳气机之流通，此为命理总纲。</p>'+
+      '<h4>通神论·地道</h4>'+
+      '<blockquote><span class="bq-label">原文</span>坤元合德机缄通，五气偏全定吉凶。</blockquote>'+
+      '<p>任铁樵注：坤元即地支，合德者合乎天干之德也。机缄通则气机流通，五气偏全即五行有余不足之谓，由此定命之吉凶贵贱。</p>'+
+      '<h4>通神论·人道</h4>'+
+      '<blockquote><span class="bq-label">原文</span>戴天履地人为贵，顺则吉兮逆则凶。</blockquote>'+
+      '<p>以日干为人之主，戴天覆于上，履地载于下，人居其中。顺五行生扶之机则吉，逆克战之气则凶。</p>'+
+      '<h4>知命篇</h4>'+
+      '<blockquote><span class="bq-label">原文</span>要与人间开聋聩，顺逆之机须理会。</blockquote>'+
+      '<p>欲为世人指点迷津，必先理会五行顺逆生克之机。顺者，生扶助益；逆者，克战冲刑。理明顺逆，方可论命。</p>'+
+      '<h4>理气篇</h4>'+
+      '<blockquote><span class="bq-label">原文</span>五阳皆阳丙为最，五阴皆阴癸为至。</blockquote>'+
+      '<p>甲丙戊庚壬为五阳干，丙火阳中之阳，光芒普照；乙丁己辛癸为五阴干，癸水阴中之阴，润泽万物。理气即辨明五行之气机强弱与流通方向。</p>'+
+      '<h4>核心论命原则</h4>'+
+      '<ul>'+
+        '<li>五行流通，生化有情，方为贵格。</li>'+
+        '<li>偏枯闭塞，克战无制，则成下格。</li>'+
+        '<li>用神有力有情则命高，用神无力则命低。</li>'+
+        '<li>看命先看月令，次看用神，再看相神。</li>'+
+      '</ul>'+
+      '<p>任铁樵以大量命例阐发此理，使《滴天髓》成为后世命学家必读之书。</p>'
+  },
+
+  qiongtong: {
+    title: '穷通宝鉴',
+    intro: '调候用神经典·月令取用法',
+    content:
+      '<span class="bc-tag">调候派经典</span>'+
+      '<p>《穷通宝鉴》原名《栏江网》，后经徐乐吾增注改名为《穷通宝鉴》，是命理调候派的代表作。专讲调候用神，按月令分述十干在十二月中的喜忌取用，以"调候"为核心——即根据气候寒暖燥湿选取用神，为八字论命的重要参考。</p>'+
+      '<h4>调候用神总论</h4>'+
+      '<blockquote><span class="bq-label">核心原则</span>五行生于各月，皆有寒暖燥湿之别，须以调候为急。冬月寒冷宜火，夏月炎热宜水，春月木旺宜金，秋月金旺宜火。</blockquote>'+
+      '<p>调候用神不同于扶抑用神，重在气候之调节。如冬月水旺火弱，不论日主强弱，皆以丙火暖局为先。</p>'+
+      '<h4>甲木生于十二月</h4>'+
+      '<blockquote><span class="bq-label">寅月（正月）</span>甲木生于寅月，丙火为用，癸水为佐。木旺得火，方化其顽。</blockquote>'+
+      '<blockquote><span class="bq-label">卯月（二月）</span>甲木生于卯月，羊刃之月。用丙火泄秀，不宜金克。</blockquote>'+
+      '<blockquote><span class="bq-label">辰月（三月）</span>甲木生于辰月，用庚金伐木，戊土佐之。</blockquote>'+
+      '<blockquote><span class="bq-label">巳月（四月）</span>甲木生于巳月，火旺木渴。先取癸水滋木，次用丁火。</blockquote>'+
+      '<blockquote><span class="bq-label">午月（五月）</span>甲木生于午月，木性虚焦。癸水为先，丁火为次。</blockquote>'+
+      '<blockquote><span class="bq-label">未月（六月）</span>甲木生于未月，用丁火泄秀，取庚金为佐。</blockquote>'+
+      '<blockquote><span class="bq-label">申月（七月）</span>甲木生于申月，用丁火制金，庚金为佐。</blockquote>'+
+      '<blockquote><span class="bq-label">酉月（八月）</span>甲木生于酉月，丁火为尊，丙火为佐。</blockquote>'+
+      '<blockquote><span class="bq-label">亥月（十月）</span>甲木生于亥月，用庚金伐木，戊土为佐。</blockquote>'+
+      '<blockquote><span class="bq-label">子月（十一月）</span>甲木生于子月，用丁火，庚金为佐。</blockquote>'+
+      '<blockquote><span class="bq-label">丑月（十二月）</span>甲木生于丑月，用丁火，丙火为佐。</blockquote>'+
+      '<h4>调候要诀</h4>'+
+      '<p>徐乐吾注：冬月之木，不离丙火；夏月之木，不离癸水。此为调候之总纲。其余九干各有月令取用，皆以调候为要，详见全书。</p>'+
+      '<p>《穷通宝鉴》的价值在于为命理提供了一套与"扶抑用神"不同的取用思路，与《子平真诠》的格局法、《滴天髓》的气势法互为补充。</p>'
+  },
+
+  sanming: {
+    title: '三命通会',
+    intro: '命理百科全书·万民英著',
+    content:
+      '<span class="bc-tag">命理集大成</span>'+
+      '<p>《三命通会》为明代万民英所撰，共十二卷，是命理学的百科全书。汇集了天干地支、纳音、神煞、格局、大运、流年等命理诸法，包罗万象，被誉为"命理学的集大成之作"。"三命"即天命（天干）、地命（地支）、人命（纳音），三者参合而论命。</p>'+
+      '<h4>天干地支</h4>'+
+      '<blockquote><span class="bq-label">十干</span>甲乙丙丁戊己庚辛壬癸。</blockquote>'+
+      '<blockquote><span class="bq-label">十二支</span>子丑寅卯辰巳午未申酉戌亥。</blockquote>'+
+      '<p>甲丙戊庚壬为阳干，乙丁己辛癸为阴干。子寅辰午申戌为阳支，丑卯巳未酉亥为阴支。干支相配，阳配阳，阴配阴，成六十甲子。</p>'+
+      '<h4>纳音五行</h4>'+
+      '<p>六十甲子配三十种纳音，每两种干支配一纳音：</p>'+
+      '<blockquote><span class="bq-label">纳音举例</span>'+
+      '甲子乙丑——海中金<br>'+
+      '丙寅丁卯——炉中火<br>'+
+      '戊辰己巳——大林木<br>'+
+      '庚午辛未——路旁土<br>'+
+      '壬申癸酉——剑锋金<br>'+
+      '甲戌乙亥——山头火<br>'+
+      '丙子丁丑——涧下水<br>'+
+      '戊寅己卯——城头土</blockquote>'+
+      '<p>纳音五行不同于正五行，各有其象，如海中金深藏不露，炉中火锻炼成器，大林木枝繁叶茂，各含命理玄机。</p>'+
+      '<h4>神煞</h4>'+
+      '<p>《三命通会》载有诸多神煞，常用的有：</p>'+
+      '<ul>'+
+        '<li><b>天乙贵人</b>：甲戊庚牛羊，乙己鼠猴乡，丙丁猪鸡位，壬癸蛇兔藏，六辛逢马虎。</li>'+
+        '<li><b>文昌</b>：甲乙己午鸡，丙戊申猴居，丁己酉鸡聚，庚猪辛逢鼠，壬癸虎兔位。</li>'+
+        '<li><b>驿马</b>：申子辰马在寅，寅午戌马在申，巳酉丑马在亥，亥卯未马在巳。</li>'+
+        '<li><b>桃花</b>：申子辰在酉，寅午戌在卯，巳酉丑在午，亥卯未在子。</li>'+
+        '<li><b>华盖</b>：申子辰在辰，寅午戌在戌，巳酉丑在丑，亥卯未在未。</li>'+
+      '</ul>'+
+      '<h4>十神格局</h4>'+
+      '<p>以日干为主，论十神配合：</p>'+
+      '<ul>'+
+        '<li><b>正官</b>：阳干见阴官，阴干见阳官。主名利，宜身旺。</li>'+
+        '<li><b>七杀（偏官）</b>：阳干见阳官，阴干见阴官。主权威，须制化。</li>'+
+        '<li><b>正财·偏财</b>：我所克者。正财主妻财，偏财主横财。</li>'+
+        '<li><b>正印·偏印</b>：生我者。正印主慈祥，偏印主孤僻。</li>'+
+        '<li><b>食神·伤官</b>：我所生者。食神主福寿，伤官主才华。</li>'+
+        '<li><b>比肩·劫财</b>：同类者。比肩主兄弟，劫财主争财。</li>'+
+      '</ul>'+
+      '<p>万民英将诸家命理之说汇为一编，使后人得以参考比较，是研究传统命理不可或缺的典籍。</p>'
+  },
+
+  ziping: {
+    title: '子平真诠',
+    intro: '格局用神·沈孝瞻著',
+    content:
+      '<span class="bc-tag">子平正统·格局派</span>'+
+      '<p>《子平真诠》为清代沈孝瞻所著，以"格局"为核心论命体系。认为用神之取，全在月令；格局之成败，决定命之贵贱。是子平命理正统学派的代表作，与《滴天髓》《穷通宝鉴》并称命理三大经典。</p>'+
+      '<h4>用神取法</h4>'+
+      '<blockquote><span class="bq-label">原文</span>八字用神，专凭月令。月令本气所藏之神，即为用神。用神既定，即定格局。</blockquote>'+
+      '<p>沈孝瞻主张：用神不必外求，月令所藏之神即为用神。如月令为寅，寅中藏甲丙戊，看透出何干，即为何格。</p>'+
+      '<h4>用神三要</h4>'+
+      '<blockquote><span class="bq-label">用神之要有三</span>一曰扶抑，二曰通关，三曰调候。</blockquote>'+
+      '<p>此三者虽为后世学者归纳，然实与沈氏格局说相辅相成：</p>'+
+      '<ul>'+
+        '<li><b>扶抑</b>：日主弱则扶之，日主强则抑之。扶用印比，抑用财官食伤。</li>'+
+        '<li><b>通关</b>：两神相争，须引通其气。如金木相战，以水通关。</li>'+
+        '<li><b>调候</b>：冬寒宜火，夏热宜水。调候用神与月令气候相关。</li>'+
+      '</ul>'+
+      '<h4>格局分类</h4>'+
+      '<blockquote><span class="bq-label">原文</span>格局有正有变。正者，如正官、七煞、财、印、食、伤之类；变者，如从格、化格、杂格之类。</blockquote>'+
+      '<p>正格以月令用神定名：</p>'+
+      '<ul>'+
+        '<li><b>正官格</b>：月令本气为正官，主贵气，忌刑冲破害。</li>'+
+        '<li><b>七杀格</b>：月令本气为七杀，须有食神制杀或印化杀。</li>'+
+        '<li><b>财格</b>：月令本气为财，身旺财旺则富。</li>'+
+        '<li><b>印格</b>：月令本气为印，主学问，忌财破印。</li>'+
+        '<li><b>食神格</b>：月令本气为食神，主福寿，忌枭神夺食。</li>'+
+        '<li><b>伤官格</b>：月令本气为伤官，须伤官佩印或伤官生财。</li>'+
+      '</ul>'+
+      '<h4>相神之说</h4>'+
+      '<blockquote><span class="bq-label">原文</span>用神既定，则观其相神。相神者，护用之神也。无相神则用神不固，格局不高。</blockquote>'+
+      '<p>如正官格以财为相神（财生官），以印为相神（印护官），无相神则官孤而无根，格局不高。</p>'+
+      '<h4>格局成败</h4>'+
+      '<p>沈氏论格局成败：用神有力有情、相神得力、无刑冲破害，则格高而命贵；用神无力、相神受伤、刑冲破害，则格破而命贱。《子平真诠》以此格局法奠定了子平命理的正统体系。</p>'
+  },
+
+  yuanhai: {
+    title: '渊海子平',
+    intro: '命理入门经典·徐升编',
+    content:
+      '<span class="bc-tag">子平命理入门</span>'+
+      '<p>《渊海子平》为宋代徐升据徐子平之学整理而成，是子平命理的入门经典。奠定了以日干为主、四柱论命、十神配合的命理基础体系，后世命理著作多以此为宗。</p>'+
+      '<h4>论日为主</h4>'+
+      '<blockquote><span class="bq-label">开宗明义</span>子平之法，以日为主，月令为提纲，时为辅佐。年为本，月为建，日为主，时为佐。</blockquote>'+
+      '<p>以日干为命主，论其旺衰强弱；以月令为提纲，定格局用神；以时辰为辅佐，看日主之归宿。此为子平命理的根本法则。</p>'+
+      '<h4>四柱八字</h4>'+
+      '<p>四柱即年柱、月柱、日柱、时柱，每柱一天干一地支，共八字。</p>'+
+      '<ul>'+
+        '<li><b>年柱</b>：为根，主祖业、幼年。</li>'+
+        '<li><b>月柱</b>：为苗，主父母、青年。月令为提纲，定格局。</li>'+
+        '<li><b>日柱</b>：为花，日干为命主本人，日支为配偶宫。</li>'+
+        '<li><b>时柱</b>：为果，主子女、晚年。</li>'+
+      '</ul>'+
+      '<h4>十神</h4>'+
+      '<p>以日干为主，论与其他干支的生克关系，得出十神：</p>'+
+      '<blockquote><span class="bq-label">十神口诀</span>'+
+      '生我者为印绶（正印·偏印）<br>'+
+      '我生者为食伤（食神·伤官）<br>'+
+      '克我者为官杀（正官·七杀）<br>'+
+      '我克者为妻财（正财·偏财）<br>'+
+      '同类者为比劫（比肩·劫财）</blockquote>'+
+      '<h4>六亲配十神</h4>'+
+      '<p>以十神配六亲，男女有别：</p>'+
+      '<ul>'+
+        '<li><b>男命</b>：正官为子，七杀为女；正财为妻，偏财为父；正印为母，偏印为继母。</li>'+
+        '<li><b>女命</b>：食神为子，伤官为女；正官为夫，七杀为偏夫；正印为母，偏印为继母。</li>'+
+      '</ul>'+
+      '<h4>大运排法</h4>'+
+      '<blockquote><span class="bq-label">原文</span>阳男阴女顺行，阴男阳女逆行。从月柱起，按节气顺逆排大运。</blockquote>'+
+      '<p>起运计算：从出生之日起，顺数或逆数至最近节气，三日折一岁，一日折四个月，一时辰折十天。如顺行三日为一岁，逆行三日亦为一岁。</p>'+
+      '<h4>神煞举要</h4>'+
+      '<ul>'+
+        '<li><b>天乙贵人</b>：命中带之，逢凶化吉。</li>'+
+        '<li><b>文昌</b>：主聪明好学。</li>'+
+        '<li><b>驿马</b>：主奔波远行。</li>'+
+        '<li><b>桃花</b>：主人缘感情。</li>'+
+        '<li><b>华盖</b>：主孤高艺术。</li>'+
+      '</ul>'+
+      '<p>《渊海子平》内容广泛，从基础概念到具体断法皆有论述，是初学命理者的必读入门书。</p>'
+  },
+
+  meihua: {
+    title: '梅花易数',
+    intro: '邵康节先天易·心易占法',
+    content:
+      '<span class="bc-tag">先天易·心易占法</span>'+
+      '<p>《梅花易数》相传为北宋邵雍（康节）所创，属先天易学体系。以"心易"为本，万物皆可起卦，无需铜钱蓍草，简单易行，为占卜术之便捷法门。相传邵雍观梅花而得此法，故名"梅花易数"。</p>'+
+      '<h4>心法口诀</h4>'+
+      '<blockquote><span class="bq-label">万物类象</span>'+
+      '一物从来有一身，一身还有一乾坤。<br>'+
+      '能知万物备于我，肯把三才别立根。</blockquote>'+
+      '<p>邵雍认为万物各具一太极，一身即一乾坤。能与天地万物感应，则不假外物而可起卦，此为"心易"之精髓。</p>'+
+      '<blockquote><span class="bq-label">感应篇</span>'+
+      '天人感应，物我一理。<br>'+
+      '寂然不动，感而遂通。</blockquote>'+
+      '<p>心静则能感通万物，心易之法贵在澄心静虑，随机感应。所谓"不动不占，不疑不卜"。</p>'+
+      '<h4>起卦方法</h4>'+
+      '<p>梅花易数起卦灵活，万物皆可入卦：</p>'+
+      '<ul>'+
+        '<li><b>时间起卦</b>：以年月日时之数起卦。年支数加月数加日数除以八余数为上卦，加时数除以八余数为下卦，总数除以六余数为动爻。</li>'+
+        '<li><b>物数起卦</b>：见可数之物，以其数除以八起卦。</li>'+
+        '<li><b>方位起卦</b>：以所见方位为上卦，以物数或时数为下卦。</li>'+
+        '<li><b>字画起卦</b>：以字之笔画数起卦，或以字数起卦。</li>'+
+        '<li><b>声音起卦</b>：以声音数或声调起卦。</li>'+
+        '<li><b>颜色起卦</b>：以所见颜色对应八卦起卦。</li>'+
+      '</ul>'+
+      '<h4>体用之辨</h4>'+
+      '<blockquote><span class="bq-label">断卦总纲</span>体用之分，体为主，用为客。体卦为己，用卦为事。</blockquote>'+
+      '<p>有动爻之卦为用卦，无动爻之卦为体卦。体为我，用为彼。断卦以体用生克论吉凶：</p>'+
+      '<ul>'+
+        '<li><b>用生体</b>：吉。他人助我，事可成。</li>'+
+        '<li><b>体生用</b>：凶。我耗于彼，事难成。</li>'+
+        '<li><b>用克体</b>：凶。他人克我，事不成。</li>'+
+        '<li><b>体克用</b>：吉。我制于彼，事可成。</li>'+
+        '<li><b>体用比和</b>：吉。同类相助，事顺成。</li>'+
+      '</ul>'+
+      '<h4>断卦步骤</h4>'+
+      '<p>先看本卦体用关系，次看互卦（中间四爻变出之卦）之生克，再看变卦（动爻变后之卦）之结果。三卦参看，方为周全。</p>'+
+      '<p>梅花易数简便灵活，重在"活法"，不可拘泥死法。邵雍曰："善占者，不假卜筮，以心通物。"此为最高境界。</p>'
+  },
+
+  qimen: {
+    title: '奇门遁甲秘笈大全',
+    intro: '三式之首·遁甲术',
+    content:
+      '<span class="bc-tag">三式之首</span>'+
+      '<p>《奇门遁甲秘笈大全》汇集奇门遁甲诸法，是三式（奇门、六壬、太乙）之首。以天盘、地盘、人盘、神盘四盘配合，推演时空吉凶，用于择吉、谋事、用兵。相传黄帝伐蚩尤时得九天玄女授遁甲之术，后经姜太公、张良、诸葛亮等传习。</p>'+
+      '<h4>节气定局</h4>'+
+      '<blockquote><span class="bq-label">定局口诀</span>'+
+      '冬至阳遁一七四，小寒二八五相随。<br>'+
+      '大寒三九六相连，立春八五二回还。<br>'+
+      '雨水九三六为定，惊蛰一七四相同。<br>'+
+      '春分三九六真途，清明四一七为局。<br>'+
+      '谷雨五二八相依，立夏四一七首先。<br>'+
+      '小满五二八可求，芒种六三九是局。<br>'+
+      '夏至阴遁九三六，小暑八二五相连。<br>'+
+      '大暑七一四相同，立秋二五八遁还。<br>'+
+      '处暑一四七为局，白露九三六里边。<br>'+
+      '秋分七一四同途，寒露六九三为局。<br>'+
+      '霜降五八二相须，立冬六九三回首。<br>'+
+      '小雪五八二加临，大雪四七一齐寻。</blockquote>'+
+      '<p>阳遁从冬至起顺排一至九，阴遁从夏至起逆排九至一。每个节气分上中下三元，各定一局，共一千八十局，后姜太公简化为七十二局，张良又简化为十八局（阳遁九局、阴遁九局）。</p>'+
+      '<h4>三奇六仪</h4>'+
+      '<p>三奇六仪为奇门遁甲的核心符号：</p>'+
+      '<ul>'+
+        '<li><b>三奇</b>：乙奇（日奇）、丙奇（月奇）、丁奇（星奇）。三奇为吉，遇之可逢凶化吉。</li>'+
+        '<li><b>六仪</b>：戊、己、庚、辛、壬、癸。六仪为凶，各有其象。</li>'+
+      '</ul>'+
+      '<p>三奇得使（乙奇逢甲戌、丙奇逢甲午、丁奇逢甲辰）为大吉之象。</p>'+
+      '<h4>八门</h4>'+
+      '<blockquote><span class="bq-label">八门吉凶</span>'+
+      '休门宜求安、嫁娶、上官。<br>'+
+      '生门宜求财、营造、远行。<br>'+
+      '伤门宜捕捉、渔猎、讨债。<br>'+
+      '杜门宜避难、隐藏、闭户。<br>'+
+      '景门宜上书、投书、面试。<br>'+
+      '死门宜吊丧、送葬、行刑。<br>'+
+      '惊门宜博戏、恐吓、捕捉。<br>'+
+      '开门宜远行、上任、开业。</blockquote>'+
+      '<p>八门中休、生、开为三吉门，伤、杜、景、死、惊为五凶门（景门半吉）。</p>'+
+      '<h4>九星</h4>'+
+      '<p>九星为天盘之星：</p>'+
+      '<ul>'+
+        '<li><b>天蓬</b>：大凶之星，主盗贼水灾。</li>'+
+        '<li><b>天芮</b>：大凶之星，主疾病丧亡。</li>'+
+        '<li><b>天冲</b>：中平之星，主冲动战斗。</li>'+
+        '<li><b>天辅</b>：大吉之星，主文化教育。</li>'+
+        '<li><b>天禽</b>：大吉之星，主权威中正。</li>'+
+        '<li><b>天心</b>：大吉之星，主医道长寿。</li>'+
+        '<li><b>天柱</b>：中平之星，主破败争讼。</li>'+
+        '<li><b>天任</b>：大吉之星，主富足安泰。</li>'+
+        '<li><b>天英</b>：中平之星，主火光血光。</li>'+
+      '</ul>'+
+      '<h4>八神</h4>'+
+      '<p>八神为神盘之神：直符、腾蛇、太阴、六合、白虎、玄武、九地、九天。直符为百神之主，最吉；腾蛇主虚惊怪异；太阴主阴私庇佑；六合主婚姻和合；白虎主血光凶伤；玄武主盗贼口舌；九地主隐蔽伏藏；九天主威武扬兵。</p>'
+  },
+
+  daliuren: {
+    title: '大六壬指南',
+    intro: '三式之冠·壬占术',
+    content:
+      '<span class="bc-tag">三式之冠</span>'+
+      '<p>《大六壬指南》为六壬占法的集大成之作。六壬与奇门、太乙合称三式，因壬占断事最为细腻入微，被誉为"三式之冠"。六壬以天地盘相叠，起四课三传，配合十二天将，推演人事吉凶。</p>'+
+      '<h4>天地盘</h4>'+
+      '<blockquote><span class="bq-label">基本结构</span>天盘动，地盘静，天盘随地盘而转。以月将加占时，转动天盘，得天地盘交会之象。</blockquote>'+
+      '<p>地盘固定不动，排列十二地支（子丑寅卯辰巳午未申酉戌亥）。天盘随月将（太阳所在躔次）和占时而转动，天盘某支加于地盘某支之上，即为起课之基础。</p>'+
+      '<h4>四课</h4>'+
+      '<p>四课为六壬推演的第一步，由日干、日支与天地盘的关系得出：</p>'+
+      '<ul>'+
+        '<li><b>第一课</b>：日干寄宫所得之天盘上神，为日干之课。</li>'+
+        '<li><b>第二课</b>：第一课上神再加天盘所得，为日干之阴。</li>'+
+        '<li><b>第三课</b>：日支所得之天盘上神，为日支之课。</li>'+
+        '<li><b>第四课</b>：第三课上神再加天盘所得，为日支之阴。</li>'+
+      '</ul>'+
+      '<p>日干寄宫口诀：甲寄寅，乙寄辰，丙戊寄巳，丁己寄未，庚寄申，辛寄戌，壬寄亥，癸寄丑。</p>'+
+      '<h4>三传</h4>'+
+      '<blockquote><span class="bq-label">三传</span>初传为发用，中传为移易，末传为归计。初传看事之始，中传看事之变，末传看事之终。</blockquote>'+
+      '<p>三传由四课中的克贼关系决定，共有九宗门起法：</p>'+
+      '<ul>'+
+        '<li><b>贼克</b>：上克下或下贼上，取先者为初传。</li>'+
+        '<li><b>比用</b>： multiple贼克，取与日干比者为初传。</li>'+
+        '<li><b>涉害</b>：比用不唯一，取涉害深者为初传。</li>'+
+        '<li><b>遥克</b>：无贼克，取遥克者为初传。</li>'+
+        '<li><b>昴星</b>：无遥克，阳日取酉上神，阴日取从魁。</li>'+
+        '<li><b>别责</b>：四课不全，取合神为初传。</li>'+
+        '<li><b>八专</b>：干支同位，取顺逆三神为传。</li>'+
+        '<li><b>伏吟</b>：天盘与地盘同位，取自刑为传。</li>'+
+        '<li><b>返吟</b>：天盘与地盘相冲，取冲为传。</li>'+
+      '</ul>'+
+      '<h4>十二天将</h4>'+
+      '<p>十二天将为六壬之神煞，各有其象：</p>'+
+      '<ul>'+
+        '<li><b>贵人</b>：主尊贵、扶持，最为吉神。</li>'+
+        '<li><b>腾蛇</b>：主虚惊、怪异、惊恐。</li>'+
+        '<li><b>朱雀</b>：主文书、口舌、信息。</li>'+
+        '<li><b>六合</b>：主婚姻、和合、交易。</li>'+
+        '<li><b>勾陈</b>：主争斗、牵连、词讼。</li>'+
+        '<li><b>青龙</b>：主财富、喜庆、尊贵。</li>'+
+        '<li><b>天空</b>：主空虚、欺诈、无实。</li>'+
+        '<li><b>白虎</b>：主疾病、血光、丧亡。</li>'+
+        '<li><b>太常</b>：主衣冠、饮食、官职。</li>'+
+        '<li><b>玄武</b>：主盗贼、私情、暗昧。</li>'+
+        '<li><b>太阴</b>：主阴私、隐秘、庇佑。</li>'+
+        '<li><b>天后</b>：主妇女、婚姻、恩泽。</li>'+
+      '</ul>'+
+      '<h4>贵人歌诀</h4>'+
+      '<blockquote><span class="bq-label">天乙贵人</span>'+
+      '甲戊庚牛羊，乙己鼠猴乡。<br>'+
+      '丙丁猪鸡位，壬癸蛇兔藏。<br>'+
+      '六辛逢马虎，此是贵人方。</blockquote>'+
+      '<p>贵人分昼夜：昼贵人与夜贵人不同。甲戊庚日昼贵人在丑（牛），夜贵人在未（羊），其余类推。</p>'+
+      '<p>六壬占法精微，非短文所能尽述。初学者当先熟记天地盘、四课三传、十二天将等基础，方能入其门径。</p>'
+  },
+
+  /* ========== 中医古籍 ========== */
+
+  neijing: {
+    title: '黄帝内经',
+    intro: '素问+灵枢·医经之祖',
+    content:
+      '<span class="bc-tag">医经之祖</span>'+
+      '<p>《黄帝内经》分《素问》《灵枢》各八十一篇，是中国医学的奠基之作。以阴阳五行、藏象经络、病因病机、诊法治则为纲领，奠定了中医理论体系的基础，被尊为"医之始祖"。</p>'+
+      '<h4>上古天真论（素问第一篇）</h4>'+
+      '<blockquote><span class="bq-label">开篇原文</span>'+
+      '昔在黄帝，生而神灵，弱而能言，幼而徇齐，长而敦敏，成而登天。<br>'+
+      '乃问于天师曰：余闻上古之人，春秋皆度百岁，而动作不衰；今时之人，年半百而动作皆衰者，时世异耶？人将失之耶？</blockquote>'+
+      '<blockquote><span class="bq-label">岐伯对曰</span>'+
+      '上古之人，其知道者，法于阴阳，和于术数，食饮有节，起居有常，不妄作劳，故能形与神俱，而尽终其天年，度百岁乃去。<br>'+
+      '今时之人不然也，以酒为浆，以妄为常，醉以入房，以欲竭其精，以耗散其真，不知持满，不时御神，务快其心，逆于生乐，起居无节，故半百而衰也。</blockquote>'+
+      '<p>此段奠定了中医养生学的理论基础："法于阴阳，和于术数"为养生总纲。</p>'+
+      '<h4>养生要诀</h4>'+
+      '<blockquote><span class="bq-label">原文</span>'+
+      '虚邪贼风，避之有时。<br>'+
+      '恬淡虚无，真气从之。<br>'+
+      '精神内守，病安从来。</blockquote>'+
+      '<p>外避虚邪贼风，内守恬淡虚无，内外兼修则病无由生。此为中医"治未病"思想的源头。</p>'+
+      '<h4>阴阳应象大论</h4>'+
+      '<blockquote><span class="bq-label">阴阳总纲</span>'+
+      '阴阳者，天地之道也，万物之纲纪，变化之父母，生杀之本始，神明之府也。<br>'+
+      '治病必求于本。</blockquote>'+
+      '<blockquote><span class="bq-label">阴阳之用</span>'+
+      '阳化气，阴成形。<br>'+
+      '阴胜则阳病，阳胜则阴病。<br>'+
+      '阳胜则热，阴胜则寒。<br>'+
+      '阳虚则外寒，阴虚则内热。</blockquote>'+
+      '<p>阴阳为中医理论的总纲，一切生理、病理、诊断、治疗皆以阴阳为根本。</p>'+
+      '<h4>藏象理论</h4>'+
+      '<p>五脏：心、肝、脾、肺、肾。六腑：胆、胃、小肠、大肠、膀胱、三焦。</p>'+
+      '<blockquote><span class="bq-label">五脏功能</span>'+
+      '心者，君主之官也，神明出焉。<br>'+
+      '肝者，将军之官也，谋虑出焉。<br>'+
+      '脾者，仓廪之官也，五味出焉。<br>'+
+      '肺者，相傅之官也，治节出焉。<br>'+
+      '肾者，作强之官也，伎巧出焉。</blockquote>'+
+      '<h4>经络学说</h4>'+
+      '<p>十二正经：手三阴（肺、心包、心）、手三阳（大肠、三焦、小肠）、足三阳（胃、胆、膀胱）、足三阴（脾、肝、肾）。另有奇经八脉：任、督、冲、带、阳维、阴维、阳蹻、阴蹻。</p>'+
+      '<p>《黄帝内经》是中医一切理论的基础，后世医家无不以此为准绳。</p>'
+  },
+
+  shanghan: {
+    title: '伤寒论',
+    intro: '张仲景著·六经辨证',
+    content:
+      '<span class="bc-tag">方书之祖</span>'+
+      '<p>《伤寒论》为东汉张仲景所著，原为《伤寒杂病论》的伤寒部分。创立六经辨证体系——太阳、阳明、少阳、太阴、少阴、厥阴，为外感病辨证论治的纲领。全书载方113首，被尊为"方书之祖"。</p>'+
+      '<h4>原序</h4>'+
+      '<blockquote><span class="bq-label">张仲景自序</span>'+
+      '余宗族素多，向余二百。建安纪年以来，犹未十稔，其死亡者，三分有二，伤寒十居其七。<br>'+
+      '感往昔之沦丧，伤横夭之莫救，乃勤求古训，博采众方，撰用素问、九卷、八十一难、阴阳大论、胎胪药录，并平脉辨证，为伤寒杂病论合十六卷。</blockquote>'+
+      '<h4>六经提纲</h4>'+
+      '<blockquote><span class="bq-label">太阳病</span>太阳之为病，脉浮，头项强痛而恶寒。</blockquote>'+
+      '<p>太阳病为外感初起，邪在表。脉浮主表，头项强痛为太阳经气不利，恶寒为卫阳被遏。</p>'+
+      '<blockquote><span class="bq-label">太阳中风</span>太阳病，发热，汗出，恶风，脉缓者，名为中风。</blockquote>'+
+      '<blockquote><span class="bq-label">太阳伤寒</span>太阳病，或已发热，或未发热，必恶寒，体痛，呕逆，脉阴阳俱紧者，名为伤寒。</blockquote>'+
+      '<blockquote><span class="bq-label">阳明病</span>阳明之为病，胃家实是也。</blockquote>'+
+      '<p>阳明病为邪热入里，化燥成实。以"胃家实"为提纲，表现为大热、大汗、大渴、脉洪大或便秘腹满。</p>'+
+      '<blockquote><span class="bq-label">少阳病</span>少阳之为病，口苦，咽干，目眩也。</blockquote>'+
+      '<p>少阳病为邪在半表半里，枢机不利。口苦、咽干、目眩为胆火上炎之象。</p>'+
+      '<blockquote><span class="bq-label">太阴病</span>太阴之为病，腹满而吐，食不下，自利益甚，时腹自痛。若下之，必胸下结硬。</blockquote>'+
+      '<p>太阴病为脾阳虚寒，寒湿内盛。腹满吐利为脾胃虚寒之象。</p>'+
+      '<blockquote><span class="bq-label">少阴病</span>少阴之为病，脉微细，但欲寐也。</blockquote>'+
+      '<p>少阴病为心肾阳衰或阴虚。脉微细为阳气衰微，但欲寐为神气衰弱。</p>'+
+      '<blockquote><span class="bq-label">厥阴病</span>厥阴之为病，消渴，气上撞心，心中疼热，饥而不欲食，食则吐蛔，下之利不止。</blockquote>'+
+      '<p>厥阴病为阴阳交争、寒热错杂。消渴、心中疼热为上热，不欲食、下利为下寒。</p>'+
+      '<h4>代表方剂</h4>'+
+      '<ul>'+
+        '<li><b>桂枝汤</b>：太阳中风表虚证。调和营卫，解肌发汗。</li>'+
+        '<li><b>麻黄汤</b>：太阳伤寒表实证。发汗解表，宣肺平喘。</li>'+
+        '<li><b>白虎汤</b>：阳明经证。清热生津。</li>'+
+        '<li><b>小柴胡汤</b>：少阳病。和解少阳。</li>'+
+        '<li><b>四逆汤</b>：少阴病阳衰。回阳救逆。</li>'+
+        '<li><b>乌梅丸</b>：厥阴病蛔厥。温脏安蛔。</li>'+
+      '</ul>'+
+      '<p>张仲景六经辨证体系至今仍为中医临床外感病辨证的纲领，其方剂被称为"经方"，影响深远。</p>'
+  },
+
+  jingui: {
+    title: '金匮要略',
+    intro: '杂病证治·张仲景著',
+    content:
+      '<span class="bc-tag">杂病辨证之祖</span>'+
+      '<p>《金匮要略》为张仲景《伤寒杂病论》的杂病部分，由宋代王洙在馆阁中发现残简整理而成。专论内科杂病及妇科、外科等，开创脏腑辨证先河，与《伤寒论》并称仲景二书。</p>'+
+      '<h4>脏腑经络先后病脉证第一</h4>'+
+      '<blockquote><span class="bq-label">开篇原文</span>'+
+      '问曰：上工治未病，何也？<br>'+
+      '师曰：夫治未病者，见肝之病，知肝传脾，当先实脾。四季脾旺不受邪，即勿补之。中工不晓相传，见肝之病，不解实脾，惟治肝也。</blockquote>'+
+      '<p>此段为全书总纲，体现了"治未病"和"脏腑传变"两大核心思想。肝木克脾土，故治肝病当先实脾，防其传变。</p>'+
+      '<blockquote><span class="bq-label">预防原则</span>'+
+      '若人能养慎，不令邪风干忤经络；适中经络，未流传脏腑，即医治之。四肢才觉重滞，即导引吐纳，针灸膏摩，勿令九窍闭塞。</blockquote>'+
+      '<h4>病因分类</h4>'+
+      '<blockquote><span class="bq-label">三条病因</span>'+
+      '千般疢难，不越三条：<br>'+
+      '一者，经络受邪入脏腑，为内所因也；<br>'+
+      '二者，四肢九窍，血脉相传，壅塞不通，为外皮肤所中也；<br>'+
+      '三者，房室、金刃、虫兽所伤。<br>'+
+      '以此详之，病由都尽。</blockquote>'+
+      '<p>此为中医最早的病因分类法，后世陈无择"三因方"即在此基础上发展。</p>'+
+      '<h4>杂病证治</h4>'+
+      '<p>全书共二十五篇，论述内、外、妇科诸病：</p>'+
+      '<ul>'+
+        '<li><b>中风</b>：邪在于络，肌肤不仁；邪在于经，即重不胜；邪入于腑，即不识人；邪入于脏，舌即难言，口吐涎。</li>'+
+        '<li><b>历节病</b>：关节疼痛，属风寒湿痹。桂枝芍药知母汤主之。</li>'+
+        '<li><b>血痹</b>：尊荣人骨弱肌肤盛，重因疲劳汗出，卧不时动摇，加被微风，遂得之。黄芪桂枝五物汤主之。</li>'+
+        '<li><b>虚劳</b>：虚劳腰痛，少腹拘急，小便不利者，八味肾气丸主之。</li>'+
+        '<li><b>痰饮</b>：病痰饮者，当以温药和之。苓桂术甘汤主之。</li>'+
+        '<li><b>消渴</b>：男子消渴，小便反多，以饮一斗，小便一斗，肾气丸主之。</li>'+
+        '<li><b>黄疸</b>：黄家所得，从湿得之。茵陈蒿汤主之。</li>'+
+      '</ul>'+
+      '<h4>代表方剂</h4>'+
+      '<ul>'+
+        '<li><b>肾气丸</b>：补肾助阳，治虚劳腰痛、消渴、小便不利。</li>'+
+        '<li><b>桂枝茯苓丸</b>：活血化瘀，治妇人宿症。</li>'+
+        '<li><b>黄芪建中汤</b>：温中补气，治虚劳里急诸不足。</li>'+
+        '<li><b>大黄牡丹汤</b>：泻热破瘀，治肠痈。</li>'+
+        '<li><b>苓桂术甘汤</b>：温化痰饮，治痰饮病。</li>'+
+        '<li><b>茵陈蒿汤</b>：清热利湿退黄，治湿热黄疸。</li>'+
+      '</ul>'+
+      '<p>《金匮要略》所载方剂被称为"金匮方"，与《伤寒论》经方合称仲景方，为后世方剂学之根本。</p>'
+  },
+
+  wenbing: {
+    title: '温病条辨',
+    intro: '吴鞠通著·三焦辨证',
+    content:
+      '<span class="bc-tag">温病学派代表</span>'+
+      '<p>《温病条辨》为清代吴鞠通（吴瑭）所著，创立三焦辨证体系。上焦、中焦、下焦分论温病，与仲景六经辨证互补，是温病学派的代表著作。与叶天士卫气营血辨证合为温病论治两大体系。</p>'+
+      '<h4>温病总论</h4>'+
+      '<blockquote><span class="bq-label">温病分类</span>'+
+      '温病者，有风温、有温热、有温疫、有温毒、有暑温、有湿温、有秋燥、有冬温。</blockquote>'+
+      '<blockquote><span class="bq-label">温病起病</span>凡病温者，始于上焦，在手太阴。</blockquote>'+
+      '<p>吴鞠通认为温病从上焦手太阴肺经开始，与伤寒从太阳膀胱经起病不同，此为温病与伤寒辨证之关键区别。</p>'+
+      '<h4>三焦辨证</h4>'+
+      '<blockquote><span class="bq-label">上焦篇</span>'+
+      '太阴之为病，脉不缓不紧而动数，或两寸独大，尺肤热，头痛，微恶风寒，身热自汗，口渴，或不渴而咳。<br>'+
+      '午后热甚者，名曰温病。</blockquote>'+
+      '<p>上焦病包括手太阴肺经和手厥阴心包经病证。肺主表，温邪上受首先犯肺。心包受邪则见神昏谵语。</p>'+
+      '<blockquote><span class="bq-label">中焦篇</span>'+
+      '面目俱赤，语声重浊，呼吸俱粗，大便闭，小便涩，舌苔老黄，甚则黑有芒刺。</blockquote>'+
+      '<p>中焦病为足阳明胃经和足太阴脾经病证。阳明热盛则见面目赤、语声重浊、便秘；太阴湿热则见身重、胸痞。</p>'+
+      '<blockquote><span class="bq-label">下焦篇</span>'+
+      '身热面赤，口舌干燥，甚则齿黑唇裂，手足心热。<br>'+
+      '热邪久羁，吸烁真阴，或因误表，或因妄攻，致神倦瘛疭，脉气虚弱。</blockquote>'+
+      '<p>下焦病为足少阴肾经和足厥阴肝经病证。温热之邪深入下焦，耗伤肝肾阴液，见手足心热、齿黑唇裂、瘛疭（抽搐）。</p>'+
+      '<h4>治则治法</h4>'+
+      '<blockquote><span class="bq-label">三焦治则</span>'+
+      '治上焦如羽，非轻不举；<br>'+
+      '治中焦如衡，非平不安；<br>'+
+      '治下焦如权，非重不沉。</blockquote>'+
+      '<p>此为三焦用药总则：</p>'+
+      '<ul>'+
+        '<li><b>上焦如羽</b>：药宜轻清宣透，如银翘散、桑菊饮，不可重浊。</li>'+
+        '<li><b>中焦如衡</b>：药宜平调清化，如白虎汤、承气汤，不偏不倚。</li>'+
+        '<li><b>下焦如权</b>：药宜重镇滋填，如增液汤、加减复脉汤，味厚质重。</li>'+
+      '</ul>'+
+      '<h4>代表方剂</h4>'+
+      '<ul>'+
+        '<li><b>银翘散</b>：辛凉解表，治风温初起。吴鞠通第一方。</li>'+
+        '<li><b>桑菊饮</b>：辛凉解表，宣肺止咳。治风温咳嗽。</li>'+
+        '<li><b>白虎汤</b>：清热生津，治阳明热盛。引自伤寒论。</li>'+
+        '<li><b>清营汤</b>：清营透热，治热入营分。</li>'+
+        '<li><b>增液汤</b>：增液润燥，治阴虚便秘。</li>'+
+        '<li><b>安宫牛黄丸</b>：清热开窍，治温热邪陷心包。</li>'+
+      '</ul>'+
+      '<p>吴鞠通三焦辨证与叶天士卫气营血辨证相互补充，使温病学成为独立于伤寒之外的完整辨证体系。</p>'
+  },
+
+  bencao: {
+    title: '本草纲目',
+    intro: '李时珍著·本草大成',
+    content:
+      '<span class="bc-tag">本草学巨著</span>'+
+      '<p>《本草纲目》为明代李时珍历时二十七年编撰而成，共五十二卷，收载药物1892种，方剂11096首。按部类分述，是中国古代药物学的集大成之作，被达尔文誉为"中国古代的百科全书"。</p>'+
+      '<h4>编写体例</h4>'+
+      '<p>全书分16部60类：</p>'+
+      '<blockquote><span class="bq-label">十六部</span>水部、火部、土部、金石部、草部、谷部、菜部、果部、木部、服器部、虫部、鳞部、介部、禽部、兽部、人部。</blockquote>'+
+      '<p>每药列以下项目：释名（别名考辨）、集解（产地形态）、正误（纠正前人谬误）、修治（炮制方法）、气味（性味归经）、主治（功效应用）、发明（药理阐发）、附录（附方）。</p>'+
+      '<h4>药物举例</h4>'+
+      '<blockquote><span class="bq-label">人参</span>'+
+      '气味：味甘，微寒，无毒。<br>'+
+      '主治：主补五脏，安精神，定魂魄，止惊悸，除邪气，明目，开心益智。久服轻身延年。</blockquote>'+
+      '<p>李时珍发明：人参得天地之纯粹以生，故能补元气。与黄芪同用补气之力更宏，与附子同用回阳救逆。</p>'+
+      '<blockquote><span class="bq-label">甘草</span>'+
+      '气味：味甘，平，无毒。<br>'+
+      '主治：主五脏六腑寒热邪气，坚筋骨，长肌肉，倍气力，解毒。久服轻身延年。</blockquote>'+
+      '<p>李时珍发明：甘草外赤中黄，色兼坤离，能协和诸药使之不争。故方中多用为使药，有"国老"之称。</p>'+
+      '<blockquote><span class="bq-label">当归</span>'+
+      '气味：味甘、辛，温，无毒。<br>'+
+      '主治：主咳逆上气，温疟寒热，妇人漏下绝子，诸恶疮疡金疮。煮汁饮之，温中止痛。</blockquote>'+
+      '<p>李时珍发明：当归头止血，身养血，尾破血，全用和血。为妇人调经要药。</p>'+
+      '<blockquote><span class="bq-label">黄芪</span>'+
+      '气味：味甘，微温，无毒。<br>'+
+      '主治：主痈疽久败疮，排脓止痛，大风癞疾，五痔鼠瘘，补虚，小儿百病。</blockquote>'+
+      '<p>李时珍发明：黄芪为补气之要药，与人参同用大补元气，与白术同用健脾益气，与防己同用益气利水。</p>'+
+      '<blockquote><span class="bq-label">黄连</span>'+
+      '气味：味苦，寒，无毒。<br>'+
+      '主治：主热气目痛，眦伤泣出，明目，肠澼腹痛下痢，妇人阴中肿痛。久服令人不忘。</blockquote>'+
+      '<p>李时珍发明：黄连大苦大寒，为治湿热泻痢之要药。姜汁炒治上焦火，吴茱萸炒治肝火，猪胆汁炒治胆火。</p>'+
+      '<h4>学术贡献</h4>'+
+      '<ul>'+
+        '<li>纠正前人本草诸多谬误，如辨明葳蕤与玉竹为二物、南星与虎掌为一物等。</li>'+
+        '<li>新增药物374种，如三七、曼陀罗、紫花地丁等。</li>'+
+        '<li>注重药物的临床验证，亲尝药性，实地考察。</li>'+
+        '<li>记载了大量民间用药经验，保存了丰富的药学资料。</li>'+
+      '</ul>'+
+      '<p>《本草纲目》不仅是药学巨著，也是植物学、动物学、矿物学的重要文献，被译成日、朝、拉丁、英、法、德等多国文字。</p>'
+  },
+
+  binhu: {
+    title: '濒湖脉学',
+    intro: '二十七脉·李时珍著',
+    content:
+      '<span class="bc-tag">脉诊入门</span>'+
+      '<p>《濒湖脉学》为明代李时珍所撰，以七言歌诀形式描述二十七种脉象，是中医脉诊的入门必读。因李时珍号濒湖，故名。全书简明扼要，便于记诵，为后世学习脉诊的首选教材。</p>'+
+      '<h4>二十七脉提要</h4>'+
+      '<blockquote><span class="bq-label">浮脉</span>'+
+      '浮脉，举之有余，按之不足，如捻葱叶。<br>'+
+      '体状诗：浮脉惟从肉上行，如循榆荚似毛轻。</blockquote>'+
+      '<p>浮脉主表证。浮而有力为表实，浮而无力为表虚。浮紧为风寒，浮数为风热。</p>'+
+      '<blockquote><span class="bq-label">沉脉</span>'+
+      '沉脉，重手按至筋骨乃得，如石投水，必及其底。<br>'+
+      '体状诗：水行润下脉来沉，筋骨之间软滑匀。</blockquote>'+
+      '<p>沉脉主里证。沉而有力为里实，沉而无力为里虚。沉迟为里寒，沉数为里热。</p>'+
+      '<blockquote><span class="bq-label">迟脉</span>'+
+      '迟脉，一息三至，去来极慢。<br>'+
+      '体状诗：迟来一息至惟三，阳不胜阴气血寒。</blockquote>'+
+      '<p>迟脉主寒证。迟而有力为实寒（冷积），迟而无力为虚寒（阳虚）。</p>'+
+      '<blockquote><span class="bq-label">数脉</span>'+
+      '数脉，一息六至，脉流薄疾。<br>'+
+      '体状诗：数脉息间常六至，阴微阳盛必狂烦。</blockquote>'+
+      '<p>数脉主热证。数而有力为实热，数而无力为虚热（阴虚火旺）。</p>'+
+      '<blockquote><span class="bq-label">滑脉</span>'+
+      '滑脉，往来前却，流利展转，替替然如盘珠，如荷露。<br>'+
+      '体状诗：滑脉如珠替替然，往来流利却还前。</blockquote>'+
+      '<p>滑脉主痰饮、食滞、实热。妇人妊娠亦常见滑脉。</p>'+
+      '<blockquote><span class="bq-label">涩脉</span>'+
+      '涩脉，细而迟，往来难且散，或一止复来，参伍不调。<br>'+
+      '体状诗：涩脉蹇滞往来难，参伍不调如雨沙。</blockquote>'+
+      '<p>涩脉主血少精伤、气滞血瘀。与滑脉相对，滑为有余，涩为不足。</p>'+
+      '<blockquote><span class="bq-label">虚脉</span>'+
+      '虚脉，迟大而软，按之无力，隐指豁豁然空。<br>'+
+      '体状诗：脉来无力属乎虚，豁豁空空如捻葱。</blockquote>'+
+      '<p>虚脉主气血两虚。为无力脉的总称。</p>'+
+      '<blockquote><span class="bq-label">实脉</span>'+
+      '实脉，浮沉皆得，大而长，应指愊愊然。<br>'+
+      '体状诗：实脉浮沉有力强，应指无虚愊愊长。</blockquote>'+
+      '<p>实脉主实证。为有余之象，见于邪气盛而正气不虚。</p>'+
+      '<blockquote><span class="bq-label">弦脉</span>'+
+      '弦脉，端直以长，如张弓弦，按之不移，绰绰然如按琴瑟弦。<br>'+
+      '体状诗：弦脉迢迢端直长，肝经木旺土应伤。</blockquote>'+
+      '<p>弦脉主肝胆病、痛证、痰饮。春季脉微弦为平脉。</p>'+
+      '<blockquote><span class="bq-label">紧脉</span>'+
+      '紧脉，来往有力，左右弹人手，如转索无常。<br>'+
+      '体状诗：紧为阴脉过于阳，状如转索其不长。</blockquote>'+
+      '<p>紧脉主寒证、痛证、宿食。寒主收引，故脉见紧急。</p>'+
+      '<h4>其余诸脉</h4>'+
+      '<p>洪脉（主热盛）、微脉（主阳衰）、缓脉（主湿或平脉）、芤脉（主失血）、濡脉（主虚湿）、弱脉（主气血不足）、散脉（主元气离散）、细脉（主气血两虚）、伏脉（主邪闭厥证）、动脉（主惊恐疼痛）、促脉（主阳盛热结）、结脉（主阴盛气结）、代脉（主脏气衰危）。</p>'+
+      '<p>李时珍以歌诀形式使脉学便于记诵，至今仍是中医入门脉诊的标准教材。</p>'
+  },
+
+  zhenjiu: {
+    title: '针灸甲乙经',
+    intro: '针灸学祖本·皇甫谧著',
+    content:
+      '<span class="bc-tag">针灸学之祖</span>'+
+      '<p>《针灸甲乙经》为晋代皇甫谧据《素问》《灵枢》《明堂孔穴针灸治要》三书整理而成，是中国现存最早的针灸学专著。全书十二卷，按经络分述穴位，共载穴349个，为后世针灸学之根本。</p>'+
+      '<h4>编写缘起</h4>'+
+      '<blockquote><span class="bq-label">皇甫谧自序</span>'+
+      '乃撰集三部，使事类相从，删其浮辞，除其重复，论其精要，至为十二卷。</blockquote>'+
+      '<p>皇甫谧因病风痹，潜心研究针灸，将《素问》《灵枢》《明堂孔穴针灸治要》三部医经中有关针灸的内容重新编次，删繁就简，分类整理，成此巨著。</p>'+
+      '<h4>十二经脉</h4>'+
+      '<p>全书以十二经脉为纲领，分述各经循行与腧穴：</p>'+
+      '<ul>'+
+        '<li><b>手太阴肺经</b>：起于中焦，下络大肠，还循胃口，上膈属肺。共11穴。</li>'+
+        '<li><b>手阳明大肠经</b>：起于商阳，终于迎香。共20穴。</li>'+
+        '<li><b>足阳明胃经</b>：起于承泣，终于厉兑。共45穴。</li>'+
+        '<li><b>足太阴脾经</b>：起于隐白，终于大包。共21穴。</li>'+
+        '<li><b>手少阴心经</b>：起于极泉，终于少冲。共9穴。</li>'+
+        '<li><b>手太阳小肠经</b>：起于少泽，终于听宫。共19穴。</li>'+
+        '<li><b>足太阳膀胱经</b>：起于睛明，终于至阴。共67穴，为穴位最多之经。</li>'+
+        '<li><b>足少阴肾经</b>：起于涌泉，终于俞府。共27穴。</li>'+
+        '<li><b>手厥阴心包经</b>：起于天池，终于中冲。共9穴。</li>'+
+        '<li><b>手少阳三焦经</b>：起于关冲，终于丝竹空。共23穴。</li>'+
+        '<li><b>足少阳胆经</b>：起于瞳子髎，终于足窍阴。共44穴。</li>'+
+        '<li><b>足厥阴肝经</b>：起于大敦，终于期门。共14穴。</li>'+
+      '</ul>'+
+      '<h4>腧穴定位</h4>'+
+      '<p>皇甫谧按头面、背、胸、腹、上肢、下肢分部记载穴位，并详细描述取穴方法：</p>'+
+      '<blockquote><span class="bq-label">取穴举例</span>'+
+      '百会穴：在头顶中央旋毛中，可容豆。<br>'+
+      '足三里穴：在膝下三寸胻骨外廉大筋内。<br>'+
+      '合谷穴：在手大指次指歧骨间陷中。</blockquote>'+
+      '<h4>刺灸方法</h4>'+
+      '<blockquote><span class="bq-label">刺法要则</span>'+
+      '凡刺之理，必先辨虚实，审气血之多少，度肥瘦之形。<br>'+
+      '虚实之要，九针最妙，补泻之时，以针为之。</blockquote>'+
+      '<p>皇甫谧强调针刺必须辨虚实、定补泻：</p>'+
+      '<ul>'+
+        '<li><b>补法</b>：进针慢，出针快，按闭针孔。</li>'+
+        '<li><b>泻法</b>：进针快，出针慢，不闭针孔。</li>'+
+        '<li><b>浅深</b>：春夏日浅，秋冬日深。瘦人浅刺，肥人深刺。</li>'+
+      '</ul>'+
+      '<h4>五输穴</h4>'+
+      '<p>每经在肘膝以下有五输穴：井、荥、输、经、合。</p>'+
+      '<blockquote><span class="bq-label">五输主治</span>'+
+      '所出为井，井主心下满；<br>'+
+      '所溜为荥，荥主身热；<br>'+
+      '所注为输，输主体重节痛；<br>'+
+      '所行为经，经主喘咳寒热；<br>'+
+      '所入为合，合主逆气而泄。</blockquote>'+
+      '<h4>特定穴</h4>'+
+      '<ul>'+
+        '<li><b>原穴</b>：脏腑原气经过留止之处，共12穴。</li>'+
+        '<li><b>络穴</b>：络脉从经脉分出之处，共15穴。</li>'+
+        '<li><b>背俞穴</b>：脏腑之气输注于背部的穴位，共12穴。</li>'+
+        '<li><b>募穴</b>：脏腑之气汇集于胸腹部的穴位，共12穴。</li>'+
+        '<li><b>八会穴</b>：脏、腑、气、血、筋、脉、骨、髓各有所会。</li>'+
+      '</ul>'+
+      '<p>《针灸甲乙经》为后世《铜人针灸图经》《针灸大成》等针灸著作之蓝本，是针灸学的奠基之作。</p>'
+  },
+
+  tangtou: {
+    title: '汤头歌诀',
+    intro: '方剂歌诀·汪昂著',
+    content:
+      '<span class="bc-tag">方剂入门</span>'+
+      '<p>《汤头歌诀》为清代汪昂（訚庵）所编，以七言歌诀形式记述常用方剂300余首，便于记诵，是中医方剂学的入门读物。汪昂选方以"切于实用"为原则，所收方剂至今仍为临床常用。</p>'+
+      '<h4>补益之剂</h4>'+
+      '<blockquote><span class="bq-label">四君子汤</span>'+
+      '四君子汤中和义，参术茯苓甘草比。<br>'+
+      '益以夏陈名六君，祛痰补气阳虚饵。<br>'+
+      '除却半夏名异功，或加香砂胃寒使。</blockquote>'+
+      '<p>四君子汤为补气基础方。人参补气，白术健脾，茯苓渗湿，甘草和中。加半夏陈皮为六君子汤，治气虚痰湿；加木香砂仁为香砂六君，治胃寒气滞。</p>'+
+      '<blockquote><span class="bq-label">四物汤</span>'+
+      '四物地芍与归芎，血家百病此方通。<br>'+
+      '八珍合入四君子，气血双疗功独崇。<br>'+
+      '更加黄芪与肉桂，十全大补补方雄。</blockquote>'+
+      '<p>四物汤为补血基础方。熟地滋阴补血，当归养血活血，白芍敛阴和营，川芎活血行气。合四君子汤为八珍汤，气血双补；加黄芪肉桂为十全大补汤，温补气血。</p>'+
+      '<blockquote><span class="bq-label">补中益气汤</span>'+
+      '补中益气芪术陈，升柴参草当归身。<br>'+
+      '虚劳内伤功独擅，阳虚外感亦堪珍。</blockquote>'+
+      '<p>补中益气汤为李东垣名方。黄芪补气升阳，人参白术甘草健脾益气，陈皮理气，升麻柴胡升阳举陷，当归补血。治脾胃气虚、中气下陷诸证。</p>'+
+      '<blockquote><span class="bq-label">六味地黄丸</span>'+
+      '六味地黄益肾肝，茱薯丹泽地苓专。<br>'+
+      '阴虚火旺成劳损，滋阴填精是本原。<br>'+
+      '益火桂附从肾气，扼阳知柏降虚火。</blockquote>'+
+      '<p>六味地黄丸为滋阴补肾基础方。熟地滋肾填精，山茱萸养肝肾，山药补脾肾，三补；泽泻泻肾浊，丹皮泻肝火，茯苓渗脾湿，三泻。加桂附为肾气丸（温补肾阳），加知柏为知柏地黄丸（滋阴降火）。</p>'+
+      '<h4>解表之剂</h4>'+
+      '<blockquote><span class="bq-label">桂枝汤</span>'+
+      '桂枝汤治太阳风，芍药甘草姜枣同。<br>'+
+      '若将一味麻黄入，便是温经解表功。</blockquote>'+
+      '<p>桂枝汤为解表调和营卫之方。桂枝解肌发汗，芍药敛阴和营，生姜助桂解表，大枣助芍和营，甘草调和诸药。加麻黄为麻黄桂枝各半汤。</p>'+
+      '<blockquote><span class="bq-label">麻黄汤</span>'+
+      '麻黄汤中用桂枝，杏仁甘草四般施。<br>'+
+      '发热恶寒头项痛，伤寒服此汗淋漓。</blockquote>'+
+      '<p>麻黄汤为发汗解表第一方。麻黄发汗解表宣肺，桂枝温经解肌助麻黄发汗，杏仁降肺气平喘，甘草调和诸药。</p>'+
+      '<h4>和解之剂</h4>'+
+      '<blockquote><span class="bq-label">小柴胡汤</span>'+
+      '小柴胡汤和解功，半夏人参甘草从。<br>'+
+      '更用黄芩加姜枣，少阳为病此方宗。</blockquote>'+
+      '<p>小柴胡汤为和解少阳代表方。柴胡疏少阳之邪，黄芩清少阳之热，半夏和胃降逆，人参甘草姜枣扶正和中。治少阳病口苦咽干目眩、往来寒热、胸胁苦满等证。</p>'+
+      '<h4>清热之剂</h4>'+
+      '<blockquote><span class="bq-label">白虎汤</span>'+
+      '白虎汤清气分热，石膏知母草米协。<br>'+
+      '更加人参益气津，热渴汗出脉洪绝。</blockquote>'+
+      '<p>白虎汤为清热生津代表方。石膏清热泻火，知母清热滋阴，甘草粳米和中益胃。加人参为白虎加人参汤，治热伤气津。</p>'+
+      '<h4>理气之剂</h4>'+
+      '<blockquote><span class="bq-label">越鞠丸</span>'+
+      '越鞠丸治六般郁，气血痰火湿食因。<br>'+
+      '芎苍香附兼栀曲，气畅郁舒痛闷伸。</blockquote>'+
+      '<p>越鞠丸为行气解郁代表方。香附行气解郁，川芎活血行气，苍术燥湿健脾，栀子清热泻火，神曲消食和胃。治气、血、痰、火、湿、食六郁。</p>'+
+      '<p>汪昂《汤头歌诀》以歌诀形式使方剂便于记诵，至今仍是中医初学方剂的首选读物。</p>'
+  }
+
+};
+
+/* ===== 资格考试模拟题数据 ===== */
+var examData = {
+  yishi: {
+    title: '中医执业医师资格考试模拟',
+    questions: [
+      {
+        q: '《黄帝内经·上古天真论》中"上古之人，春秋皆度百岁"的下一句是？',
+        opts: ['而动作不衰', '而动作皆衰', '而寿终正寝', '而不知其所'],
+        answer: 0,
+        explain: '原文："上古之人，春秋皆度百岁，而动作不衰。"出自《素问·上古天真论》第一篇，论述上古之人养生有道，年至百岁仍动作不衰。'
+      },
+      {
+        q: '《伤寒论》中太阳病的典型脉象是？',
+        opts: ['沉脉', '数脉', '浮脉', '迟脉'],
+        answer: 2,
+        explain: '原文："太阳之为病，脉浮，头项强痛而恶寒。"浮脉主表证，是太阳病辨证的标志脉象。'
+      },
+      {
+        q: '吴鞠通《温病条辨》三焦辨证中"治上焦如羽"的下一句是？',
+        opts: ['非轻不举', '非平不安', '非重不沉', '非清不解'],
+        answer: 0,
+        explain: '原文："治上焦如羽，非轻不举；治中焦如衡，非平不安；治下焦如权，非重不沉。"此为三焦用药总则。'
+      },
+      {
+        q: '李时珍《濒湖脉学》中"浮脉"的体状特征是？',
+        opts: ['举之有余，按之不足', '重手按至筋骨乃得', '一息三至，去来极慢', '一息六至，脉流薄疾'],
+        answer: 0,
+        explain: '原文："浮脉，举之有余，按之不足，如捻葱叶。"浮脉轻取即得，重按稍减，主表证。'
+      },
+      {
+        q: '"见肝之病，知肝传脾，当先实脾"出自以下哪部典籍？',
+        opts: ['《黄帝内经》', '《伤寒论》', '《金匮要略》', '《温病条辨》'],
+        answer: 2,
+        explain: '出自《金匮要略·脏腑经络先后病脉证第一》："问曰：上工治未病，何也？师曰：见肝之病，知肝传脾，当先实脾。"体现了脏腑传变与治未病思想。'
+      }
+    ]
+  },
+  yaoshi: {
+    title: '中药师资格考试模拟',
+    questions: [
+      {
+        q: '《本草纲目》共分为多少部？',
+        opts: ['12部', '14部', '16部', '18部'],
+        answer: 2,
+        explain: '《本草纲目》分16部60类：水、火、土、金石、草、谷、菜、果、木、服器、虫、鳞、介、禽、兽、人，共16部。'
+      },
+      {
+        q: '《本草纲目》记载人参的性味是？',
+        opts: ['味甘微寒', '味苦大寒', '味辛温', '味咸寒'],
+        answer: 0,
+        explain: '原文："人参，味甘，微寒，无毒。主补五脏，安精神，定魂魄，止惊悸。"人参为补气要药。'
+      },
+      {
+        q: '《本草纲目》中甘草的主治不包括以下哪项？',
+        opts: ['五脏六腑寒热邪气', '坚筋骨长肌肉', '解毒', '发汗解表'],
+        answer: 3,
+        explain: '甘草"味甘平无毒，主五脏六腑寒热邪气，坚筋骨，长肌肉，倍气力，解毒。"发汗解表为麻黄、桂枝之功效，非甘草所主。'
+      },
+      {
+        q: '《本草纲目》的作者是？',
+        opts: ['张仲景', '孙思邈', '李时珍', '陶弘景'],
+        answer: 2,
+        explain: '《本草纲目》为明代李时珍历时二十七年编撰而成，收载药物1892种，方剂11096首。'
+      },
+      {
+        q: '《本草纲目》记载当归的性味是？',
+        opts: ['味甘辛温', '味苦寒', '味咸平', '味酸温'],
+        answer: 0,
+        explain: '原文："当归，味甘、辛，温，无毒。主咳逆上气，温疟寒热，妇人漏下绝子。"为妇科调经要药。'
+      }
+    ]
+  },
+  zhuli: {
+    title: '中医助理医师模拟',
+    questions: [
+      {
+        q: '十二经脉共有多少条？',
+        opts: ['8条', '10条', '12条', '14条'],
+        answer: 2,
+        explain: '十二正经：手三阴（肺、心包、心）、手三阳（大肠、三焦、小肠）、足三阳（胃、胆、膀胱）、足三阴（脾、肝、肾），共12条。另有奇经八脉。'
+      },
+      {
+        q: '《汤头歌诀》中四君子汤的组成是？',
+        opts: ['人参白术茯苓甘草', '人参黄芪当归甘草', '人参白术干姜甘草', '人参茯苓半夏甘草'],
+        answer: 0,
+        explain: '歌诀："四君子汤中和义，参术茯苓甘草比。"四药皆属平和之品，故名四君子，为补气基础方。'
+      },
+      {
+        q: '桂枝汤的组成中不包括以下哪味药？',
+        opts: ['桂枝', '芍药', '麻黄', '甘草'],
+        answer: 2,
+        explain: '歌诀："桂枝汤治太阳风，芍药甘草姜枣同。"桂枝汤含桂枝、芍药、甘草、生姜、大枣五味，不含麻黄。加麻黄则为麻黄桂枝各半汤。'
+      },
+      {
+        q: '"上工治未病"最早见于以下哪部典籍？',
+        opts: ['《伤寒论》', '《金匮要略》', '《本草纲目》', '《温病条辨》'],
+        answer: 1,
+        explain: '"上工治未病"语出《金匮要略·脏腑经络先后病脉证第一》："问曰：上工治未病，何也？师曰：夫治未病者，见肝之病，知肝传脾，当先实脾。"'
+      },
+      {
+        q: '六味地黄丸中不包括以下哪味药？',
+        opts: ['熟地黄', '山药', '丹皮', '黄芪'],
+        answer: 3,
+        explain: '六味地黄丸含熟地黄、山药、山茱萸、丹皮、茯苓、泽泻六味，不含黄芪。歌诀："六味地黄益肾肝，茱薯丹泽地苓专。"'
+      }
+    ]
+  }
+};
+
 /* ===== Tab 切换 ===== */
 function switchTab(tab){
   document.querySelectorAll('.tab').forEach(function(t){
@@ -441,8 +1429,114 @@ function switchTab(tab){
   document.querySelectorAll('.tab-content').forEach(function(c){
     c.style.display = (c.id===tab) ? 'block' : 'none';
   });
-  // 切换后回到顶部内容区
+  closeBook();
   window.scrollTo({top:0, behavior:'smooth'});
+}
+
+/* ===== 书籍内容展示 ===== */
+function showBook(bookId){
+  var book = booksData[bookId];
+  if(!book){ toast('内容整理中'); return; }
+  document.getElementById('bcTitle').textContent = book.title;
+  document.getElementById('bcIntro').textContent = book.intro;
+  document.getElementById('bcBody').innerHTML = book.content;
+  var box = document.getElementById('bookContent');
+  box.style.display = 'block';
+  setTimeout(function(){
+    box.scrollIntoView({behavior:'smooth', block:'start'});
+  }, 100);
+}
+
+function closeBook(){
+  document.getElementById('bookContent').style.display = 'none';
+}
+
+/* ===== 资格考试模拟 ===== */
+var currentExamId = null;
+var examAnswers = {};
+var examChecked = false;
+
+function showExam(examId){
+  examChecked = false;
+  currentExamId = examId;
+  var exam = examData[examId];
+  if(!exam){ toast('模拟练习即将开放'); return; }
+  examAnswers = {};
+
+  document.getElementById('examSheetTitle').textContent = exam.title;
+  var body = document.getElementById('examSheetBody');
+  var html = '';
+  exam.questions.forEach(function(q, i){
+    html += '<div class="eq-item" data-idx="'+i+'">';
+    html += '<div class="eq-q"><span class="eq-no">'+(i+1)+'.</span>'+q.q+'</div>';
+    q.opts.forEach(function(opt, j){
+      html += '<div class="eq-opt" onclick="selectOption('+i+','+j+')"><div class="eq-radio">'+String.fromCharCode(65+j)+'</div><span>'+opt+'</span></div>';
+    });
+    html += '<div class="eq-explain" id="explain-'+i+'">解析：'+q.explain+'</div>';
+    html += '</div>';
+  });
+  body.innerHTML = html;
+  body.scrollTop = 0;
+
+  document.getElementById('examCheckBtn').textContent = '提交答案';
+  document.getElementById('examModal').style.display = 'flex';
+}
+
+function selectOption(qIdx, optIdx){
+  if(examChecked) return;
+  examAnswers[qIdx] = optIdx;
+  var item = document.querySelector('.eq-item[data-idx="'+qIdx+'"]');
+  if(!item) return;
+  var opts = item.querySelectorAll('.eq-opt');
+  opts.forEach(function(opt, j){
+    opt.classList.toggle('selected', j === optIdx);
+  });
+}
+
+function onCheckBtn(){
+  if(!examChecked){
+    checkExam();
+  } else {
+    showExam(currentExamId);
+  }
+}
+
+function checkExam(){
+  if(!currentExamId) return;
+  var exam = examData[currentExamId];
+  var correct = 0;
+  exam.questions.forEach(function(q, i){
+    var item = document.querySelector('.eq-item[data-idx="'+i+'"]');
+    if(!item) return;
+    var opts = item.querySelectorAll('.eq-opt');
+    opts.forEach(function(opt, j){
+      opt.classList.remove('selected');
+      if(j === q.answer) opt.classList.add('correct');
+      if(examAnswers[i] === j && j !== q.answer) opt.classList.add('wrong');
+    });
+    var exp = document.getElementById('explain-'+i);
+    if(exp) exp.classList.add('show');
+    if(examAnswers[i] === q.answer) correct++;
+  });
+
+  var total = exam.questions.length;
+  var pct = Math.round(correct / total * 100);
+  var text = '';
+  if(pct >= 80) text = '优秀！已掌握核心知识点';
+  else if(pct >= 60) text = '合格，继续努力';
+  else text = '需加强学习，多读经典';
+
+  var body = document.getElementById('examSheetBody');
+  var resultHtml = '<div class="exam-result"><div class="er-score">'+correct+' / '+total+'</div><div class="er-text">'+text+'</div></div>';
+  body.insertAdjacentHTML('afterbegin', resultHtml);
+
+  examChecked = true;
+  document.getElementById('examCheckBtn').textContent = '重新答题';
+  body.scrollTop = 0;
+}
+
+function closeExam(){
+  document.getElementById('examModal').style.display = 'none';
 }
 
 /* ===== Toast 提示 ===== */

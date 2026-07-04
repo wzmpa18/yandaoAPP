@@ -13,7 +13,7 @@
   --font-main:'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif;
   --radius:12px;--shadow:0 2px 6px rgba(0,0,0,.05);
 }
-body{font-family:var(--font-main);background:var(--bg);color:var(--ink);font-size:14px;max-width:480px;margin:0 auto;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+body{font-family:var(--font-main);background:var(--bg);color:var(--ink);font-size:14px;max-width:390px;margin:0 auto;height:100vh;display:flex;flex-direction:column;overflow:hidden}
 .header{display:flex;align-items:center;padding:0 14px;background:linear-gradient(135deg,var(--gold),#C7913A);color:#FFF;min-height:44px;flex-shrink:0;position:relative}
 .header .back-btn{display:flex;align-items:center;justify-content:center;width:44px;height:44px;cursor:pointer;border:none;background:none;padding:0;margin-left:-14px;transition:opacity .2s}
 .header .back-btn:active{opacity:.7}
@@ -21,11 +21,11 @@ body{font-family:var(--font-main);background:var(--bg);color:var(--ink);font-siz
 .header .title{font-size:16px;font-weight:700;margin-left:4px;letter-spacing:1px}
 .main{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 14px}
 .tab-bar{display:flex;gap:0;background:var(--card);border-radius:10px;padding:3px;margin-bottom:12px;box-shadow:var(--shadow);position:sticky;top:0;z-index:10}
-.tab{flex:1;padding:7px 4px;text-align:center;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;border:none;background:none;font-family:inherit;color:var(--muted);transition:.2s}
+.tab{flex:1;padding:7px 2px;text-align:center;border-radius:8px;font-size:10px;font-weight:600;cursor:pointer;border:none;background:none;font-family:inherit;color:var(--muted);transition:.2s}
 .tab.active{background:var(--gold);color:#FFF}
 .card{background:var(--card);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);margin-bottom:10px}
-.card h3{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:8px;display:flex;align-items:center;gap:8px}
-.card h3 svg{width:20px;height:20px;flex-shrink:0}
+.card h3{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.card h3 svg{width:18px;height:18px;flex-shrink:0}
 .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 16px;text-align:center;color:var(--muted);font-size:13px;gap:6px}
 .empty-state svg{width:28px;height:28px;opacity:.4}
 .form-group{margin-bottom:10px}
@@ -59,6 +59,26 @@ body{font-family:var(--font-main);background:var(--bg);color:var(--ink);font-siz
 .badge-yangsheng{background:#E8F5E9;color:var(--green)}
 .badge-fangji{background:#FFF3E0;color:#E65100}
 .badge-zhenjiu{background:#E3F2FD;color:var(--blue)}
+.badge-zhongyao{background:#F3E5F5;color:#7B1FA2}
+.herbs-cat{margin-bottom:10px}
+.herbs-cat .hc-header{display:flex;align-items:center;gap:6px;margin-bottom:6px;cursor:pointer}
+.herbs-cat .hc-name{font-size:13px;font-weight:700;color:var(--ink)}
+.herbs-cat .hc-count{font-size:10px;color:var(--muted)}
+.herbs-list{display:flex;flex-wrap:wrap;gap:4px}
+.herb-chip{background:#F3E5F5;color:#7B1FA2;font-size:11px;padding:4px 8px;border-radius:8px;border:1px solid #E1BEE7;cursor:pointer;font-family:inherit}
+.herb-chip:active{transform:scale(0.95)}
+.formula-card{background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--gold);border-radius:8px;padding:10px 12px;margin-bottom:8px;cursor:pointer;transition:.2s}
+.formula-card:active{background:var(--bg)}
+.formula-card .fc-name{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.formula-card .fc-composition{font-size:11px;color:var(--muted);margin-bottom:3px}
+.formula-card .fc-effect{font-size:11px;color:var(--gold);font-weight:600}
+.formula-card .fc-indication{font-size:10px;color:var(--muted);margin-top:2px}
+/* BOTTOM NAV */
+.bottom-nav{display:flex;background:var(--card);border-top:1px solid var(--rule);flex-shrink:0;padding-bottom:max(4px,env(safe-area-inset-bottom))}
+.bottom-nav .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;color:var(--muted);cursor:pointer;gap:2px;padding:4px 0;text-decoration:none}
+.bottom-nav .nav-item.active{color:var(--gold)}
+.bottom-nav .nav-item .nav-icon{font-size:18px}
+.bottom-nav .nav-item .nav-ai{background:var(--gold);color:#FFF;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:16px;margin-top:-6px;box-shadow:0 2px 6px rgba(184,134,11,.4)}
 .toast{position:fixed;top:60px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.82);color:#FFF;padding:10px 22px;border-radius:22px;font-size:13px;z-index:999;pointer-events:none;opacity:0;transition:opacity .3s;max-width:90%}
 .toast.show{opacity:1}
 ::-webkit-scrollbar{width:0}
@@ -75,13 +95,21 @@ body{font-family:var(--font-main);background:var(--bg);color:var(--ink);font-siz
 
 <div class="main">
   <div class="tab-bar">
-    <button class="tab active" onclick="switchTab('theory')">理论学习</button>
-    <button class="tab" onclick="switchTab('fangji')">模拟开方</button>
-    <button class="tab" onclick="switchTab('zhenjiu')">针灸实训</button>
-    <button class="tab" onclick="switchTab('quiz')">题库考试</button>
-    <button class="tab" onclick="switchTab('yian')">历代医案</button>
+    <button class="tab active" onclick="switchTab('theory')">理论</button>
+    <button class="tab" onclick="switchTab('zhongyao')">中药</button>
+    <button class="tab" onclick="switchTab('fangji')">方剂</button>
+    <button class="tab" onclick="switchTab('zhenjiu')">针灸</button>
+    <button class="tab" onclick="switchTab('quiz')">题库</button>
+    <button class="tab" onclick="switchTab('yian')">医案</button>
   </div>
   <div id="tabContent"></div>
+</div>
+
+<div class="bottom-nav">
+  <a class="nav-item" href="../index.html"><span class="nav-icon">&#127968;</span>主页</a>
+  <a class="nav-item" href="tcm-demo.html"><span class="nav-ai">AI</span></a>
+  <a class="nav-item active" href="zhongyi-study-demo.html"><span class="nav-icon">&#128214;</span>学习</a>
+  <a class="nav-item" href="../profile.html"><span class="nav-icon">&#128100;</span>个人中心</a>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -117,13 +145,14 @@ function showToast(msg) {
 /* ==================== TAB ==================== */
 function switchTab(tab) {
   activeTab = tab;
-  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', i===['theory','fangji','zhenjiu','quiz','yian'].indexOf(tab)));
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', i===['theory','zhongyao','fangji','zhenjiu','quiz','yian'].indexOf(tab)));
   renderTab();
 }
 function renderTab() {
   const c = document.getElementById('tabContent');
   switch(activeTab) {
     case 'theory': c.innerHTML = renderTheory(); break;
+    case 'zhongyao': c.innerHTML = renderZhongyao(); break;
     case 'fangji': c.innerHTML = renderFangji(); break;
     case 'zhenjiu': c.innerHTML = renderZhenjiu(); break;
     case 'quiz': c.innerHTML = renderQuiz(); quizState.answered=false; break;
@@ -132,30 +161,58 @@ function renderTab() {
 }
 
 /* ==================== THEORY ==================== */
+const THEORY_DATA = [
+  { title:'阴阳学说', items:[
+    {sub:'基本概念', content:'阴阳是对自然界相互关联的某些事物和现象对立双方的概括。阴：寒冷、向下、向内、静止、物质；阳：温热、向上、向外、运动、功能。'},
+    {sub:'对立制约', content:'阴阳双方相互对立、相互制约。如寒与热、动与静、水与火。'},
+    {sub:'互根互用', content:'阴依存于阳，阳依存于阴，"无阳则阴无以生，无阴则阳无以化"。"孤阴不生，独阳不长"。'},
+    {sub:'消长平衡', content:'阴阳双方处于此消彼长的动态平衡中。"阴胜则阳病，阳胜则阴病"。'},
+    {sub:'相互转化', content:'在一定条件下，阴阳可以相互转化。"重阴必阳，重阳必阴"，"寒极生热，热极生寒"。'}
+  ]},
+  { title:'五行学说', items:[
+    {sub:'五行归类', content:'木：肝、胆、目、筋、怒、酸；火：心、小肠、舌、脉、喜、苦；土：脾、胃、口、肉、思、甘；金：肺、大肠、鼻、皮、悲、辛；水：肾、膀胱、耳、骨、恐、咸。'},
+    {sub:'相生关系', content:'木生火，火生土，土生金，金生水，水生木。相生为母子关系，生我者为母，我生者为子。'},
+    {sub:'相克关系', content:'木克土，土克水，水克火，火克金，金克木。相克为所胜所不胜关系，克我者为所不胜，我克者为所胜。'},
+    {sub:'制化胜复', content:'五行之间相互制约、相互化生，维持动态平衡。"亢则害，承乃制，制则生化。"'},
+    {sub:'临床应用', content:'据相生关系治"虚则补其母，实则泻其子"；据相克关系治"抑强扶弱"。如滋水涵木、培土生金、金水相生等。'}
+  ]},
+  { title:'藏象学说', items:[
+    {sub:'心', content:'君主之官，神明出焉。主血脉，藏神。开窍于舌，其华在面。五行属火。'},
+    {sub:'肝', content:'将军之官，谋虑出焉。主疏泄，藏血。开窍于目，其华在爪。五行属木。'},
+    {sub:'脾', content:'仓廪之官，化物出焉。主运化，主统血。开窍于口，其华在唇。五行属土。为后天之本。'},
+    {sub:'肺', content:'相傅之官，治节出焉。主气，司呼吸，主宣发肃降。开窍于鼻，其华在毛。五行属金。'},
+    {sub:'肾', content:'作强之官，技巧出焉。主藏精，主水，主纳气。开窍于耳及二阴，其华在发。五行属水。为先天之本。'},
+    {sub:'六腑', content:'胆、胃、小肠、大肠、膀胱、三焦。六腑以通为用，以降为顺。胆藏精汁主决断；胃主受纳腐熟；小肠受盛化物泌别清浊；大肠传化糟粕；膀胱贮尿排尿；三焦通行元气与水液。'},
+    {sub:'奇恒之腑', content:'脑、髓、骨、脉、胆、女子胞。形态似腑，功能似脏，藏精气而不泻。'}
+  ]},
+  { title:'气血津液', items:[
+    {sub:'气', content:'构成人体和维持生命活动的最基本物质。功能：推动、温煦、防御、固摄、气化。分类：元气（原气）、宗气、营气、卫气。'},
+    {sub:'血', content:'在脉中循行，滋润和营养全身的红色液体。由水谷精微化生。功能：营养滋润全身，神志活动的物质基础。"血为气之母"。'},
+    {sub:'津液', content:'津：质地清稀，布散体表皮肤肌肉，起滋润作用。液：质地稠厚，灌注关节脑髓骨孔，起濡养作用。'},
+    {sub:'气血关系', content:'气为血之帅（气能生血、行血、摄血），血为气之母（血能载气、养气）。'},
+    {sub:'津气关系', content："津液与气关系密切。气能生津、行津、摄津；津能载气。大汗、大吐下可致气随津脱。'}
+  ]}
+];
+
 function renderTheory() {
   return `
     <div class="card">
-      <h3>${I.book} 中医理论学习资料库</h3>
+      <h3>${I.book} 中医基础理论</h3>
       <div class="form-group">
-        <input type="text" id="theorySearch" placeholder="搜索经典著作、理论篇章..." oninput="searchTheory()">
+        <input type="text" id="theorySearch" placeholder="搜索理论内容，如：阴阳、五行、藏象..." oninput="searchTheory()">
       </div>
       <div id="theoryResults">
-        <div style="font-size:12px;color:var(--ink2);line-height:1.7;padding:4px 0">
-          <span style="font-weight:700;color:var(--gold)">阴阳学说</span>：对立制约、互根互用、消长平衡、相互转化<br><br>
-          <span style="font-weight:700;color:var(--gold)">五行学说</span>：木火土金水，相生相克，制化平衡<br>
-          <span style="display:inline-block;color:#34A853;margin-right:6px">木</span>
-          <span style="display:inline-block;color:#EA4335;margin-right:6px">火</span>
-          <span style="display:inline-block;color:#A67C52;margin-right:6px">土</span>
-          <span style="display:inline-block;color:#F1B232;margin-right:6px">金</span>
-          <span style="display:inline-block;color:#2368B2">水</span><br><br>
-          <span style="font-weight:700;color:var(--gold)">藏象学说</span>：五脏六腑的生理功能与病理变化<br>
-          <span style="font-weight:700">心</span>：君主之官，主血脉，藏神<br>
-          <span style="font-weight:700">肝</span>：将军之官，主疏泄，藏血<br>
-          <span style="font-weight:700">脾</span>：仓廪之官，主运化，统血<br>
-          <span style="font-weight:700">肺</span>：相傅之官，主气，司呼吸<br>
-          <span style="font-weight:700">肾</span>：作强之官，主藏精，主水<br><br>
-          <span style="font-weight:700;color:var(--gold)">气血津液</span>：气主推动温煦，血主营养滋润，津液主滋润濡养
-        </div>
+        ${THEORY_DATA.map(cat => `
+          <div style="margin-bottom:12px">
+            <div style="font-size:14px;font-weight:700;color:var(--gold);margin-bottom:6px">${cat.title}</div>
+            ${cat.items.map(it => `
+              <div style="margin-bottom:6px">
+                <span style="font-weight:700;color:var(--ink);font-size:12px">${it.sub}：</span>
+                <span style="font-size:12px;color:var(--ink2);line-height:1.6">${it.content}</span>
+              </div>
+            `).join('')}
+          </div>
+        `).join('')}
       </div>
     </div>
     <div class="card">
@@ -188,11 +245,190 @@ function getClassicQuote(name) {
 function searchTheory() {
   const q = document.getElementById('theorySearch')?.value?.trim();
   if (!q) { renderTab(); return; }
-  document.getElementById('theoryResults').innerHTML = `
-    <div class="empty-state">${I.clock}<span>${EMPTY}</span></div>`;
+  const div = document.getElementById('theoryResults');
+  let found = [];
+  THEORY_DATA.forEach(cat => {
+    cat.items.forEach(it => {
+      if (cat.title.includes(q) || it.sub.includes(q) || it.content.includes(q)) {
+        found.push({ cat:cat.title, ...it });
+      }
+    });
+  });
+  if (found.length === 0) {
+    div.innerHTML = '<div class="empty-state">未找到相关内容</div>';
+  } else {
+    div.innerHTML = `<div style="font-size:11px;color:var(--muted);margin-bottom:8px">找到 ${found.length} 条相关内容：</div>
+      ${found.map(it => `
+        <div style="margin-bottom:6px">
+          <span style="font-weight:700;color:var(--gold);font-size:12px">${it.cat} · ${it.sub}</span>
+          <div style="font-size:12px;color:var(--ink2);line-height:1.6">${it.content}</div>
+        </div>
+      `).join('')}`;
+  }
+}
+
+/* ==================== ZHONGYAO (中药分类) ==================== */
+const HERB_CATEGORIES = [
+  { cat:'解表药', desc:'发散表邪，解除外感', herbs:[
+    {name:'麻黄', nature:'辛温', eff:'发汗解表，宣肺平喘', app:'风寒感冒，咳嗽气喘'},
+    {name:'桂枝', nature:'辛甘温', eff:'发汗解肌，温通经脉', app:'风寒感冒，关节疼痛'},
+    {name:'紫苏', nature:'辛温', eff:'解表散寒，行气宽中', app:'风寒感冒，胸闷呕吐'},
+    {name:'荆芥', nature:'辛微温', eff:'祛风解表，透疹消疮', app:'外感表证，麻疹不透'},
+    {name:'防风', nature:'辛甘微温', eff:'祛风解表，胜湿止痛', app:'感冒头痛，风湿痹痛'},
+    {name:'薄荷', nature:'辛凉', eff:'疏散风热，清利头目', app:'风热感冒，头痛目赤'},
+    {name:'蝉蜕', nature:'甘寒', eff:'疏散风热，透疹息风', app:'风热感冒，咽痛音哑'},
+    {name:'柴胡', nature:'苦辛微寒', eff:'和解表里，疏肝升阳', app:'寒热往来，胸胁胀痛'}
+  ]},
+  { cat:'清热药', desc:'清解里热，泻火解毒', herbs:[
+    {name:'石膏', nature:'辛甘大寒', eff:'清热泻火，除烦止渴', app:'壮热烦渴，肺热喘咳'},
+    {name:'知母', nature:'苦甘寒', eff:'清热泻火，滋阴润燥', app:'热病烦渴，骨蒸潮热'},
+    {name:'黄芩', nature:'苦寒', eff:'清热燥湿，泻火解毒', app:'湿热痞满，肺热咳嗽'},
+    {name:'黄连', nature:'苦寒', eff:'清热燥湿，泻火解毒', app:'湿热痞满，呕吐吞酸'},
+    {name:'黄柏', nature:'苦寒', eff:'清热燥湿，泻火除蒸', app:'湿热泻痢，骨蒸劳热'},
+    {name:'金银花', nature:'甘寒', eff:'清热解毒，疏散风热', app:'痈肿疔疮，外感风热'},
+    {name:'连翘', nature:'苦微寒', eff:'清热解毒，消痈散结', app:'痈肿疮毒，瘰疬痰核'},
+    {name:'栀子', nature:'苦寒', eff:'泻火除烦，清热利湿', app:'热病心烦，湿热黄疸'}
+  ]},
+  { cat:'泻下药', desc:'通利大便，排除积滞', herbs:[
+    {name:'大黄', nature:'苦寒', eff:'泻下攻积，清热泻火', app:'积滞便秘，血热出血'},
+    {name:'芒硝', nature:'咸苦寒', eff:'泻下通便，润燥软坚', app:'实热便秘，咽痛口疮'},
+    {name:'番泻叶', nature:'甘苦寒', eff:'泻下导滞', app:'热结便秘'},
+    {name:'火麻仁', nature:'甘平', eff:'润肠通便', app:'肠燥便秘'},
+    {name:'郁李仁', nature:'辛苦平', eff:'润肠通便，利水消肿', app:'肠燥便秘，水肿'}
+  ]},
+  { cat:'祛风湿药', desc:'祛除风湿，通络止痛', herbs:[
+    {name:'独活', nature:'辛苦微温', eff:'祛风除湿，通痹止痛', app:'风寒湿痹，腰膝酸痛'},
+    {name:'威灵仙', nature:'辛咸温', eff:'祛风除湿，通络止痛', app:'风湿痹痛，诸骨鲠咽'},
+    {name:'秦艽', nature:'辛苦平', eff:'祛风湿，清湿热', app:'风湿痹痛，骨蒸潮热'},
+    {name:'木瓜', nature:'酸温', eff:'舒筋活络，和胃化湿', app:'湿痹拘挛，脚气水肿'},
+    {name:'桑寄生', nature:'苦甘平', eff:'祛风湿，补肝肾', app:'风湿痹痛，胎动不安'},
+    {name:'五加皮', nature:'辛苦温', eff:'祛风湿，强筋骨', app:'风湿痹痛，筋骨痿软'}
+  ]},
+  { cat:'化湿药', desc:'芳香化湿，醒脾辟秽', herbs:[
+    {name:'藿香', nature:'辛微温', eff:'化湿止呕，解暑发表', app:'湿浊中阻，呕吐泄泻'},
+    {name:'佩兰', nature:'辛平', eff:'芳香化湿，醒脾开胃', app:'湿浊中阻，口中甜腻'},
+    {name:'苍术', nature:'辛苦温', eff:'燥湿健脾，祛风散寒', app:'湿阻中焦，风湿痹痛'},
+    {name:'厚朴', nature:'苦辛温', eff:'燥湿消痰，下气除满', app:'湿滞伤中，脘痞吐泻'},
+    {name:'砂仁', nature:'辛温', eff:'化湿行气，温中止泻', app:'湿浊中阻，脾胃虚寒'},
+    {name:'白豆蔻', nature:'辛温', eff:'化湿行气，温中止呕', app:'湿浊中阻，恶心呕吐'}
+  ]},
+  { cat:'利水渗湿药', desc:'通利水道，渗泄水湿', herbs:[
+    {name:'茯苓', nature:'甘淡平', eff:'利水渗湿，健脾安神', app:'水肿尿少，脾虚食少'},
+    {name:'泽泻', nature:'甘寒', eff:'利水渗湿，泄热', app:'水肿胀满，痰饮眩晕'},
+    {name:'薏苡仁', nature:'甘淡凉', eff:'利水渗湿，健脾止泻', app:'水肿脚气，脾虚泄泻'},
+    {name:'车前子', nature:'甘寒', eff:'利尿通淋，渗湿止泻', app:'淋证水肿，暑湿泄泻'},
+    {name:'滑石', nature:'甘淡寒', eff:'利尿通淋，清热解暑', app:'热淋石淋，暑湿烦渴'},
+    {name:'木通', nature:'苦寒', eff:'利尿通淋，清心除烦', app:'热淋涩痛，心烦口疮'}
+  ]},
+  { cat:'温里药', desc:'温散里寒，温阳救逆', herbs:[
+    {name:'附子', nature:'辛甘大热', eff:'回阳救逆，补火助阳', app:'亡阳证，阳虚证'},
+    {name:'干姜', nature:'辛热', eff:'温中散寒，回阳通脉', app:'脾胃寒证，亡阳证'},
+    {name:'肉桂', nature:'辛甘热', eff:'补火助阳，散寒止痛', app:'肾阳不足，寒疝腹痛'},
+    {name:'吴茱萸', nature:'辛苦热', eff:'散寒止痛，降逆止呕', app:'寒疝腹痛，厥阴头痛'},
+    {name:'花椒', nature:'辛温', eff:'温中止痛，杀虫止痒', app:'中寒腹痛，虫积腹痛'},
+    {name:'丁香', nature:'辛温', eff:'温中降逆，散寒止痛', app:'胃寒呕吐，呃逆'}
+  ]},
+  { cat:'理气药', desc:'调理气机，行气解郁', herbs:[
+    {name:'陈皮', nature:'辛苦温', eff:'理气健脾，燥湿化痰', app:'脘腹胀满，食少吐泻'},
+    {name:'青皮', nature:'苦辛温', eff:'疏肝破气，消积化滞', app:'胸胁胀痛，疝气疼痛'},
+    {name:'枳实', nature:'苦辛微寒', eff:'破气消积，化痰除痞', app:'积滞内停，痞满胀痛'},
+    {name:'木香', nature:'辛苦温', eff:'行气止痛，健脾消食', app:'胸胁胀痛，泻痢后重'},
+    {name:'香附', nature:'辛苦平', eff:'疏肝解郁，理气宽中', app:'肝郁气滞，月经不调'},
+    {name:'佛手', nature:'辛苦温', eff:'疏肝理气，和胃止痛', app:'肝胃气滞，胸胁胀痛'},
+    {name:'沉香', nature:'辛苦微温', eff:'行气止痛，温中止呕', app:'寒凝气滞，胃寒呕吐'}
+  ]},
+  { cat:'补虚药', desc:'补益正气，扶正固本', herbs:[
+    {name:'人参', nature:'甘微苦微温', eff:'大补元气，复脉固脱', app:'气虚欲脱，脾虚食少'},
+    {name:'黄芪', nature:'甘微温', eff:'补气升阳，固表止汗', app:'气虚乏力，表虚自汗'},
+    {name:'白术', nature:'苦甘温', eff:'益气健脾，燥湿利水', app:'脾虚食少，痰饮水肿'},
+    {name:'甘草', nature:'甘平', eff:'补脾益气，缓急止痛', app:'脾胃虚弱，调和诸药'},
+    {name:'当归', nature:'甘辛温', eff:'补血活血，调经止痛', app:'血虚诸证，月经不调'},
+    {name:'熟地黄', nature:'甘微温', eff:'补血滋阴，益精填髓', app:'血虚萎黄，肾阴不足'},
+    {name:'白芍', nature:'苦酸微寒', eff:'养血敛阴，柔肝止痛', app:'血虚证，肝脾不和'},
+    {name:'鹿茸', nature:'甘咸温', eff:'壮肾阳，益精血', app:'肾阳不足，精血亏虚'}
+  ]},
+  { cat:'活血化瘀药', desc:'通畅血脉，消散瘀滞', herbs:[
+    {name:'川芎', nature:'辛温', eff:'活血行气，祛风止痛', app:'血瘀气滞，头痛风湿'},
+    {name:'丹参', nature:'苦微寒', eff:'活血祛瘀，通经止痛', app:'胸痹心痛，月经不调'},
+    {name:'红花', nature:'辛温', eff:'活血通经，散瘀止痛', app:'瘀血阻滞，经闭痛经'},
+    {name:'桃仁', nature:'苦甘平', eff:'活血祛瘀，润肠通便', app:'瘀血阻滞，肠燥便秘'},
+    {name:'益母草', nature:'辛苦微寒', eff:'活血调经，利水消肿', app:'月经不调，水肿尿少'},
+    {name:'牛膝', nature:'苦酸平', eff:'活血通经，补肝肾', app:'瘀血阻滞，腰膝酸痛'}
+  ]}
+];
+
+function renderZhongyao() {
+  return `
+    <div class="card">
+      <h3>${I.leaf} 中药分类速查</h3>
+      <div class="form-group"><input type="text" id="herbSearch" placeholder="搜索中药名称..." oninput="searchHerb()"></div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:8px">按功效分类，共${HERB_CATEGORIES.length}类，${HERB_CATEGORIES.reduce((s,c)=>s+c.herbs.length,0)}味中药</div>
+      <div id="herbResults">
+        ${HERB_CATEGORIES.map(cat => `
+          <div class="herbs-cat">
+            <div class="hc-header" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'flex':'none'">
+              <span class="badge badge-zhongyao">${cat.cat}</span>
+              <span class="hc-name">${cat.cat}</span>
+              <span class="hc-count">${cat.herbs.length}味 · ${cat.desc}</span>
+            </div>
+            <div class="herbs-list">
+              ${cat.herbs.map(h => `
+                <span class="herb-chip" onclick="showToast('${h.name}\\n药性：${h.nature}\\n功效：${h.eff}\\n应用：${h.app}')">${h.name}</span>
+              `).join('')}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>`;
+}
+
+function searchHerb() {
+  const q = document.getElementById('herbSearch')?.value?.trim();
+  if (!q) { renderTab(); return; }
+  let found = [];
+  HERB_CATEGORIES.forEach(cat => {
+    cat.herbs.forEach(h => { if (h.name.includes(q)) found.push({...h, cat:cat.cat}); });
+  });
+  const div = document.getElementById('herbResults');
+  if (found.length === 0) {
+    div.innerHTML = '<div class="empty-state">未找到相关中药</div>';
+  } else {
+    div.innerHTML = `<div style="font-size:11px;color:var(--muted);margin-bottom:8px">找到 ${found.length} 味中药：</div>
+      <div class="herbs-list">
+        ${found.map(h => `<span class="herb-chip" onclick="showToast('${h.name}（${h.cat}）\\n药性：${h.nature}\\n功效：${h.eff}\\n应用：${h.app}')">${h.name}</span>`).join('')}
+      </div>`;
+  }
 }
 
 /* ==================== FANGJI ==================== */
+const FORMULAS = [
+  {name:'麻黄汤', comp:'麻黄、桂枝、杏仁、甘草', eff:'发汗解表，宣肺平喘', ind:'外感风寒表实证。恶寒发热，无汗而喘', cat:'解表剂'},
+  {name:'桂枝汤', comp:'桂枝、芍药、甘草、生姜、大枣', eff:'解肌发表，调和营卫', ind:'外感风寒表虚证。发热汗出，恶风脉浮缓', cat:'解表剂'},
+  {name:'银翘散', comp:'金银花、连翘、桔梗、薄荷、竹叶、甘草、荆芥穗、淡豆豉、牛蒡子', eff:'辛凉解表，清热解毒', ind:'温病初起。发热微恶寒，口渴咽痛', cat:'解表剂'},
+  {name:'桑菊饮', comp:'桑叶、菊花、杏仁、连翘、薄荷、桔梗、甘草、苇根', eff:'疏风清热，宣肺止咳', ind:'风温初起。咳嗽，身热不甚', cat:'解表剂'},
+  {name:'小柴胡汤', comp:'柴胡、黄芩、人参、半夏、甘草、生姜、大枣', eff:'和解少阳', ind:'少阳病。寒热往来，胸胁苦满，口苦咽干', cat:'和解剂'},
+  {name:'逍遥散', comp:'柴胡、当归、白芍、白术、茯苓、甘草、薄荷、生姜', eff:'疏肝解郁，养血健脾', ind:'肝郁血虚脾弱证。两胁作痛，头痛目眩', cat:'和解剂'},
+  {name:'白虎汤', comp:'石膏、知母、甘草、粳米', eff:'清热生津', ind:'阳明气分热盛证。壮热面赤，烦渴引饮', cat:'清热剂'},
+  {name:'黄连解毒汤', comp:'黄连、黄芩、黄柏、栀子', eff:'清热泻火', ind:'三焦热盛证。大热烦躁，吐衄发斑', cat:'清热剂'},
+  {name:'龙胆泻肝汤', comp:'龙胆草、黄芩、栀子、泽泻、木通、车前子、当归、生地黄、柴胡、甘草', eff:'清肝胆实火，泻下焦湿热', ind:'肝胆实火上炎证。头痛目赤，胁痛口苦', cat:'清热剂'},
+  {name:'大承气汤', comp:'大黄、芒硝、枳实、厚朴', eff:'峻下热结', ind:'阳明腑实证。大便不通，腹痛拒按', cat:'泻下剂'},
+  {name:'理中丸', comp:'人参、干姜、白术、甘草', eff:'温中祛寒，补气健脾', ind:'脾胃虚寒证。脘腹冷痛，呕吐泄泻', cat:'温里剂'},
+  {name:'四君子汤', comp:'人参、白术、茯苓、甘草', eff:'益气健脾', ind:'脾胃气虚证。食少便溏，气短乏力', cat:'补益剂'},
+  {name:'四物汤', comp:'当归、川芎、白芍、熟地黄', eff:'补血调血', ind:'营血虚滞证。头晕心悸，面色无华，月经不调', cat:'补益剂'},
+  {name:'六味地黄丸', comp:'熟地黄、山茱萸、山药、泽泻、牡丹皮、茯苓', eff:'滋补肾阴', ind:'肾阴不足证。腰膝酸软，头晕耳鸣，盗汗遗精', cat:'补益剂'},
+  {name:'金匮肾气丸', comp:'干地黄、山药、山茱萸、泽泻、茯苓、牡丹皮、桂枝、附子', eff:'温补肾阳', ind:'肾阳不足证。腰痛脚软，小便不利或反多', cat:'补益剂'},
+  {name:'补中益气汤', comp:'黄芪、人参、白术、甘草、当归、陈皮、升麻、柴胡', eff:'补中益气，升阳举陷', ind:'脾胃气虚证及气虚下陷证。食少倦怠，久泻脱肛', cat:'补益剂'},
+  {name:'归脾汤', comp:'黄芪、人参、白术、甘草、当归、龙眼肉、茯神、酸枣仁、远志、木香', eff:'益气补血，健脾养心', ind:'心脾两虚证。心悸失眠，食少体倦', cat:'补益剂'},
+  {name:'生脉散', comp:'人参、麦冬、五味子', eff:'益气生津，敛阴止汗', ind:'气阴两虚证。体倦气短，咽干口渴', cat:'补益剂'},
+  {name:'玉屏风散', comp:'黄芪、白术、防风', eff:'益气固表止汗', ind:'表虚自汗证。自汗恶风，面色㿠白', cat:'补益剂'},
+  {name:'参苓白术散', comp:'人参、白术、茯苓、甘草、山药、莲子、白扁豆、薏苡仁、砂仁、桔梗', eff:'益气健脾，渗湿止泻', ind:'脾虚湿盛证。食少便溏，四肢乏力', cat:'补益剂'},
+  {name:'二陈汤', comp:'半夏、陈皮、茯苓、甘草', eff:'燥湿化痰，理气和中', ind:'湿痰证。咳嗽痰多，胸膈痞闷', cat:'祛痰剂'},
+  {name:'平胃散', comp:'苍术、厚朴、陈皮、甘草', eff:'燥湿和胃', ind:'湿滞脾胃证。脘腹胀满，不思饮食', cat:'祛湿剂'},
+  {name:'藿香正气散', comp:'藿香、紫苏、白芷、大腹皮、茯苓、白术、陈皮、半夏、厚朴、桔梗、甘草', eff:'解表化湿，理气和中', ind:'外感风寒，内伤湿滞。霍乱吐泻，恶寒发热', cat:'祛湿剂'},
+  {name:'血府逐瘀汤', comp:'桃仁、红花、当归、川芎、生地黄、赤芍、牛膝、桔梗、柴胡、枳壳、甘草', eff:'活血化瘀，行气止痛', ind:'胸中血瘀证。胸痛头痛，日久不愈', cat:'理血剂'},
+  {name:'保和丸', comp:'山楂、神曲、半夏、茯苓、陈皮、连翘、莱菔子', eff:'消食和胃', ind:'食积证。脘腹痞满胀痛，嗳腐吞酸', cat:'消食剂'}
+];
+
 function renderFangji() {
   return `
     <div class="card">
@@ -206,12 +442,16 @@ function renderFangji() {
       <div class="result-box" id="fangjiResult">请填写症状后点击"开始辨证开方"</div>
     </div>
     <div class="card">
-      <h3>${I.search} 方剂快速检索</h3>
-      <div class="form-group"><input type="text" id="fangjiSearch" placeholder="输入方名，如：麻黄汤、桂枝汤..." oninput="searchFangji()"></div>
-      <div id="fangjiSearchResult" style="font-size:12px;color:var(--ink2);line-height:1.6;margin-top:4px"></div>
-      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">
-        ${['麻黄汤','桂枝汤','小柴胡汤','四君子汤','六味地黄丸','逍遥散','白虎汤','理中丸'].map(f => `
-          <span class="badge badge-fangji" style="cursor:pointer" onclick="document.getElementById('fangjiSearch').value='${f}';searchFangji()">${f}</span>
+      <h3>${I.search} 经典方剂大全（共${FORMULAS.length}首）</h3>
+      <div class="form-group"><input type="text" id="fangjiSearch" placeholder="搜索方名、功效或主治..." oninput="searchFangji()"></div>
+      <div id="fangjiList">
+        ${FORMULAS.map(f => `
+          <div class="formula-card" onclick="showToast('${f.name}\\n组成：${f.comp}\\n功效：${f.eff}\\n主治：${f.ind}')">
+            <div class="fc-name">${f.name} <span class="badge badge-fangji" style="font-size:9px">${f.cat}</span></div>
+            <div class="fc-composition">组成：${f.comp}</div>
+            <div class="fc-effect">功效：${f.eff}</div>
+            <div class="fc-indication">主治：${f.ind}</div>
+          </div>
         `).join('')}
       </div>
     </div>`;
@@ -219,25 +459,32 @@ function renderFangji() {
 
 function searchFangji() {
   const q = document.getElementById('fangjiSearch')?.value?.trim();
-  const result = document.getElementById('fangjiSearchResult');
-  if (!q) { result.innerHTML = ''; return; }
-  const formulas = {
-    '麻黄汤':'麻黄、桂枝、杏仁、甘草。发汗解表，宣肺平喘。主治外感风寒表实证。',
-    '桂枝汤':'桂枝、芍药、甘草、生姜、大枣。解肌发表，调和营卫。主治外感风寒表虚证。',
-    '小柴胡汤':'柴胡、黄芩、人参、半夏、甘草、生姜、大枣。和解少阳。主治少阳病。',
-    '四君子汤':'人参、白术、茯苓、甘草。益气健脾。主治脾胃气虚证。',
-    '六味地黄丸':'熟地黄、山茱萸、山药、泽泻、牡丹皮、茯苓。滋补肾阴。主治肾阴不足证。',
-    '逍遥散':'柴胡、当归、白芍、白术、茯苓、甘草、薄荷、生姜。疏肝解郁，养血健脾。',
-    '白虎汤':'石膏、知母、甘草、粳米。清热生津。主治阳明气分热盛证。',
-    '理中丸':'人参、干姜、白术、甘草。温中祛寒，补气健脾。主治脾胃虚寒证。',
-    '四物汤':'当归、川芎、白芍、熟地黄。补血调血。主治营血虚滞证。',
-    '银翘散':'金银花、连翘、桔梗、薄荷、竹叶、甘草、荆芥穗、淡豆豉、牛蒡子。辛凉解表，清热解毒。',
-    '补中益气汤':'黄芪、人参、白术、甘草、当归、陈皮、升麻、柴胡。补中益气，升阳举陷。'
-  };
-  const found = Object.entries(formulas).find(([k]) => k.includes(q));
-  result.innerHTML = found
-    ? `<span style="font-weight:700;color:var(--gold)">${found[0]}</span>：${found[1]}`
-    : '<span style="color:var(--muted)">未找到匹配方剂，请尝试其他方名</span>';
+  const div = document.getElementById('fangjiList');
+  if (!q) {
+    div.innerHTML = FORMULAS.map(f => `
+      <div class="formula-card" onclick="showToast('${f.name}\\n组成：${f.comp}\\n功效：${f.eff}\\n主治：${f.ind}')">
+        <div class="fc-name">${f.name} <span class="badge badge-fangji" style="font-size:9px">${f.cat}</span></div>
+        <div class="fc-composition">组成：${f.comp}</div>
+        <div class="fc-effect">功效：${f.eff}</div>
+        <div class="fc-indication">主治：${f.ind}</div>
+      </div>
+    `).join('');
+    return;
+  }
+  const found = FORMULAS.filter(f => f.name.includes(q) || f.eff.includes(q) || f.ind.includes(q) || f.cat.includes(q));
+  if (found.length === 0) {
+    div.innerHTML = '<div class="empty-state">未找到匹配方剂</div>';
+  } else {
+    div.innerHTML = `<div style="font-size:11px;color:var(--muted);margin-bottom:8px">找到 ${found.length} 首方剂：</div>
+      ${found.map(f => `
+        <div class="formula-card" onclick="showToast('${f.name}\\n组成：${f.comp}\\n功效：${f.eff}\\n主治：${f.ind}')">
+          <div class="fc-name">${f.name} <span class="badge badge-fangji" style="font-size:9px">${f.cat}</span></div>
+          <div class="fc-composition">组成：${f.comp}</div>
+          <div class="fc-effect">功效：${f.eff}</div>
+          <div class="fc-indication">主治：${f.ind}</div>
+        </div>
+      `).join('')}`;
+  }
 }
 
 function submitFangji() {
@@ -277,7 +524,15 @@ function renderZhenjiu() {
     { name:'风池', loc:'胸锁乳突肌与斜方肌上端之间', ind:'头痛、眩晕、颈项强痛', code:'GB20' },
     { name:'关元', loc:'脐下3寸', ind:'补肾固本，强壮要穴', code:'CV4' },
     { name:'气海', loc:'脐下1.5寸', ind:'补气要穴，气虚乏力', code:'CV6' },
-    { name:'大椎', loc:'第7颈椎棘突下', ind:'清热解表，退热要穴', code:'GV14' }
+    { name:'大椎', loc:'第7颈椎棘突下', ind:'清热解表，退热要穴', code:'GV14' },
+    { name:'太溪', loc:'内踝尖与跟腱之间凹陷', ind:'肾虚腰痛、耳鸣、不孕', code:'KI3' },
+    { name:'阳陵泉', loc:'腓骨小头前下方凹陷', ind:'胁痛、黄疸、膝肿痛', code:'GB34' },
+    { name:'委中', loc:'腘窝横纹中点', ind:'腰背痛、急性腰扭伤', code:'BL40' },
+    { name:'承山', loc:'小腿后面正中凹陷处', ind:'腰腿痛、腓肠肌痉挛', code:'BL57' },
+    { name:'曲池', loc:'屈肘肘横纹外侧端', ind:'热病、高血压、皮肤瘙痒', code:'LI11' },
+    { name:'中脘', loc:'脐上4寸', ind:'胃痛、呕吐、消化不良', code:'CV12' },
+    { name:'命门', loc:'第2腰椎棘突下', ind:'腰痛、阳痿、遗尿、五更泄', code:'GV6' },
+    { name:'列缺', loc:'桡骨茎突上方腕横纹上1.5寸', ind:'头痛、咳嗽、颈项强痛', code:'LU7' }
   ];
   return `
     <div class="card">

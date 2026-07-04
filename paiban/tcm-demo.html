@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>中医专区 - 首页</title>
+<title>中医问诊 - 四诊合参</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;background:#f5f6f8;max-width:480px;margin:0 auto;min-height:100vh;color:#333;overflow-x:hidden;}
+body{font-family:'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;background:#f5f6f8;max-width:390px;margin:0 auto;min-height:100vh;color:#333;overflow-x:hidden;}
 /* 顶部渐变 */
 .top-gradient{background:linear-gradient(180deg,#4ECDC4 0%,#44B5AD 100%);padding:12px 16px 20px;position:relative;}
 .status-row{display:flex;justify-content:space-between;align-items:center;color:rgba(255,255,255,0.8);font-size:11px;margin-bottom:12px;}
@@ -17,84 +17,62 @@ body{font-family:'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;b
 .search-bar input::placeholder{color:#bbb;}
 .search-bar .ai-badge{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;font-size:10px;padding:4px 8px;border-radius:12px;white-space:nowrap;font-weight:600;letter-spacing:0.5px;}
 .search-bar .search-btn{background:#4ECDC4;color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:13px;cursor:pointer;white-space:nowrap;}
-/* 分类标签 */
-.cat-tabs{display:flex;gap:20px;padding:14px 16px;background:#fff;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
-.cat-tabs::-webkit-scrollbar{display:none;}
-.cat-tab{font-size:14px;color:#999;white-space:nowrap;cursor:pointer;padding-bottom:6px;border-bottom:2px solid transparent;transition:all 0.2s;flex-shrink:0;}
-.cat-tab.active{color:#4ECDC4;border-bottom-color:#4ECDC4;font-weight:600;}
-/* Banner */
-.banner-wrap{padding:0 12px;margin-bottom:10px;}
-.banner{background:linear-gradient(135deg,#FFF8E1,#FFE0B2);border-radius:14px;padding:18px;display:flex;align-items:center;position:relative;overflow:hidden;min-height:140px;}
-.banner .banner-text{flex:1;z-index:1;}
-.banner .banner-text .b-title{font-size:28px;color:#E65100;font-weight:700;font-family:'STKaiti','KaiTi',serif;margin-bottom:4px;}
-.banner .banner-text .b-sub{font-size:12px;color:#8D6E63;margin-bottom:10px;}
-.banner .banner-text .b-tags{display:flex;flex-wrap:wrap;gap:6px;}
-.banner .banner-text .b-tag{background:rgba(78,205,196,0.15);color:#4ECDC4;font-size:11px;padding:3px 10px;border-radius:10px;border:1px solid rgba(78,205,196,0.3);}
-.banner .banner-img{width:90px;height:110px;z-index:1;display:flex;align-items:flex-end;justify-content:center;font-size:64px;}
-.banner .banner-dots{position:absolute;bottom:10px;right:16px;display:flex;gap:6px;z-index:1;}
-.banner .banner-dots .dot{width:6px;height:6px;border-radius:50%;background:#ccc;}
-.banner .banner-dots .dot.active{background:#4ECDC4;width:16px;border-radius:3px;}
-/* 重磅上新 */
-.news-bar{background:#fff;margin:0 12px 10px;border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 1px 3px rgba(0,0,0,0.04);}
-.news-bar .news-tag{background:#F44336;color:#fff;font-size:10px;padding:3px 8px;border-radius:4px;white-space:nowrap;font-weight:600;}
-.news-bar .news-text{flex:1;font-size:13px;color:#555;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.news-bar .news-more{color:#999;font-size:12px;white-space:nowrap;}
-/* 数据卡片 */
-.data-cards{padding:0 12px;margin-bottom:10px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
-.data-card{border-radius:12px;padding:14px 10px;color:#fff;text-align:center;position:relative;overflow:hidden;}
-.data-card.dc-herb{background:linear-gradient(135deg,#4ECDC4,#44B5AD);}
-.data-card.dc-formula{background:linear-gradient(135deg,#FF9800,#F57C00);}
-.data-card.dc-lecture{background:linear-gradient(135deg,#42A5F5,#1E88E5);}
-.data-card .dc-title{font-size:15px;font-weight:700;margin-bottom:4px;}
-.data-card .dc-sub{font-size:10px;opacity:0.85;margin-bottom:6px;}
-.data-card .dc-count{font-size:20px;font-weight:700;}
-.data-card .dc-count span{font-size:11px;font-weight:400;}
-/* 功能入口网格 */
-.section-wrap{padding:0 12px;margin-bottom:12px;}
-.section-title{font-size:15px;font-weight:700;color:#333;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
-.section-title .st-badge{font-size:10px;background:#F44336;color:#fff;padding:2px 6px;border-radius:4px;}
-.icon-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px;}
-.icon-item{background:#fff;border-radius:12px;padding:14px 4px;text-align:center;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.04);transition:all 0.2s;position:relative;}
-.icon-item:active{transform:scale(0.95);}
-.icon-item .ii-icon{font-size:28px;margin-bottom:6px;display:block;}
-.icon-item .ii-label{font-size:11px;color:#555;}
-.icon-item .ii-badge{position:absolute;top:6px;right:6px;font-size:9px;padding:2px 5px;border-radius:6px;font-weight:600;}
-.badge-new{background:#4ECDC4;color:#fff;}
-.badge-hot{background:#F44336;color:#fff;}
-/* 课程横滚 */
-.course-scroll{display:flex;gap:10px;overflow-x:auto;padding:4px 0 8px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
-.course-scroll::-webkit-scrollbar{display:none;}
-.course-card{min-width:220px;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.06);flex-shrink:0;}
-.course-card .cc-img{height:100px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;font-weight:700;position:relative;}
-.cc-img-1{background:linear-gradient(135deg,#8B4513,#A0522D);}
-.cc-img-2{background:linear-gradient(135deg,#1a3a5c,#2a5a8c);}
-.cc-img-3{background:linear-gradient(135deg,#2E7D32,#4CAF50);}
-.course-card .cc-rank{position:absolute;top:6px;left:6px;background:rgba(0,0,0,0.5);color:#fff;font-size:10px;padding:2px 6px;border-radius:4px;}
-.course-card .cc-info{padding:10px 12px;}
-.course-card .cc-name{font-size:13px;font-weight:600;color:#333;margin-bottom:4px;line-height:1.3;}
-.course-card .cc-meta{font-size:10px;color:#999;display:flex;gap:8px;flex-wrap:wrap;}
-.course-card .cc-meta .cc-free{color:#4ECDC4;font-weight:600;}
-/* 背诵卡片 */
-.recite-card{background:#fff;border-radius:12px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,0.04);margin-bottom:12px;}
-.recite-card .rc-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
-.recite-card .rc-title{font-size:14px;font-weight:700;color:#333;}
-.recite-card .rc-count{font-size:11px;color:#999;}
-.recite-items{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;}
-.recite-items::-webkit-scrollbar{display:none;}
-.recite-item{min-width:100px;background:#f8fdf9;border-radius:10px;padding:12px;text-align:center;flex-shrink:0;border:1px solid #e8f5e9;}
-.recite-item .ri-name{font-size:16px;font-weight:700;color:#2E7D32;margin-bottom:2px;font-family:'STKaiti','KaiTi',serif;}
-.recite-item .ri-type{font-size:10px;color:#999;}
-.recite-btn{display:block;width:100%;margin-top:10px;background:linear-gradient(135deg,#4ECDC4,#44B5AD);color:#fff;border:none;border-radius:20px;padding:10px 0;font-size:14px;cursor:pointer;font-weight:600;}
+/* 四诊Tab */
+.diag-tabs{display:flex;gap:0;background:#fff;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;border-bottom:1px solid #eee;}
+.diag-tabs::-webkit-scrollbar{display:none;}
+.diag-tab{flex:1;min-width:80px;text-align:center;padding:12px 4px;font-size:13px;color:#999;cursor:pointer;border-bottom:3px solid transparent;transition:all 0.2s;white-space:nowrap;}
+.diag-tab.active{color:#4ECDC4;border-bottom-color:#4ECDC4;font-weight:600;}
+.diag-tab .dt-icon{font-size:20px;display:block;margin-bottom:2px;}
+/* 诊断内容 */
+.diag-content{padding:12px;}
+.diag-section{background:#fff;border-radius:12px;padding:14px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,0.04);}
+.diag-section h3{font-size:14px;font-weight:700;color:#333;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.diag-section h3 .dh-icon{font-size:16px;}
+.symptom-group{margin-bottom:10px;}
+.symptom-group .sg-title{font-size:12px;font-weight:600;color:#666;margin-bottom:6px;padding-left:2px;}
+.symptom-chips{display:flex;flex-wrap:wrap;gap:6px;}
+.symptom-chip{font-size:11px;padding:5px 10px;border-radius:14px;border:1.5px solid #e0e0e0;background:#fafafa;color:#555;cursor:pointer;transition:all 0.15s;font-family:inherit;}
+.symptom-chip:active{transform:scale(0.95);}
+.symptom-chip.selected{background:#4ECDC4;color:#fff;border-color:#4ECDC4;font-weight:600;}
+.pulse-list{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.pulse-item{background:#f8fdf9;border:1px solid #e8f5e9;border-radius:8px;padding:8px 10px;cursor:pointer;transition:all 0.15s;}
+.pulse-item:active{background:#e8f5e9;}
+.pulse-item.selected{background:#4ECDC4;color:#fff;border-color:#4ECDC4;}
+.pulse-item .pi-name{font-size:13px;font-weight:700;}
+.pulse-item .pi-desc{font-size:10px;color:#999;margin-top:2px;}
+.pulse-item.selected .pi-desc{color:rgba(255,255,255,0.8);}
+.shi-wen-ge{background:#fff;border-radius:12px;padding:14px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,0.04);}
+.shi-wen-ge .swg-title{font-size:14px;font-weight:700;color:#E65100;margin-bottom:8px;text-align:center;font-family:'STKaiti','KaiTi',serif;}
+.shi-wen-ge .swg-text{font-size:13px;color:#555;line-height:2;text-align:center;font-family:'STKaiti','KaiTi',serif;}
+.shi-wen-ge .swg-q{font-size:12px;color:#666;line-height:1.8;margin-top:8px;}
+/* 分析结果 */
+.analyze-bar{position:sticky;bottom:60px;background:linear-gradient(180deg,rgba(245,246,248,0),#f5f6f8 30%);padding:10px 0;z-index:5;}
+.analyze-btn{display:block;width:100%;background:linear-gradient(135deg,#4ECDC4,#44B5AD);color:#fff;border:none;border-radius:24px;padding:12px;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 3px 12px rgba(78,205,196,0.3);}
+.analyze-btn:active{transform:scale(0.98);}
+.analyze-result{background:#fff;border-radius:12px;padding:16px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,0.06);display:none;}
+.analyze-result.show{display:block;}
+.analyze-result .ar-title{font-size:15px;font-weight:700;color:#4ECDC4;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.analyze-result .ar-disclaimer{font-size:11px;color:#999;background:#fff3e0;border-radius:8px;padding:8px 10px;margin-top:10px;line-height:1.5;}
+.analyze-result .ar-item{font-size:12px;color:#555;line-height:1.7;margin-bottom:6px;}
+.analyze-result .ar-item strong{color:#333;}
+.ar-tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:10px;margin:2px;font-weight:600;}
+.ar-tag.tag-han{background:#E3F2FD;color:#1565C0;}
+.ar-tag.tag-re{background:#FFEBEE;color:#C62828;}
+.ar-tag.tag-xu{background:#FFF3E0;color:#E65100;}
+.ar-tag.tag-shi{background:#E8F5E9;color:#2E7D32;}
+.ar-syndrome{background:#E0F7FA;border-radius:8px;padding:10px;margin-bottom:8px;}
+.ar-syndrome .as-name{font-size:14px;font-weight:700;color:#00897B;margin-bottom:4px;}
+.ar-syndrome .as-desc{font-size:12px;color:#555;line-height:1.6;}
 /* 底部Tab */
-.bottom-tab{position:fixed;bottom:0;left:50%;transform:translateX(-50%);max-width:480px;width:100%;background:#fff;display:flex;border-top:1px solid #eee;padding:6px 0;padding-bottom:max(6px,env(safe-area-inset-bottom));z-index:100;}
-.bottom-tab .tab-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;color:#999;cursor:pointer;gap:3px;padding:4px 0;}
+.bottom-tab{position:fixed;bottom:0;left:50%;transform:translateX(-50%);max-width:390px;width:100%;background:#fff;display:flex;border-top:1px solid #eee;padding:6px 0;padding-bottom:max(6px,env(safe-area-inset-bottom));z-index:100;}
+.bottom-tab .tab-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;color:#999;cursor:pointer;gap:3px;padding:4px 0;text-decoration:none;}
 .bottom-tab .tab-item .tab-icon{font-size:22px;}
 .bottom-tab .tab-item.active{color:#4ECDC4;}
 .bottom-tab .tab-item .tab-ai{background:linear-gradient(135deg,#4ECDC4,#44B5AD);color:#fff;border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-top:-10px;box-shadow:0 3px 10px rgba(78,205,196,0.4);}
 /* 弹窗 */
 .modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:200;justify-content:center;align-items:center;}
 .modal-overlay.show{display:flex;}
-.modal-toast{background:#fff;border-radius:16px;padding:24px 32px;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,0.15);}
+.modal-toast{background:#fff;border-radius:16px;padding:24px 32px;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,0.15);max-width:80%;}
 .modal-toast .toast-icon{font-size:40px;margin-bottom:10px;}
 .modal-toast .toast-text{font-size:14px;color:#666;margin-bottom:16px;}
 .modal-toast .toast-btn{background:#4ECDC4;color:#fff;border:none;border-radius:20px;padding:8px 28px;font-size:14px;cursor:pointer;}
@@ -111,177 +89,39 @@ body{font-family:'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;b
   </div>
   <div class="search-bar">
     <span class="search-icon">&#128269;</span>
-    <input type="text" placeholder="联网同步素材中，请刷新">
-    <span class="ai-badge">AI x Deepseek</span>
-    <button class="search-btn">搜索</button>
+    <input type="text" placeholder="搜索症状、证型、方剂...">
+    <span class="ai-badge">AI 辨证</span>
+    <button class="search-btn" onclick="showToast('搜索功能开发中，请使用下方四诊进行辨证分析')">搜索</button>
   </div>
 </div>
 
-<!-- 分类标签 -->
-<div class="cat-tabs" id="catTabs">
-  <span class="cat-tab active" onclick="switchTab(this)">精选</span>
-  <span class="cat-tab" onclick="switchTab(this)">入门</span>
-  <span class="cat-tab" onclick="switchTab(this)">学科</span>
-  <span class="cat-tab" onclick="switchTab(this)">经典</span>
-  <span class="cat-tab" onclick="switchTab(this)">外治</span>
-  <span class="cat-tab" onclick="switchTab(this)">诊断</span>
+<!-- 四诊Tab -->
+<div class="diag-tabs" id="diagTabs">
+  <div class="diag-tab active" onclick="switchDiag('wang')"><span class="dt-icon">&#128064;</span>望诊</div>
+  <div class="diag-tab" onclick="switchDiag('wen')"><span class="dt-icon">&#128066;</span>闻诊</div>
+  <div class="diag-tab" onclick="switchDiag('wen2')"><span class="dt-icon">&#128172;</span>问诊</div>
+  <div class="diag-tab" onclick="switchDiag('qie')"><span class="dt-icon">&#129522;</span>切诊</div>
 </div>
 
-<!-- 五禽戏Banner -->
-<div class="banner-wrap">
-  <div class="banner">
-    <div class="banner-text">
-      <div class="b-title">五禽戏</div>
-      <div class="b-sub">华佗创编 · 仿生导引术</div>
-      <div class="b-tags">
-        <span class="b-tag">虎戏</span>
-        <span class="b-tag">鹿戏</span>
-        <span class="b-tag">熊戏</span>
-      </div>
-    </div>
-    <div class="banner-img">&#129496;</div>
-    <div class="banner-dots">
-      <span class="dot active"></span><span class="dot"></span><span class="dot"></span>
-    </div>
-  </div>
-</div>
+<!-- 诊断内容 -->
+<div class="diag-content" id="diagContent"></div>
 
-<!-- 重磅上新 -->
-<div class="news-bar" onclick="showToast()">
-  <span class="news-tag">重磅上新</span>
-  <span class="news-text">AI智能问诊系统上线 · 四诊合参辨证开方</span>
-  <span class="news-more">更多 &#8250;</span>
-</div>
-
-<!-- 数据卡片 -->
-<div class="data-cards">
-  <div class="data-card dc-herb" onclick="showToast()">
-    <div class="dc-title">&#127807; 中药</div>
-    <div class="dc-sub">识本草懂药性</div>
-    <div class="dc-count">500+ <span>味</span></div>
+<!-- 分析按钮 -->
+<div class="diag-content" style="padding-top:0">
+  <div class="analyze-bar">
+    <button class="analyze-btn" onclick="analyzeSymptoms()">&#129504; 四诊合参 · 辨证分析</button>
   </div>
-  <div class="data-card dc-formula" onclick="showToast()">
-    <div class="dc-title">&#128138; 方剂</div>
-    <div class="dc-sub">懂配伍精临证</div>
-    <div class="dc-count">300+ <span>首</span></div>
-  </div>
-  <div class="data-card dc-lecture" onclick="showToast()">
-    <div class="dc-title">&#127891; 名家讲堂</div>
-    <div class="dc-sub">跟明师入医门</div>
-    <div class="dc-count">200+ <span>讲</span></div>
-  </div>
-</div>
-
-<!-- 中医百科 -->
-<div class="section-wrap">
-  <div class="section-title">中医百科</div>
-  <div class="icon-grid">
-    <div class="icon-item" onclick="showToast()"><span class="ii-icon">&#128075;</span><span class="ii-label">经络穴位</span></div>
-    <div class="icon-item" onclick="showToast()"><span class="ii-icon">&#128218;</span><span class="ii-label">经典书城</span></div>
-    <div class="icon-item" onclick="showToast()"><span class="ii-icon">&#128269;</span><span class="ii-label">疾病百科</span></div>
-    <div class="icon-item" onclick="showToast()"><span class="ii-icon">&#128196;</span><span class="ii-label">医案</span></div>
-    <div class="icon-item" onclick="showToast()"><span class="ii-icon">&#128722;</span><span class="ii-label">中成药</span></div>
-  </div>
-</div>
-
-<!-- 养生调理 -->
-<div class="section-wrap">
-  <div class="section-title">养生调理</div>
-  <div class="icon-grid">
-    <div class="icon-item" onclick="showToast()"><span class="ii-icon">&#128066;</span><span class="ii-label">AI舌诊</span></div>
-    <div class="icon-item" onclick="showToast()"><span class="ii-icon">&#129309;</span><span class="ii-label">AI把脉</span><span class="ii-badge badge-new">NEW</span></div>
-    <div class="icon-item" onclick="showToast()"><span class="ii-icon">&#128101;</span><span class="ii-label">体质检测</span><span class="ii-badge badge-hot">HOT</span></div>
-    <div class="icon-item" onclick="showToast()"><span class="ii-icon">&#127968;</span><span class="ii-label">自营商城</span><span class="ii-badge badge-hot">HOT</span></div>
-    <div class="icon-item" onclick="showToast()"><span class="ii-icon">&#128566;</span><span class="ii-label">AI面诊</span></div>
-  </div>
-</div>
-
-<!-- 学习工具 -->
-<div class="section-wrap">
-  <div class="section-title">学习工具</div>
-  <div class="icon-grid">
-    <div class="icon-item" onclick="showToast()"><span class="ii-icon">&#128736;</span><span class="ii-label">课程导图</span></div>
-    <div class="icon-item" onclick="showToast()"><span class="ii-icon">&#128221;</span><span class="ii-label">医考题库</span></div>
-    <div class="icon-item" onclick="showToast()"><span class="ii-icon">&#9889;</span><span class="ii-label">方药背诵</span><span class="ii-badge badge-new">NEW</span></div>
-    <div class="icon-item" onclick="showToast()"><span class="ii-icon">&#128247;</span><span class="ii-label">智能识方</span></div>
-    <div class="icon-item" onclick="showToast()"><span class="ii-icon">&#9776;</span><span class="ii-label">全部功能</span></div>
-  </div>
-</div>
-
-<!-- 本周热门课程 -->
-<div class="section-wrap">
-  <div class="section-title">本周热门课程 <span class="st-badge">TOP50</span> <span style="font-size:11px;color:#999;margin-left:auto;font-weight:400;">更多 &#8250;</span></div>
-  <div class="course-scroll">
-    <div class="course-card" onclick="showToast()">
-      <div class="cc-img cc-img-1"><span class="cc-rank">TOP 1</span>中药学入门</div>
-      <div class="cc-info">
-        <div class="cc-name">四气五味 · 识本草</div>
-        <div class="cc-meta"><span>128课时</span><span class="cc-free">免费</span></div>
-      </div>
-    </div>
-    <div class="course-card" onclick="showToast()">
-      <div class="cc-img cc-img-2"><span class="cc-rank">TOP 2</span>方剂学精讲</div>
-      <div class="cc-info">
-        <div class="cc-name">经方时方 · 学配伍</div>
-        <div class="cc-meta"><span>96课时</span><span class="cc-free">免费</span></div>
-      </div>
-    </div>
-    <div class="course-card" onclick="showToast()">
-      <div class="cc-img cc-img-3"><span class="cc-rank">TOP 3</span>黄帝内经</div>
-      <div class="cc-info">
-        <div class="cc-name">经典研读 · 明医理</div>
-        <div class="cc-meta"><span>64课时</span><span class="cc-free">免费</span></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- 今日推荐背诵 -->
-<div class="section-wrap">
-  <div class="recite-card">
-    <div class="rc-header">
-      <span class="rc-title">今日推荐背诵</span>
-      <span class="rc-count">方歌 · 药材</span>
-    </div>
-    <div class="recite-items">
-      <div class="recite-item">
-        <div class="ri-name">四君子汤</div>
-        <div class="ri-type">补气基础方</div>
-      </div>
-      <div class="recite-item">
-        <div class="ri-name">桂枝汤</div>
-        <div class="ri-type">解肌发表</div>
-      </div>
-      <div class="recite-item">
-        <div class="ri-name">六味地黄丸</div>
-        <div class="ri-type">滋补肾阴</div>
-      </div>
-    </div>
-    <button class="recite-btn" onclick="showToast()">开始背诵</button>
-  </div>
-</div>
-
-<!-- 零基础学中医 -->
-<div class="section-wrap">
-  <div style="background:linear-gradient(135deg,#2E7D32,#1B5E20);border-radius:12px;padding:16px;color:#fff;display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="showToast()">
-    <div style="flex:1;">
-      <div style="font-size:18px;font-weight:700;margin-bottom:4px;">零基础学中医</div>
-      <div style="font-size:12px;opacity:0.8;margin-bottom:6px;">阴阳五行 · 藏象经络 · 辨证论治</div>
-      <div style="display:inline-block;background:rgba(255,255,255,0.2);color:#fff;padding:3px 10px;border-radius:4px;font-size:12px;">限时免费</div>
-    </div>
-    <div style="font-size:48px;">&#128214;</div>
-  </div>
+  <div class="analyze-result" id="analyzeResult"></div>
 </div>
 
 <div class="spacer-bottom"></div>
 
 <!-- 底部Tab -->
 <div class="bottom-tab">
-  <div class="tab-item active" onclick="switchBottomTab(this)"><span class="tab-icon">&#127968;</span>首页</div>
-  <div class="tab-item" onclick="switchBottomTab(this)"><span class="tab-icon">&#128214;</span>讲堂</div>
-  <div class="tab-item" onclick="switchBottomTab(this)"><span class="tab-ai">AI</span></div>
-  <div class="tab-item" onclick="switchBottomTab(this)"><span class="tab-icon">&#128220;</span>医考</div>
-  <div class="tab-item" onclick="switchBottomTab(this)"><span class="tab-icon">&#128100;</span>我的</div>
+  <a class="tab-item" href="../index.html"><span class="tab-icon">&#127968;</span>主页</a>
+  <a class="tab-item active" href="tcm-demo.html"><span class="tab-ai">AI</span></a>
+  <a class="tab-item" href="zhongyi-study-demo.html"><span class="tab-icon">&#128214;</span>学习</a>
+  <a class="tab-item" href="../profile.html"><span class="tab-icon">&#128100;</span>个人中心</a>
 </div>
 
 <!-- 弹窗 -->
@@ -294,64 +134,352 @@ body{font-family:'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;b
 </div>
 
 <script>
-// ============ 本地功能 ============
-function switchTab(el) {
-  document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
-  showToast();
-}
-
-function switchBottomTab(el) {
-  document.querySelectorAll('.bottom-tab .tab-item').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
-  if (el.querySelector('.tab-ai')) {
-    showToast();
+// ============ 四诊数据 ============
+const DIAG_DATA = {
+  wang: {
+    title: '望诊 - 观其形色',
+    groups: [
+      { title: '舌质', chips: [
+        {name:'淡白舌', tag:'xu', desc:'主虚证、寒证。气血不足或阳虚。'},
+        {name:'红舌', tag:'re', desc:'主热证。实热或虚热。'},
+        {name:'绛舌', tag:'re', desc:'主热盛。邪热深入营血。'},
+        {name:'紫舌', tag:'shi', desc:'主血瘀。气滞血瘀或寒凝血瘀。'},
+        {name:'青舌', tag:'han', desc:'主寒凝、瘀血、阳虚。'},
+        {name:'胖大舌', tag:'xu', desc:'主脾虚、水湿内停。'},
+        {name:'瘦薄舌', tag:'xu', desc:'主气血不足、阴虚火旺。'},
+        {name:'齿痕舌', tag:'xu', desc:'主脾虚、水湿内停。'}
+      ]},
+      { title: '舌苔', chips: [
+        {name:'薄白苔', tag:'', desc:'正常或表证初起。'},
+        {name:'白厚苔', tag:'han', desc:'主湿浊、寒湿、食积。'},
+        {name:'黄苔', tag:'re', desc:'主热证、里证。'},
+        {name:'灰黑苔', tag:'han', desc:'主热极或寒极。'},
+        {name:'腻苔', tag:'shi', desc:'主湿浊、痰饮、食积。'},
+        {name:'剥苔', tag:'xu', desc:'主胃气不足、胃阴亏虚。'},
+        {name:'无苔', tag:'xu', desc:'主胃气大伤、胃阴枯竭。'}
+      ]},
+      { title: '面色', chips: [
+        {name:'面红', tag:'re', desc:'主热证。实热满面通红，虚热午后颧红。'},
+        {name:'面白', tag:'xu', desc:'主虚证、寒证。气血不足或阳气虚衰。'},
+        {name:'面黄', tag:'xu', desc:'主湿证、虚证。萎黄主脾胃虚弱。'},
+        {name:'面青', tag:'han', desc:'主寒证、痛证、瘀血、惊风。'},
+        {name:'面黑', tag:'xu', desc:'主肾虚、寒证、水饮、瘀血。'}
+      ]},
+      { title: '形体', chips: [
+        {name:'形体肥胖', tag:'shi', desc:'多痰湿。'},
+        {name:'形体消瘦', tag:'xu', desc:'多阴虚火旺或气血不足。'},
+        {name:'精神萎靡', tag:'xu', desc:'主精气不足。'},
+        {name:'烦躁不安', tag:'re', desc:'主热扰心神。'}
+      ]}
+    ]
+  },
+  wen: {
+    title: '闻诊 - 听声嗅味',
+    groups: [
+      { title: '听声音', chips: [
+        {name:'语声高亢', tag:'shi', desc:'主实证、热证。'},
+        {name:'语声低微', tag:'xu', desc:'主虚证、寒证。'},
+        {name:'呼吸气粗', tag:'shi', desc:'主实热证。'},
+        {name:'呼吸微弱', tag:'xu', desc:'主虚证。'},
+        {name:'咳声重浊', tag:'han', desc:'主寒湿犯肺。'},
+        {name:'咳声清脆', tag:'re', desc:'主燥热犯肺。'},
+        {name:'嗳气', tag:'shi', desc:'主胃气上逆。'},
+        {name:'太息', tag:'shi', desc:'主肝气郁结。'},
+        {name:'谵语', tag:'re', desc:'主热扰心神。'},
+        {name:'郑声', tag:'xu', desc:'主心气大伤。'}
+      ]},
+      { title: '嗅气味', chips: [
+        {name:'口气臭秽', tag:'re', desc:'主胃热。'},
+        {name:'口气酸臭', tag:'shi', desc:'主食积。'},
+        {name:'汗气腥膻', tag:'shi', desc:'主湿热熏蒸。'},
+        {name:'尿臊气重', tag:'re', desc:'主膀胱湿热。'},
+        {name:'大便臭秽', tag:'re', desc:'主大肠湿热。'},
+        {name:'矢气酸臭', tag:'shi', desc:'主食积。'}
+      ]}
+    ]
+  },
+  wen2: {
+    title: '问诊 - 十问歌',
+    song: '一问寒热二问汗，三问头身四问便\n五问饮食六胸腹，七聋八渴俱当辨\n九问旧病十问因，再兼服药参机变\n妇人尤必问经期，迟速闭崩皆可见',
+    groups: [
+      { title: '一问寒热', chips: [
+        {name:'恶寒发热', tag:'shi', desc:'主外感表证。'},
+        {name:'但寒不热', tag:'han', desc:'主里寒证。'},
+        {name:'但热不寒', tag:'re', desc:'主里热证。'},
+        {name:'寒热往来', tag:'shi', desc:'主半表半里证（少阳病）。'},
+        {name:'潮热', tag:'xu', desc:'主阴虚或阳明腑实。'},
+        {name:'五心烦热', tag:'xu', desc:'主阴虚火旺。'}
+      ]},
+      { title: '二问汗', chips: [
+        {name:'自汗', tag:'xu', desc:'日间汗出，动则尤甚，主气虚。'},
+        {name:'盗汗', tag:'xu', desc:'睡时汗出，醒则汗止，主阴虚。'},
+        {name:'大汗', tag:'xu', desc:'大汗淋漓，主亡阳。'},
+        {name:'无汗', tag:'han', desc:'主表寒实证。'}
+      ]},
+      { title: '三问头身', chips: [
+        {name:'头痛', tag:'shi', desc:'需辨外感内伤。'},
+        {name:'眩晕', tag:'xu', desc:'主肝阳上亢或气血不足。'},
+        {name:'身痛', tag:'han', desc:'主风寒湿邪。'},
+        {name:'腰痛', tag:'xu', desc:'主肾虚或寒湿。'},
+        {name:'关节痛', tag:'shi', desc:'主痹证。'}
+      ]},
+      { title: '四问便', chips: [
+        {name:'便秘', tag:'re', desc:'大便干燥，主热结或津亏。'},
+        {name:'便溏', tag:'xu', desc:'大便稀溏，主脾虚或寒湿。'},
+        {name:'尿黄赤', tag:'re', desc:'主热证。'},
+        {name:'尿清长', tag:'han', desc:'主寒证。'},
+        {name:'尿频', tag:'xu', desc:'主肾气不固。'}
+      ]},
+      { title: '五问饮食', chips: [
+        {name:'食欲减退', tag:'xu', desc:'主脾胃虚弱。'},
+        {name:'多食易饥', tag:'re', desc:'主胃火炽盛。'},
+        {name:'口渴喜饮', tag:'re', desc:'主热盛伤津。'},
+        {name:'口不渴', tag:'han', desc:'主寒证或湿证。'},
+        {name:'口苦', tag:'re', desc:'主肝胆湿热。'}
+      ]},
+      { title: '六问胸腹', chips: [
+        {name:'胸痛', tag:'shi', desc:'主心血瘀阻或气滞。'},
+        {name:'胁痛', tag:'shi', desc:'主肝气郁结。'},
+        {name:'腹胀', tag:'xu', desc:'主脾虚或气滞。'},
+        {name:'腹痛', tag:'han', desc:'需辨寒热虚实。'}
+      ]},
+      { title: '七八问', chips: [
+        {name:'耳鸣', tag:'xu', desc:'主肾虚或肝胆火盛。'},
+        {name:'耳聋', tag:'xu', desc:'主肾精不足。'},
+        {name:'口渴', tag:'re', desc:'主热证。'}
+      ]}
+    ]
+  },
+  qie: {
+    title: '切诊 - 二十八脉',
+    pulses: [
+      {name:'浮脉', tag:'shi', desc:'轻取即得，主表证。'},
+      {name:'沉脉', tag:'xu', desc:'重按始得，主里证。'},
+      {name:'迟脉', tag:'han', desc:'一息三至，主寒证。'},
+      {name:'数脉', tag:'re', desc:'一息六至，主热证。'},
+      {name:'洪脉', tag:'re', desc:'脉体宽大，主热盛。'},
+      {name:'微脉', tag:'xu', desc:'极细极软，主阳衰。'},
+      {name:'细脉', tag:'xu', desc:'脉细如线，主虚证。'},
+      {name:'散脉', tag:'xu', desc:'浮散无根，主元气离散。'},
+      {name:'虚脉', tag:'xu', desc:'三部无力，主虚证。'},
+      {name:'实脉', tag:'shi', desc:'三部有力，主实证。'},
+      {name:'滑脉', tag:'shi', desc:'往来流利，主痰湿食积。'},
+      {name:'涩脉', tag:'shi', desc:'往来艰涩，主气滞血瘀。'},
+      {name:'弦脉', tag:'shi', desc:'如按琴弦，主肝胆病痛证。'},
+      {name:'紧脉', tag:'han', desc:'紧如转索，主寒证痛证。'},
+      {name:'长脉', tag:'shi', desc:'超过本位，主阳气有余。'},
+      {name:'短脉', tag:'xu', desc:'不及本位，主气病。'},
+      {name:'濡脉', tag:'xu', desc:'浮而细软，主湿虚。'},
+      {name:'弱脉', tag:'xu', desc:'沉而细软，主气血不足。'},
+      {name:'芤脉', tag:'xu', desc:'浮大中空，主失血。'},
+      {name:'革脉', tag:'xu', desc:'浮而搏指，主亡血失精。'},
+      {name:'牢脉', tag:'han', desc:'沉按实大，主阴寒内结。'},
+      {name:'伏脉', tag:'han', desc:'重按着骨，主邪闭厥证。'},
+      {name:'动脉', tag:'re', desc:'滑数短，主惊痛。'},
+      {name:'促脉', tag:'re', desc:'数而时止，主阳盛热实。'},
+      {name:'结脉', tag:'han', desc:'缓而时止，主阴盛气结。'},
+      {name:'代脉', tag:'xu', desc:'止有定数，主脏气衰微。'},
+      {name:'疾脉', tag:'re', desc:'一息七至，主阳极阴竭。'},
+      {name:'大脉', tag:'shi', desc:'脉体宽大，主邪气盛。'}
+    ]
   }
+};
+
+// ============ 辨证分析数据 ============
+const SYNDROMES = [
+  { name:'表寒证', tags:['han','shi'], minScore:2, desc:'外感风寒，恶寒发热，头痛身痛，无汗，舌苔薄白，脉浮紧。治宜辛温解表，方如麻黄汤。' },
+  { name:'表热证', tags:['re','shi'], minScore:2, desc:'外感风热，发热微恶寒，口渴，咽痛，舌边尖红苔薄黄，脉浮数。治宜辛凉解表，方如银翘散。' },
+  { name:'里热证', tags:['re','shi'], minScore:3, desc:'邪热入里，壮热不寒，口渴喜饮，面红目赤，便秘尿赤，舌红苔黄，脉数有力。治宜清热泻火，方如白虎汤。' },
+  { name:'里寒证', tags:['han'], minScore:2, desc:'寒邪直中，但寒不热，腹痛喜温，便溏尿清，舌淡苔白，脉沉迟。治宜温中散寒，方如理中丸。' },
+  { name:'虚寒证', tags:['xu','han'], minScore:2, desc:'阳气不足，畏寒肢冷，面色苍白，神疲乏力，舌淡胖，脉沉细无力。治宜温阳益气，方如附子理中丸。' },
+  { name:'虚热证', tags:['xu','re'], minScore:2, desc:'阴虚火旺，五心烦热，潮热盗汗，口干咽燥，舌红少苔，脉细数。治宜滋阴清热，方如知柏地黄丸。' },
+  { name:'气虚证', tags:['xu'], minScore:3, desc:'元气不足，神疲乏力，少气懒言，自汗，食少便溏，舌淡，脉虚弱。治宜益气健脾，方如四君子汤。' },
+  { name:'血虚证', tags:['xu'], minScore:3, desc:'血液亏虚，面色淡白或萎黄，唇舌色淡，头晕眼花，心悸失眠，脉细。治宜补血养血，方如四物汤。' },
+  { name:'阴虚证', tags:['xu','re'], minScore:2, desc:'阴液亏虚，形体消瘦，口燥咽干，五心烦热，盗汗，舌红少苔，脉细数。治宜滋阴降火，方如六味地黄丸。' },
+  { name:'阳虚证', tags:['xu','han'], minScore:2, desc:'阳气衰微，畏寒肢冷，面色苍白，腰膝酸软，小便清长，舌淡胖有齿痕，脉沉迟无力。治宜温补肾阳，方如金匮肾气丸。' },
+  { name:'湿热证', tags:['re','shi'], minScore:2, desc:'湿热内蕴，身热不扬，口苦粘腻，脘腹痞满，大便臭秽，尿黄赤，舌红苔黄腻，脉滑数。治宜清热利湿，方如龙胆泻肝汤。' },
+  { name:'寒湿证', tags:['han','shi'], minScore:2, desc:'寒湿内阻，脘腹冷痛，大便溏泄，肢体沉重，舌淡苔白腻，脉沉迟。治宜温中化湿，方如胃苓汤。' },
+  { name:'气滞证', tags:['shi'], minScore:3, desc:'气机不畅，胸胁胀痛，脘腹痞满，善太息，情志不舒时加重，脉弦。治宜理气解郁，方如逍遥散。' },
+  { name:'血瘀证', tags:['shi'], minScore:3, desc:'瘀血内阻，刺痛固定不移，面色黧黑，唇甲青紫，舌紫暗有瘀斑，脉涩。治宜活血化瘀，方如血府逐瘀汤。' },
+  { name:'痰湿证', tags:['shi'], minScore:3, desc:'痰湿内停，咳嗽痰多，胸闷纳呆，形体肥胖，舌苔白腻，脉滑。治宜燥湿化痰，方如二陈汤。' },
+  { name:'食积证', tags:['shi'], minScore:3, desc:'食积胃肠，脘腹胀痛，嗳腐吞酸，厌食，大便酸臭，舌苔厚腻，脉滑。治宜消食导滞，方如保和丸。' },
+  { name:'肝火上炎', tags:['re','shi'], minScore:2, desc:'肝火偏旺，头痛眩晕，面红目赤，口苦易怒，便秘尿赤，舌红苔黄，脉弦数。治宜清肝泻火，方如龙胆泻肝汤。' },
+  { name:'脾胃虚寒', tags:['xu','han'], minScore:2, desc:'脾胃阳虚，腹满隐隐作痛，喜温喜按，食少便溏，四肢不温，舌淡苔白，脉沉弱。治宜温中健脾，方如理中丸。' }
+];
+
+let activeDiag = 'wang';
+let selectedSymptoms = {};
+
+// ============ 四诊切换 ============
+function switchDiag(tab) {
+  activeDiag = tab;
+  const tabNames = ['wang', 'wen', 'wen2', 'qie'];
+  document.querySelectorAll('.diag-tab').forEach((t, i) => {
+    t.classList.toggle('active', i === tabNames.indexOf(tab));
+  });
+  renderDiag();
 }
 
-function showToast() {
-  document.getElementById('modalOverlay').classList.add('show');
+function renderDiag() {
+  const c = document.getElementById('diagContent');
+  const d = DIAG_DATA[activeDiag];
+  let html = '';
+
+  if (activeDiag === 'qie') {
+    // 切诊 - 脉诊
+    html = `<div class="diag-section">
+      <h3><span class="dh-icon">&#129522;</span> ${d.title}</h3>
+      <div style="font-size:11px;color:#999;margin-bottom:10px">点击选择脉象（可多选）：</div>
+      <div class="pulse-list">
+        ${d.pulses.map(p => `
+          <div class="pulse-item ${isSelected('qie',p.name)?'selected':''}" onclick="toggleSymptom('qie','${p.name}','${p.tag}','${p.desc}')">
+            <div class="pi-name">${p.name}</div>
+            <div class="pi-desc">${p.desc}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>`;
+  } else if (activeDiag === 'wen2') {
+    // 问诊 - 十问歌
+    html = `<div class="shi-wen-ge">
+      <div class="swg-title">十问歌</div>
+      <div class="swg-text">${d.song.replace(/\n/g,'<br>')}</div>
+    </div>`;
+    d.groups.forEach(g => {
+      html += `<div class="diag-section">
+        <h3><span class="dh-icon">&#128172;</span> ${g.title}</h3>
+        <div class="symptom-chips">
+          ${g.chips.map(c => `<span class="symptom-chip ${isSelected(activeDiag,c.name)?'selected':''}" onclick="toggleSymptom('${activeDiag}','${c.name}','${c.tag}','${c.desc}')">${c.name}</span>`).join('')}
+        </div>
+      </div>`;
+    });
+  } else {
+    // 望诊、闻诊
+    d.groups.forEach(g => {
+      html += `<div class="diag-section">
+        <h3><span class="dh-icon">${activeDiag==='wang'?'&#128064;':'&#128066;'}</span> ${g.title}</h3>
+        <div class="symptom-chips">
+          ${g.chips.map(c => `<span class="symptom-chip ${isSelected(activeDiag,c.name)?'selected':''}" onclick="toggleSymptom('${activeDiag}','${c.name}','${c.tag}','${c.desc}')">${c.name}</span>`).join('')}
+        </div>
+      </div>`;
+    });
+  }
+  c.innerHTML = html;
+}
+
+function isSelected(tab, name) {
+  return selectedSymptoms[tab + '_' + name] !== undefined;
+}
+
+function toggleSymptom(tab, name, tag, desc) {
+  const key = tab + '_' + name;
+  if (selectedSymptoms[key]) {
+    delete selectedSymptoms[key];
+  } else {
+    selectedSymptoms[key] = { tab, name, tag, desc };
+  }
+  renderDiag();
+}
+
+// ============ 辨证分析 ============
+function analyzeSymptoms() {
+  const all = Object.values(selectedSymptoms);
+  if (all.length === 0) {
+    showToast('请先在四诊中选择症状');
+    return;
+  }
+
+  // 统计各标签得分
+  const scores = { han:0, re:0, xu:0, shi:0 };
+  all.forEach(s => { if (s.tag && scores[s.tag] !== undefined) scores[s.tag]++; });
+
+  // 按问诊/切诊/望诊/闻诊权重不同
+  const weighted = { han:0, re:0, xu:0, shi:0 };
+  all.forEach(s => {
+    if (!s.tag) return;
+    const w = s.tab === 'qie' ? 2 : (s.tab === 'wang' ? 1.5 : 1);
+    weighted[s.tag] = (weighted[s.tag] || 0) + w;
+  });
+
+  // 匹配证型
+  const matched = [];
+  SYNDROMES.forEach(syn => {
+    let score = 0;
+    syn.tags.forEach(t => { score += weighted[t] || 0; });
+    if (score >= syn.minScore) {
+      matched.push({ ...syn, score });
+    }
+  });
+  matched.sort((a, b) => b.score - a.score);
+  const top = matched.slice(0, 3);
+
+  // 八纲判断
+  const bagang = [];
+  if (scores.han > scores.re) bagang.push({name:'寒', cls:'tag-han'});
+  else if (scores.re > scores.han) bagang.push({name:'热', cls:'tag-re'});
+  if (scores.xu > scores.shi) bagang.push({name:'虚', cls:'tag-xu'});
+  else if (scores.shi > scores.xu) bagang.push({name:'实', cls:'tag-shi'});
+
+  const result = document.getElementById('analyzeResult');
+  let html = `<div class="ar-title">&#129504; 四诊合参辨证分析结果</div>`;
+
+  // 所选症状
+  html += `<div class="ar-item"><strong>所选症状（${all.length}项）：</strong>`;
+  const byTab = { wang:[], wen:[], wen2:[], qie:[] };
+  all.forEach(s => byTab[s.tab].push(s.name));
+  const tabNames = { wang:'望诊', wen:'闻诊', wen2:'问诊', qie:'切诊' };
+  Object.keys(byTab).forEach(t => {
+    if (byTab[t].length > 0) {
+      html += `<br><span style="color:#999">${tabNames[t]}：</span>${byTab[t].join('、')}`;
+    }
+  });
+  html += '</div>';
+
+  // 八纲
+  if (bagang.length > 0) {
+    html += `<div class="ar-item"><strong>八纲倾向：</strong>`;
+    bagang.forEach(b => html += `<span class="ar-tag ${b.cls}">${b.name}</span>`);
+    html += '</div>';
+  }
+
+  // 证型
+  if (top.length > 0) {
+    html += '<div class="ar-item" style="margin-top:8px"><strong>初步辨证（仅供参考）：</strong></div>';
+    top.forEach(s => {
+      html += `<div class="ar-syndrome">
+        <div class="as-name">${s.name}</div>
+        <div class="as-desc">${s.desc}</div>
+      </div>`;
+    });
+  } else {
+    html += '<div class="ar-item">根据所选症状，暂无法明确辨证，建议选择更多症状信息。</div>';
+  }
+
+  // 免责声明
+  html += `<div class="ar-disclaimer">
+    &#9888; <strong>免责声明：</strong>本分析结果基于中医四诊理论自动生成，仅供学习和参考使用，不能替代专业中医师的诊断和治疗。如有不适，请及时就医，由执业医师进行辨证施治。
+  </div>`;
+
+  result.innerHTML = html;
+  result.classList.add('show');
+  result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// ============ 通用功能 ============
+function showToast(msg) {
+  const modal = document.getElementById('modalOverlay');
+  if (modal) {
+    modal.querySelector('.toast-text').textContent = msg || '功能开发中，敬请期待！';
+    modal.classList.add('show');
+  }
 }
 
 function closeModal() {
   document.getElementById('modalOverlay').classList.remove('show');
 }
 
-// ============ Banner轮播 ============
-let bannerIdx = 0;
-const bannerData = [
-  {title:'五禽戏',sub:'华佗创编 · 仿生导引术',tags:['虎戏','鹿戏','熊戏','猿戏','鸟戏'],emoji:'&#129496;',bg:'linear-gradient(135deg,#FFF8E1,#FFE0B2)'},
-  {title:'八段锦',sub:'千年养生功法 · 调理脏腑',tags:['双手托天','左右开弓','调理脾胃','固肾腰'],emoji:'&#129496;',bg:'linear-gradient(135deg,#E8F5E9,#C8E6C9)'},
-  {title:'四季养生',sub:'春养肝·夏养心·秋养肺·冬养肾',tags:['饮食有节','起居有常','不妄作劳'],emoji:'&#127807;',bg:'linear-gradient(135deg,#E3F2FD,#BBDEFB)'}
-];
-
-setInterval(() => {
-  bannerIdx = (bannerIdx + 1) % bannerData.length;
-  const d = bannerData[bannerIdx];
-  const banner = document.querySelector('.banner');
-  if (banner) {
-    banner.style.background = d.bg;
-    banner.querySelector('.b-title').textContent = d.title;
-    banner.querySelector('.b-sub').textContent = d.sub;
-    banner.querySelector('.banner-img').innerHTML = d.emoji;
-    const tagsContainer = banner.querySelector('.b-tags');
-    tagsContainer.innerHTML = d.tags.map(t => `<span class="b-tag">${t}</span>`).join('');
-    const dots = banner.querySelectorAll('.banner-dots .dot');
-    dots.forEach((dot,i) => dot.classList.toggle('active', i === bannerIdx));
-  }
-}, 4000);
-
-// ============ API Fallback ============
-async function fetchFromAPI(endpoint, params) {
-  try {
-    const resp = await fetch(`http://localhost:3002/api${endpoint}`, {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify(params)
-    });
-    if (resp.ok) return await resp.json();
-  } catch(e) { console.log('API不可用,使用本地数据'); }
-  return null;
-}
+// ============ 初始化 ============
+renderDiag();
 </script>
 
 <!-- feedback system -->
