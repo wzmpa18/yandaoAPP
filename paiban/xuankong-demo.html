@@ -3,7 +3,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=960,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <title>热卜玄空飞星</title>
 <style>
 :root{
@@ -15,8 +15,8 @@
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{width:100%;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;color:var(--dark);background:var(--bg);overflow-x:hidden;}
-body{max-width:390px;margin:0 auto;min-height:100vh;position:relative;}
-body.has-result{padding-bottom:60px;}
+body{max-width:390px;margin:0 auto;min-height:100vh;position:relative;padding-bottom:60px;}
+body.has-result{padding-bottom:130px;}
 a{text-decoration:none;color:inherit;}
 input,select,button,textarea{font-family:inherit;outline:none;border:none;background:none;}
 
@@ -116,17 +116,18 @@ input,select,button,textarea{font-family:inherit;outline:none;border:none;backgr
 .pl-wheel{width:100%;aspect-ratio:1/1;position:relative;max-width:680px;margin:0 auto;}
 .pl-wheel svg{width:100%;height:100%;}
 
-/* ===== 结果页底部操作栏 ===== */
-.res-bar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:390px;height:60px;background:#fff;display:flex;align-items:center;border-top:1px solid var(--lightgray);z-index:100;}
+/* ===== 结果页底部操作栏（上浮于全局导航之上）===== */
+.res-bar{position:fixed;bottom:60px;left:50%;transform:translateX(-50%);width:100%;max-width:390px;height:60px;background:#fff;display:flex;align-items:center;border-top:1px solid var(--lightgray);z-index:100;}
 .rb-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;height:100%;position:relative;}
 .rb-icon{font-size:26px;line-height:1;color:#333;}
 .rb-text{font-size:13px;color:#333;}
 .rb-item.save .rb-icon{color:var(--red);}.rb-item.save .rb-text{color:var(--red);}
+.rb-item.ai .rb-icon{color:var(--red);}.rb-item.ai .rb-text{color:var(--red);}
 .rb-badge{position:absolute;top:6px;right:calc(50% - 22px);background:var(--red);color:#fff;font-size:10px;min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 4px;font-weight:bold;line-height:1;}
 .rb-icon-wrap{position:relative;}
 
 /* 回到顶部 */
-.back-top{position:fixed;right:16px;bottom:76px;width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.9);border:2px solid #BBB;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:90;color:#999;font-size:24px;}
+.back-top{position:fixed;right:16px;bottom:136px;width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.9);border:2px solid #BBB;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:90;color:#999;font-size:24px;}
 
 /* ===== 下拉菜单浮层 ===== */
 .dd-mask{position:fixed;top:0;left:0;width:100%;height:100%;background:transparent;z-index:200;display:none;}
@@ -167,6 +168,26 @@ input,select,button,textarea{font-family:inherit;outline:none;border:none;backgr
 
 /* ===== 五行色值辅助类 ===== */
 .c-wood{color:var(--green);}.c-fire{color:var(--red);}.c-earth{color:var(--earth);}.c-metal{color:var(--metal);}.c-water{color:var(--water);}
+
+/* ===== 折叠卡片（纯CSS：input checkbox + label，默认折叠）===== */
+.collapse-card{margin:0 10px 10px;background:#fff;border-radius:12px;overflow:hidden;}
+.collapse-title{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;font-size:16px;font-weight:bold;color:#fff;background:#00BCB4;cursor:pointer;}
+.collapse-body{max-height:0;overflow:hidden;transition:max-height .3s;}
+.cc-toggle:checked + .collapse-title + .collapse-body{max-height:3000px;padding:12px 16px;}
+.cc-toggle:checked + .collapse-title .arrow{transform:rotate(90deg);}
+.cc-toggle{display:none;}
+.arrow{transition:transform .2s;display:inline-block;}
+/* 折叠体内复用 interp-card / ss-card 内容时去除外边距与阴影避免双重样式 */
+.collapse-body .interp-card{margin:0;background:transparent;box-shadow:none;padding:0;border-radius:0;}
+.collapse-body .interp-card .card-title{display:none;}
+.collapse-body .ss-card{margin:0;background:transparent;box-shadow:none;padding:0;border-radius:0;}
+.collapse-body .ss-card .ss-card-title{display:none;}
+
+/* ===== 底部全局导航 60px ===== */
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:390px;height:60px;background:#fff;display:flex;z-index:200;border-top:1px solid var(--lightgray);}
+.bottom-nav .ni{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:13px;color:#999;gap:2px;cursor:pointer;}
+.bottom-nav .ni .nic{font-size:24px;line-height:1;}
+.bottom-nav .ni.on{color:var(--teal);}
 </style>
 </head>
 <body>
@@ -335,93 +356,141 @@ input,select,button,textarea{font-family:inherit;outline:none;border:none;backgr
     </div>
   </div>
 
-  <!-- ===== 九宫飞星解读 ===== -->
-  <div class="interp-card">
-    <div class="card-title">九宫飞星解读</div>
-    <div class="card-body">
-      <p>玄空九星为：<span class="wx-water">一白贪狼</span>、<span class="wx-earth">二黑巨门</span>、<span class="wx-wood">三碧禄存</span>、<span class="wx-wood">四绿文曲</span>、<span class="wx-earth">五黄廉贞</span>、<span class="wx-metal">六白武曲</span>、<span class="wx-metal">七赤破军</span>、<span class="wx-earth">八白左辅</span>、<span class="wx-fire">九紫右弼</span>。</p>
-      <p style="margin-top:10px;">九星配卦配五行：<span class="wx-water">一白坎水</span>、<span class="wx-earth">二黑坤土</span>、<span class="wx-wood">三碧震木</span>、<span class="wx-wood">四绿巽木</span>、<span class="wx-earth">五黄中土</span>、<span class="wx-metal">六白乾金</span>、<span class="wx-metal">七赤兑金</span>、<span class="wx-earth">八白艮土</span>、<span class="wx-fire">九紫离火</span>。</p>
-      <p style="margin-top:10px;">九星本身无绝对吉凶，其吉凶由元运、方位、山水形势配合而定。当令之星为旺星，未来之星为生气星，过去之星为退气星；旺星所到之处主吉，退气之星主凶或无用。</p>
-      <p style="margin-top:10px;">洛书九宫口诀：戴九履一，左三右七，二四为肩，六八为足，以五为中心，无论斜直相加皆得十五。飞星轨迹：顺飞由中宫起，按数字递增顺序飞布九宫；逆飞由中宫起，按数字递减顺序飞布九宫。</p>
+  <!-- ===== 九宫飞星解读（折叠）===== -->
+  <div class="collapse-card">
+    <input type="checkbox" id="cc1" class="cc-toggle">
+    <label class="collapse-title" for="cc1"><span>九宫飞星解读</span><span class="arrow">&#9654;</span></label>
+    <div class="collapse-body">
+      <div class="interp-card">
+        <div class="card-title">九宫飞星解读</div>
+        <div class="card-body">
+          <p>玄空九星为：<span class="wx-water">一白贪狼</span>、<span class="wx-earth">二黑巨门</span>、<span class="wx-wood">三碧禄存</span>、<span class="wx-wood">四绿文曲</span>、<span class="wx-earth">五黄廉贞</span>、<span class="wx-metal">六白武曲</span>、<span class="wx-metal">七赤破军</span>、<span class="wx-earth">八白左辅</span>、<span class="wx-fire">九紫右弼</span>。</p>
+          <p style="margin-top:10px;">九星配卦配五行：<span class="wx-water">一白坎水</span>、<span class="wx-earth">二黑坤土</span>、<span class="wx-wood">三碧震木</span>、<span class="wx-wood">四绿巽木</span>、<span class="wx-earth">五黄中土</span>、<span class="wx-metal">六白乾金</span>、<span class="wx-metal">七赤兑金</span>、<span class="wx-earth">八白艮土</span>、<span class="wx-fire">九紫离火</span>。</p>
+          <p style="margin-top:10px;">九星本身无绝对吉凶，其吉凶由元运、方位、山水形势配合而定。当令之星为旺星，未来之星为生气星，过去之星为退气星；旺星所到之处主吉，退气之星主凶或无用。</p>
+          <p style="margin-top:10px;">洛书九宫口诀：戴九履一，左三右七，二四为肩，六八为足，以五为中心，无论斜直相加皆得十五。飞星轨迹：顺飞由中宫起，按数字递增顺序飞布九宫；逆飞由中宫起，按数字递减顺序飞布九宫。</p>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- ===== 山向运星分析 ===== -->
-  <div class="interp-card">
-    <div class="card-title">山向运星分析</div>
-    <div class="card-body">
-      <p>排盘步骤：一、确定建造或入住元运；二、确定坐山朝向；三、查二十四山本山星；四、定元运顺逆；五、山星入中飞布九宫；六、结合向盘与运盘分析。</p>
-      <p style="margin-top:10px;">坐山挨星为<span class="wx-water">1</span>、<span class="wx-earth">2</span>、<span class="wx-wood">3</span>、<span class="wx-wood">4</span>者，上元顺飞，下元逆飞；坐山挨星为<span class="wx-metal">6</span>、<span class="wx-metal">7</span>、<span class="wx-earth">8</span>、<span class="wx-fire">9</span>者，上元逆飞，下元顺飞。阳山阳向顺飞，阴山阴向逆飞，此为大玄空挨星顺逆之根本。</p>
-      <p style="margin-top:10px;">旺山旺向者，当令旺星到山到向，主丁财两旺，家宅安宁，事业顺遂。上山下水者，当令旺星飞到坐山方反见水，飞到向首方反见山，主丁财两败。正神宜高满、宜来山、宜来风；零神宜空虚、宜见水、宜出气。</p>
+  <!-- ===== 山向运星分析（折叠）===== -->
+  <div class="collapse-card">
+    <input type="checkbox" id="cc2" class="cc-toggle">
+    <label class="collapse-title" for="cc2"><span>山向运星分析</span><span class="arrow">&#9654;</span></label>
+    <div class="collapse-body">
+      <div class="interp-card">
+        <div class="card-title">山向运星分析</div>
+        <div class="card-body">
+          <p>排盘步骤：一、确定建造或入住元运；二、确定坐山朝向；三、查二十四山本山星；四、定元运顺逆；五、山星入中飞布九宫；六、结合向盘与运盘分析。</p>
+          <p style="margin-top:10px;">坐山挨星为<span class="wx-water">1</span>、<span class="wx-earth">2</span>、<span class="wx-wood">3</span>、<span class="wx-wood">4</span>者，上元顺飞，下元逆飞；坐山挨星为<span class="wx-metal">6</span>、<span class="wx-metal">7</span>、<span class="wx-earth">8</span>、<span class="wx-fire">9</span>者，上元逆飞，下元顺飞。阳山阳向顺飞，阴山阴向逆飞，此为大玄空挨星顺逆之根本。</p>
+          <p style="margin-top:10px;">旺山旺向者，当令旺星到山到向，主丁财两旺，家宅安宁，事业顺遂。上山下水者，当令旺星飞到坐山方反见水，飞到向首方反见山，主丁财两败。正神宜高满、宜来山、宜来风；零神宜空虚、宜见水、宜出气。</p>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- ===== 排龙诀解读 ===== -->
-  <div class="interp-card">
-    <div class="card-title">排龙诀解读</div>
-    <div class="card-body">
-      <p>排龙诀用于判断来龙与坐向的关系，是玄空飞星的核心技法之一。大玄空挨星真诀：</p>
-      <p style="margin-top:10px;font-family:'KaiTi','STKaiti',serif;font-size:18px;color:var(--dark);">甲癸申，贪狼一路行；坤壬乙，巨门从头出；<br>子卯未，三碧禄存到；戌乾巳，四绿文曲照；<br>辰巽亥，尽是武曲位；艮丙辛，位位是破军；<br>寅庚丁，一例左辅星；午酉丑，九紫右弼守。</p>
-      <p style="margin-top:10px;">二十四山分布于地盘正针，每山占15度，共360度。阳山包括甲庚壬丙、乾坤艮巽、寅申巳亥；阴山包括乙辛丁癸、子午卯酉、辰戌丑未。四正卦各管三山：坎卦管壬子癸，离卦管丙午丁，震卦管甲卯乙，兑卦管庚酉辛。四隅卦各管三山：乾卦管戌乾亥，坤卦管未坤申，艮卦管丑艮寅，巽卦管辰巽巳。</p>
+  <!-- ===== 排龙诀解读（折叠）===== -->
+  <div class="collapse-card">
+    <input type="checkbox" id="cc3" class="cc-toggle">
+    <label class="collapse-title" for="cc3"><span>排龙诀解读</span><span class="arrow">&#9654;</span></label>
+    <div class="collapse-body">
+      <div class="interp-card">
+        <div class="card-title">排龙诀解读</div>
+        <div class="card-body">
+          <p>排龙诀用于判断来龙与坐向的关系，是玄空飞星的核心技法之一。大玄空挨星真诀：</p>
+          <p style="margin-top:10px;font-family:'KaiTi','STKaiti',serif;font-size:18px;color:var(--dark);">甲癸申，贪狼一路行；坤壬乙，巨门从头出；<br>子卯未，三碧禄存到；戌乾巳，四绿文曲照；<br>辰巽亥，尽是武曲位；艮丙辛，位位是破军；<br>寅庚丁，一例左辅星；午酉丑，九紫右弼守。</p>
+          <p style="margin-top:10px;">二十四山分布于地盘正针，每山占15度，共360度。阳山包括甲庚壬丙、乾坤艮巽、寅申巳亥；阴山包括乙辛丁癸、子午卯酉、辰戌丑未。四正卦各管三山：坎卦管壬子癸，离卦管丙午丁，震卦管甲卯乙，兑卦管庚酉辛。四隅卦各管三山：乾卦管戌乾亥，坤卦管未坤申，艮卦管丑艮寅，巽卦管辰巽巳。</p>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- ===== 下卦替卦说明 ===== -->
-  <div class="interp-card">
-    <div class="card-title">下卦替卦说明</div>
-    <div class="card-body">
-      <p><span class="highlight">下卦：</span>以坐山本山星直接入中飞布，为常规排盘之法。同一山向，上元与下元排盘不同；只要山向不变，入中之星在上元或下元九十年中不动。</p>
-      <p style="margin-top:10px;"><span class="highlight">替卦：</span>兼向时若出卦则用替卦，以替星代替本山星入中。兼向须在本卦内，不可出卦；出卦则阴阳差错，主凶。</p>
-      <p style="margin-top:10px;">空亡分大空亡与小空亡，大空亡为八卦交界之处，小空亡为两山交界之处，皆不宜立向。立向以房屋背山面水、负阴抱阳为原则，坐山为体，向首为用；坐实向虚，坐高压低。</p>
+  <!-- ===== 下卦替卦说明（折叠）===== -->
+  <div class="collapse-card">
+    <input type="checkbox" id="cc4" class="cc-toggle">
+    <label class="collapse-title" for="cc4"><span>下卦替卦说明</span><span class="arrow">&#9654;</span></label>
+    <div class="collapse-body">
+      <div class="interp-card">
+        <div class="card-title">下卦替卦说明</div>
+        <div class="card-body">
+          <p><span class="highlight">下卦：</span>以坐山本山星直接入中飞布，为常规排盘之法。同一山向，上元与下元排盘不同；只要山向不变，入中之星在上元或下元九十年中不动。</p>
+          <p style="margin-top:10px;"><span class="highlight">替卦：</span>兼向时若出卦则用替卦，以替星代替本山星入中。兼向须在本卦内，不可出卦；出卦则阴阳差错，主凶。</p>
+          <p style="margin-top:10px;">空亡分大空亡与小空亡，大空亡为八卦交界之处，小空亡为两山交界之处，皆不宜立向。立向以房屋背山面水、负阴抱阳为原则，坐山为体，向首为用；坐实向虚，坐高压低。</p>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- ===== 神煞分析 ===== -->
-  <div class="ss-card">
-    <div class="ss-card-title">九星神煞速查</div>
-    <div class="ss-row"><span class="ss-ganzhi">一白贪狼：</span><span class="ss-names">中男　智慧　官禄　财源　吉星</span></div>
-    <div class="ss-row"><span class="ss-ganzhi">二黑巨门：</span><span class="ss-names">老母　病符　田产　脾胃　凶星</span></div>
-    <div class="ss-row"><span class="ss-ganzhi">三碧禄存：</span><span class="ss-names">长男　是非　官讼　震动　凶星</span></div>
-    <div class="ss-row"><span class="ss-ganzhi">四绿文曲：</span><span class="ss-names">长女　文昌　科名　风流　吉星</span></div>
-    <div class="ss-row"><span class="ss-ganzhi">五黄廉贞：</span><span class="ss-names">皇极　灾祸　瘟疫　意外　大凶</span></div>
-    <div class="ss-row"><span class="ss-ganzhi">六白武曲：</span><span class="ss-names">老父　权力　贵人　武职　吉星</span></div>
-    <div class="ss-row"><span class="ss-ganzhi">七赤破军：</span><span class="ss-names">少女　口舌　盗贼　破损　凶星</span></div>
-    <div class="ss-row"><span class="ss-ganzhi">八白左辅：</span><span class="ss-names">少男　田产　财富　稳定　吉星</span></div>
-    <div class="ss-row"><span class="ss-ganzhi">九紫右弼：</span><span class="ss-names">中女　喜庆　名誉　血光　吉星</span></div>
-  </div>
-
-  <!-- ===== 九星组合象义 ===== -->
-  <div class="ss-card">
-    <div class="ss-card-title">九星组合象义速查</div>
-    <div class="ss-row"><span class="ss-ganzhi">一四组合：</span><span class="ss-names">文昌科名　利学业　吉</span></div>
-    <div class="ss-row"><span class="ss-ganzhi">二五组合：</span><span class="ss-names">病符黄煞　主疾病灾祸　大凶</span></div>
-    <div class="ss-row"><span class="ss-ganzhi">三七组合：</span><span class="ss-names">穿心煞　主盗贼是非　凶</span></div>
-    <div class="ss-row"><span class="ss-ganzhi">六八组合：</span><span class="ss-names">武曲生财　利权力财富　吉</span></div>
-    <div class="ss-row"><span class="ss-ganzhi">七九组合：</span><span class="ss-names">回禄之灾　主火灾血光　凶</span></div>
-    <div class="ss-row"><span class="ss-ganzhi">八九组合：</span><span class="ss-names">喜庆发财　利添丁置业　吉</span></div>
-    <div class="ss-row"><span class="ss-ganzhi">一六组合：</span><span class="ss-names">官星贵人　利仕途　吉</span></div>
-    <div class="ss-row"><span class="ss-ganzhi">四七组合：</span><span class="ss-names">破军文昌　主刑伤文书　凶</span></div>
-  </div>
-
-  <!-- ===== 三元九运速查 ===== -->
-  <div class="interp-card">
-    <div class="card-title">三元九运速查</div>
-    <div class="card-body">
-      <p>三元者，上元、中元、下元也。每元三运，每运二十年，共九运、一百八十年，为一个正元周期。</p>
-      <p style="margin-top:10px;">上元：<span class="wx-water">一白（坎水）</span>1864-1883、<span class="wx-earth">二黑（坤土）</span>1884-1903、<span class="wx-wood">三碧（震木）</span>1904-1923</p>
-      <p>中元：<span class="wx-wood">四绿（巽木）</span>1924-1943、<span class="wx-earth">五黄（中土）</span>1944-1963、<span class="wx-metal">六白（乾金）</span>1964-1983</p>
-      <p>下元：<span class="wx-metal">七赤（兑金）</span>1984-2003、<span class="wx-earth">八白（艮土）</span>2004-2023、<span class="wx-fire">九紫（离火）</span>2024-2043</p>
+  <!-- ===== 神煞分析（折叠）===== -->
+  <div class="collapse-card">
+    <input type="checkbox" id="cc5" class="cc-toggle">
+    <label class="collapse-title" for="cc5"><span>九星神煞速查</span><span class="arrow">&#9654;</span></label>
+    <div class="collapse-body">
+      <div class="ss-card">
+        <div class="ss-card-title">九星神煞速查</div>
+        <div class="ss-row"><span class="ss-ganzhi">一白贪狼：</span><span class="ss-names">中男　智慧　官禄　财源　吉星</span></div>
+        <div class="ss-row"><span class="ss-ganzhi">二黑巨门：</span><span class="ss-names">老母　病符　田产　脾胃　凶星</span></div>
+        <div class="ss-row"><span class="ss-ganzhi">三碧禄存：</span><span class="ss-names">长男　是非　官讼　震动　凶星</span></div>
+        <div class="ss-row"><span class="ss-ganzhi">四绿文曲：</span><span class="ss-names">长女　文昌　科名　风流　吉星</span></div>
+        <div class="ss-row"><span class="ss-ganzhi">五黄廉贞：</span><span class="ss-names">皇极　灾祸　瘟疫　意外　大凶</span></div>
+        <div class="ss-row"><span class="ss-ganzhi">六白武曲：</span><span class="ss-names">老父　权力　贵人　武职　吉星</span></div>
+        <div class="ss-row"><span class="ss-ganzhi">七赤破军：</span><span class="ss-names">少女　口舌　盗贼　破损　凶星</span></div>
+        <div class="ss-row"><span class="ss-ganzhi">八白左辅：</span><span class="ss-names">少男　田产　财富　稳定　吉星</span></div>
+        <div class="ss-row"><span class="ss-ganzhi">九紫右弼：</span><span class="ss-names">中女　喜庆　名誉　血光　吉星</span></div>
+      </div>
     </div>
   </div>
 
-  <!-- ===== 旺山旺向速查 ===== -->
-  <div class="interp-card">
-    <div class="card-title">九运旺山旺向速查</div>
-    <div class="card-body">
-      <p>旺山旺向之局，主丁财两旺，家宅安宁，事业顺遂。须配合峦头形势，方应验如神。</p>
-      <p style="margin-top:10px;">九运（2024-2043）旺山旺向：<span class="highlight">申山寅向、寅山申向、庚山甲向、甲山庚向</span></p>
-      <p style="margin-top:10px;">八运（2004-2023）旺山旺向：未山丑向、丑山未向、坤山艮向、艮山坤向</p>
-      <p>七运（1984-2003）旺山旺向：午山子向、子山午向、丁山癸向、癸山丁向</p>
+  <!-- ===== 九星组合象义（折叠）===== -->
+  <div class="collapse-card">
+    <input type="checkbox" id="cc6" class="cc-toggle">
+    <label class="collapse-title" for="cc6"><span>九星组合象义速查</span><span class="arrow">&#9654;</span></label>
+    <div class="collapse-body">
+      <div class="ss-card">
+        <div class="ss-card-title">九星组合象义速查</div>
+        <div class="ss-row"><span class="ss-ganzhi">一四组合：</span><span class="ss-names">文昌科名　利学业　吉</span></div>
+        <div class="ss-row"><span class="ss-ganzhi">二五组合：</span><span class="ss-names">病符黄煞　主疾病灾祸　大凶</span></div>
+        <div class="ss-row"><span class="ss-ganzhi">三七组合：</span><span class="ss-names">穿心煞　主盗贼是非　凶</span></div>
+        <div class="ss-row"><span class="ss-ganzhi">六八组合：</span><span class="ss-names">武曲生财　利权力财富　吉</span></div>
+        <div class="ss-row"><span class="ss-ganzhi">七九组合：</span><span class="ss-names">回禄之灾　主火灾血光　凶</span></div>
+        <div class="ss-row"><span class="ss-ganzhi">八九组合：</span><span class="ss-names">喜庆发财　利添丁置业　吉</span></div>
+        <div class="ss-row"><span class="ss-ganzhi">一六组合：</span><span class="ss-names">官星贵人　利仕途　吉</span></div>
+        <div class="ss-row"><span class="ss-ganzhi">四七组合：</span><span class="ss-names">破军文昌　主刑伤文书　凶</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 三元九运速查（折叠）===== -->
+  <div class="collapse-card">
+    <input type="checkbox" id="cc7" class="cc-toggle">
+    <label class="collapse-title" for="cc7"><span>三元九运速查</span><span class="arrow">&#9654;</span></label>
+    <div class="collapse-body">
+      <div class="interp-card">
+        <div class="card-title">三元九运速查</div>
+        <div class="card-body">
+          <p>三元者，上元、中元、下元也。每元三运，每运二十年，共九运、一百八十年，为一个正元周期。</p>
+          <p style="margin-top:10px;">上元：<span class="wx-water">一白（坎水）</span>1864-1883、<span class="wx-earth">二黑（坤土）</span>1884-1903、<span class="wx-wood">三碧（震木）</span>1904-1923</p>
+          <p>中元：<span class="wx-wood">四绿（巽木）</span>1924-1943、<span class="wx-earth">五黄（中土）</span>1944-1963、<span class="wx-metal">六白（乾金）</span>1964-1983</p>
+          <p>下元：<span class="wx-metal">七赤（兑金）</span>1984-2003、<span class="wx-earth">八白（艮土）</span>2004-2023、<span class="wx-fire">九紫（离火）</span>2024-2043</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 旺山旺向速查（折叠）===== -->
+  <div class="collapse-card">
+    <input type="checkbox" id="cc8" class="cc-toggle">
+    <label class="collapse-title" for="cc8"><span>九运旺山旺向速查</span><span class="arrow">&#9654;</span></label>
+    <div class="collapse-body">
+      <div class="interp-card">
+        <div class="card-title">九运旺山旺向速查</div>
+        <div class="card-body">
+          <p>旺山旺向之局，主丁财两旺，家宅安宁，事业顺遂。须配合峦头形势，方应验如神。</p>
+          <p style="margin-top:10px;">九运（2024-2043）旺山旺向：<span class="highlight">申山寅向、寅山申向、庚山甲向、甲山庚向</span></p>
+          <p style="margin-top:10px;">八运（2004-2023）旺山旺向：未山丑向、丑山未向、坤山艮向、艮山坤向</p>
+          <p>七运（1984-2003）旺山旺向：午山子向、子山午向、丁山癸向、癸山丁向</p>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -439,6 +508,12 @@ input,select,button,textarea{font-family:inherit;outline:none;border:none;backgr
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>
     </div>
     <div class="rb-text">分享</div>
+  </div>
+  <div class="rb-item ai" onclick="alert('AI解析功能开发中，敬请期待')">
+    <div class="rb-icon">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 013 3v1h1a3 3 0 013 3v1h1a2 2 0 010 4h-1v1a3 3 0 01-3 3h-1v1a3 3 0 01-6 0v-1H8a3 3 0 01-3-3v-1H4a2 2 0 010-4h1V9a3 3 0 013-3h1V5a3 3 0 013-3z"/><circle cx="9.5" cy="10.5" r="1" fill="currentColor"/><circle cx="14.5" cy="10.5" r="1" fill="currentColor"/></svg>
+    </div>
+    <div class="rb-text">AI解析</div>
   </div>
   <div class="rb-item" onclick="alert('请在排盘后保存笔记')">
     <div style="position:relative;">
@@ -460,6 +535,14 @@ input,select,button,textarea{font-family:inherit;outline:none;border:none;backgr
 <!-- 回到顶部 -->
 <div class="back-top" id="backTop" style="display:none;" onclick="window.scrollTo({top:0,behavior:'smooth'})">
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2.5"><path d="M18 15l-6-6-6 6"/></svg>
+</div>
+
+<!-- 底部全局导航（所有页面共用） -->
+<div class="bottom-nav">
+  <a class="ni" href="../index.html"><span class="nic">&#8962;</span><span>主页</span></a>
+  <a class="ni" href="../ai.html"><span class="nic">&#9733;</span><span>AI</span></a>
+  <a class="ni" href="../study.html"><span class="nic">&#128214;</span><span>学习</span></a>
+  <a class="ni" href="../profile.html"><span class="nic">&#128100;</span><span>个人中心</span></a>
 </div>
 
 <script src="xuankong-engine.js"></script>

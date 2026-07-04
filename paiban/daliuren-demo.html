@@ -10,13 +10,13 @@ html,body{width:100%;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",
 /* 页面基准宽度390px（手机标准宽度），居中显示 */
 body{max-width:390px;margin:0 auto;min-height:100vh;position:relative;padding-bottom:104px;background:#F5EDE6;}
 :root{
-  --white:#FFFFFF;--dark:#333333;--blue:#2368B2;
+  --white:#FFFFFF;--dark:#00BCB4;--blue:#00BCB4;--teal:#00BCB4;--teal-dark:#009B94;--teal-light:#E0F5F3;
   --main:#1A1A1A;--gray:#777777;--datebg:#EDE4D8;
-  --gblock:#9E9E9E;--gbar:#F0F0F0;
+  --gblock:#00BCB4;--gbar:#E0F5F3;
   --fire:#EA4335;--wood:#34A853;--water:#2368B2;
   --earth:#A67C52;--metal:#F1B232;
   --gold:#B5953D;--gold-light:#D4B86A;--gold-bg:#F5ECD7;
-  --bdr:#F0F0F0;
+  --bdr:#E8E8E8;
 }
 .c-fire{color:var(--fire);} .c-wood{color:var(--wood);}
 .c-water{color:var(--water);} .c-earth{color:var(--earth);}
@@ -28,23 +28,23 @@ body{max-width:390px;margin:0 auto;min-height:100vh;position:relative;padding-bo
 .ul-g{text-decoration:underline;text-decoration-color:var(--metal);text-underline-offset:4px;}
 .kbox{border:2px solid #1A1A1A;display:inline-block;line-height:1;padding:2px 4px;}
 
-/* ===== 头部 高50px（内页）/ 80px（首页）===== */
+/* ===== 头部 高50px（内页）/ 80px（首页）青绿色通栏 ===== */
 .app-header{
-  position:sticky;top:0;z-index:100;height:50px;background:var(--white);
+  position:sticky;top:0;z-index:100;height:50px;background:var(--teal);
   display:flex;align-items:center;justify-content:space-between;padding:0 12px;
   width:100%;
 }
 .app-header.home{height:80px;}
 .app-header .ht{
-  font-size:24px;font-weight:bold;color:var(--main);
+  font-size:24px;font-weight:bold;color:#fff;
   position:absolute;left:50%;transform:translateX(-50%);
 }
 .app-header.home .ht{font-size:32px;}
 .hb{
   width:44px;height:44px;display:flex;align-items:center;justify-content:center;
-  font-size:28px;color:var(--blue);background:none;border:none;cursor:pointer;line-height:1;padding:0;
+  font-size:28px;color:#fff;background:none;border:none;cursor:pointer;line-height:1;padding:0;
 }
-.hb-dark{color:var(--dark);}
+.hb-dark{color:#fff;}
 .hr{display:flex;gap:4px;align-items:center;}
 
 /* ===== 底部Tab栏 高44px ===== */
@@ -92,7 +92,7 @@ body{max-width:390px;margin:0 auto;min-height:100vh;position:relative;padding-bo
 /* ===== 日期栏 ===== */
 .dbar{
   background:var(--datebg);padding:0;width:100%;
-  display:flex;align-items:stretch;height:96px;
+  display:flex;align-items:stretch;height:80px;
 }
 .dbl{display:flex;flex-direction:column;flex-shrink:0;}
 .dbl span{
@@ -102,127 +102,69 @@ body{max-width:390px;margin:0 auto;min-height:100vh;position:relative;padding-bo
 }
 .dbg{display:flex;flex:1;min-width:0;}
 .dbc{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2px 0;min-width:0;}
-.dbc .tg{font-size:26px;font-weight:bold;line-height:1.1;}
-.dbc .dz{font-size:26px;font-weight:bold;line-height:1.1;}
-.dbc .dl{font-size:11px;color:var(--gray);line-height:1;margin-top:2px;}
+.dbc .tg{font-size:22px;font-weight:bold;line-height:1.1;}
+.dbc .dz{font-size:22px;font-weight:bold;line-height:1.1;}
+.dbc .dl{font-size:10px;color:var(--gray);line-height:1;margin-top:2px;}
 .dbi{text-align:right;font-size:11px;color:var(--gray);line-height:1.5;
   flex-shrink:0;padding:4px 8px 4px 4px;display:flex;flex-direction:column;justify-content:center;max-width:150px;}
 .dbi .d1{font-size:13px;color:var(--main);font-weight:500;line-height:1.4;}
 
 /* ===== 主盘面 ===== */
-.panel{background:var(--white);border-top:1px solid var(--bdr);width:100%;}
-.pmain{display:flex;flex-direction:column;width:100%;}
-/* 左栏满宽，单栏纵向布局 */
-.pl{width:100%;flex-shrink:0;border-right:none;border-bottom:1px solid var(--bdr);background:var(--white);}
-/* 右栏满宽 */
-.pr{width:100%;flex-shrink:0;background:var(--white);}
+/* 旧左栏纵向铺开布局已废弃，改为：panel-main(三传/四课/天地盘) + 折叠卡片(命身/神煞/自选) */
+/* .panel-main / .collapse-card / .info-grid / .ss-grid / .ke-card / .kb-card 见下方新增样式 */
 
-/* 左栏横条标题 */
-.lht{background:var(--gblock);color:#fff;font-size:16px;font-weight:bold;padding:6px 4px;text-align:center;width:100%;}
-.lsub{font-size:18px;padding:8px 4px;text-align:center;font-weight:bold;line-height:1.4;}
-
-/* 左栏行(竖排标签+内容) 统一高度38px */
-.lrow{display:flex;align-items:stretch;border-bottom:1px solid #E8E8E8;height:38px;width:100%;}
-.llab{
-  background:var(--gblock);color:#fff;font-size:14px;font-weight:bold;
-  writing-mode:vertical-rl;letter-spacing:2px;
-  width:48px;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
-  padding:4px 0;
-}
-.lval{flex:1;display:flex;align-items:center;justify-content:center;gap:0;position:relative;padding:2px 4px;min-width:0;}
-.lval .lc{font-size:24px;font-weight:bold;line-height:1.15;text-align:center;flex:1;}
-.lval .lc.kbox{padding:2px 4px;flex:none;}
-.lval .lr{position:absolute;right:6px;font-size:20px;font-weight:bold;}
-
-/* 本命/行年 2字并排 每行38px */
-.bmrow{display:flex;align-items:stretch;border-bottom:1px solid var(--bdr);height:38px;width:100%;}
-.bmlab{
-  background:var(--gblock);color:#fff;font-size:14px;font-weight:bold;
-  writing-mode:vertical-rl;letter-spacing:2px;
-  width:48px;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
-}
-.bmchars{display:flex;flex:1;}
-.bmchars span{
-  flex:1;text-align:center;font-size:24px;font-weight:bold;
-  border-right:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;
-  padding:4px 0;line-height:1.1;
-}
-.bmchars span:last-child{border-right:none;}
-
-/* 月将 */
-.yj{padding:6px 0 8px;text-align:center;border-bottom:1px solid var(--bdr);height:auto;}
-.yj .yjl{font-size:16px;font-weight:bold;}
-.yj .yjc{
-  font-size:44px;font-weight:bold;color:var(--fire);
-  text-decoration:underline;text-decoration-color:var(--fire);
-  text-underline-offset:6px;line-height:1.1;margin-left:6px;
-}
-
-/* 自选神煞 每行36px */
-.zxt{font-size:16px;font-weight:bold;text-align:center;padding:10px 4px 6px;}
-.zxlist{padding:0 0 8px;}
-.zxrow{display:flex;align-items:stretch;border-bottom:1px solid #E8E8E8;height:36px;}
-.zxname{
-  background:var(--gblock);color:#fff;font-size:14px;font-weight:bold;
-  writing-mode:vertical-rl;letter-spacing:2px;
-  width:48px;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
-}
-.zxc{flex:1;display:flex;align-items:center;padding-left:10px;font-size:24px;font-weight:bold;}
-
-/* ===== 三传 5列×3行 列比1:1.118:2.247:1.118:1，三行等高 ===== */
-.sc{display:grid;grid-template-columns:1fr 1.118fr 2.247fr 1.118fr 1fr;grid-auto-rows:1fr;border-bottom:1px solid var(--bdr);width:100%;}
+/* ===== 三传 4列×3行 紧凑(行高32px)：传名/六亲/地支(含旬遁干)/天将 ===== */
+.sc{display:grid;grid-template-columns:0.6fr 0.7fr 1.5fr 0.7fr;grid-auto-rows:32px;border-bottom:1px solid var(--bdr);width:100%;}
 .sc > div{
   border-right:1px solid var(--bdr);border-bottom:1px solid var(--bdr);
   display:flex;align-items:center;justify-content:center;background:#fff;min-height:0;
 }
-.sc > div:nth-child(5n){border-right:none;}
-.sc > div:nth-child(n+11){border-bottom:none;}
+.sc > div:nth-child(4n){border-right:none;}
+.sc > div:nth-child(n+9){border-bottom:none;}
 .sc .scl{
-  background:var(--gblock)!important;color:#fff;font-size:14px;font-weight:bold;
-  writing-mode:vertical-rl;letter-spacing:3px;padding:4px 0;
+  background:var(--gblock)!important;color:#fff;font-size:13px;font-weight:bold;
+  letter-spacing:1px;
 }
-.sc .sclq{font-size:18px;font-weight:500;line-height:1;}
-.sc .scg{font-size:22px;font-weight:bold;line-height:1.1;}
-.sc .scdz{font-size:32px;font-weight:bold;line-height:1;}
-.sc .sctj{font-size:16px;font-weight:bold;color:#C87820;}
+.sc .sclq{font-size:15px;font-weight:500;line-height:1;}
+.sc .scdz{display:flex;align-items:baseline;justify-content:center;gap:2px;padding:2px 4px;}
+.sc .scdz .scg{font-size:12px;font-weight:bold;line-height:1;}
+.sc .scdz .dz-main{font-size:20px;font-weight:bold;line-height:1;}
+.sc .sctj{font-size:14px;font-weight:bold;color:#C87820;}
 .sc .gray{background:var(--gbar)!important;}
 
-/* ===== 四课 4列×4行 每格均等，16格大小完全一致 ===== */
-.sk{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:1fr;border-bottom:1px solid var(--bdr);width:100%;}
+/* ===== 四课 5列×4行 紧凑(行高32px)：标签列 + 四课/三课/二课/一课（从右到左，一课在最右） ===== */
+.sk{display:grid;grid-template-columns:0.5fr repeat(4,1fr);grid-auto-rows:32px;border-bottom:1px solid var(--bdr);width:100%;}
 .sk > div{
   border-right:1px solid var(--bdr);border-bottom:1px solid var(--bdr);
   display:flex;align-items:center;justify-content:center;background:#fff;min-height:0;
 }
-.sk > div:nth-child(4n){border-right:none;}
-.sk > div:nth-child(n+13){border-bottom:none;}
-.sk .skh{background:var(--gblock)!important;color:#fff;font-size:14px;font-weight:bold;padding:4px 0;}
-.sk .sktj{font-size:16px;font-weight:bold;padding:4px 0;}
-.sk .skss{font-size:30px;font-weight:bold;line-height:1;padding:2px 0;}
-.sk .skxs{font-size:22px;font-weight:bold;line-height:1;padding:2px 0;}
+.sk > div:nth-child(5n){border-right:none;}
+.sk > div:nth-child(n+16){border-bottom:none;}
+.sk .skh{background:var(--gblock)!important;color:#fff;font-size:12px;font-weight:bold;}
+.sk .sktj{font-size:14px;font-weight:bold;}
+.sk .skss{font-size:20px;font-weight:bold;line-height:1;}
+.sk .skxs{font-size:16px;font-weight:bold;line-height:1;}
 
-/* ===== 天地盘 正方形 每格1/4宽 ===== */
+/* ===== 天地盘 正方形 每格1/4宽，每格清晰显示天将/天盘地支/地盘地支 ===== */
 .tpw{border-top:1px solid var(--white);width:100%;}
 .tp{display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(4,1fr);width:100%;aspect-ratio:1/1;}
 .tpc{
   border-right:1px solid var(--bdr);border-bottom:1px solid var(--bdr);
   background:#fff;display:flex;flex-direction:column;align-items:center;
-  position:relative;cursor:pointer;
+  position:relative;cursor:pointer;overflow:hidden;
 }
-.tp-top .ttj{font-size:13px;font-weight:bold;padding:3px 0 2px;text-align:center;width:100%;}
-.tp-side .ttj{width:100%;background:var(--gbar);text-align:center;padding:3px 0;font-size:13px;font-weight:bold;}
-.tdz{font-size:30px;font-weight:bold;line-height:1;margin:auto 0;padding:2px 0;}
-.tdp{position:absolute;right:3px;bottom:2px;font-size:12px;color:#444;line-height:1;font-weight:500;}
+.tp-top .ttj{font-size:13px;font-weight:bold;padding:3px 0 2px;text-align:center;width:100%;background:var(--teal-light);}
+.tp-side .ttj{width:100%;background:var(--teal-light);text-align:center;padding:3px 0;font-size:13px;font-weight:bold;}
+.tdz{font-size:28px;font-weight:bold;line-height:1;margin:auto 0 2px;padding:2px 0;}
+.tdp{width:100%;text-align:center;font-size:12px;color:#666;line-height:1;font-weight:500;padding:0 0 3px;}
 .tcen{
   grid-column:2/4;grid-row:2/4;
-  background:#fff;border-right:1px solid var(--bdr);border-bottom:1px solid var(--bdr);
+  background:var(--teal-light);border-right:1px solid var(--bdr);border-bottom:1px solid var(--bdr);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   padding:6px 4px;cursor:pointer;
 }
-.tcen .cday{font-size:18px;font-weight:bold;}
-.tcen .cke{font-size:16px;margin:4px 0;font-weight:500;}
+.tcen .cday{font-size:18px;font-weight:bold;color:var(--teal-dark);}
+.tcen .cke{font-size:16px;margin:4px 0;font-weight:500;color:var(--teal-dark);}
 .tcen .cfa{font-size:14px;color:#888;}
 .tphint{padding:10px 6px;text-align:center;background:#fff;width:100%;}
 .tphint .hr{color:var(--fire);font-size:14px;font-weight:500;margin-bottom:4px;}
@@ -272,7 +214,7 @@ body{max-width:390px;margin:0 auto;min-height:100vh;position:relative;padding-bo
 .pbar{background:var(--dark);color:#fff;height:44px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:bold;position:relative;}
 .pbar .ph{position:absolute;right:14px;font-size:24px;}
 .pbody{padding:10px;}
-.psec{background:#C8C8C8;color:#fff;font-size:17px;font-weight:bold;padding:6px 12px;margin:0 -10px 8px;}
+.psec{background:var(--teal-dark);color:#fff;font-size:17px;font-weight:bold;padding:6px 12px;margin:0 -10px 8px;}
 
 /* ===== 档案页 ===== */
 .dcard{margin:12px 10px;background:#fff;border-radius:12px;overflow:hidden;}
@@ -334,7 +276,7 @@ body{max-width:390px;margin:0 auto;min-height:100vh;position:relative;padding-bo
   overflow:hidden;border:1px solid #F0F0F0;
 }
 .kb-block .kb-title{
-  background:#333;color:#fff;font-size:18px;font-weight:bold;
+  background:var(--teal);color:#fff;font-size:18px;font-weight:bold;
   padding:10px 14px;text-align:center;
 }
 .kb-block .kb-body{
@@ -347,6 +289,73 @@ body{max-width:390px;margin:0 auto;min-height:100vh;position:relative;padding-bo
 .kb-block .kb-body .kb-source{
   font-size:13px;color:var(--gray);margin-top:4px;
 }
+
+/* ===== 主盘面紧凑容器（三传/四课/天地盘） ===== */
+.panel-main{background:var(--white);border-top:1px solid var(--bdr);width:100%;}
+
+/* ===== 折叠卡片（纯CSS：input checkbox + label，默认折叠） ===== */
+.collapse-card{
+  margin:10px 10px;background:#F8F8F8;border-radius:12px;
+  overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.06);
+}
+.cc-toggle{display:none;}
+.collapse-title{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 14px;background:var(--teal);color:#fff;
+  font-size:16px;font-weight:bold;cursor:pointer;
+}
+.collapse-title .arrow{
+  display:inline-block;transition:transform 0.25s ease;
+  font-size:12px;opacity:0.9;
+}
+.cc-toggle:checked + .collapse-title .arrow{transform:rotate(90deg);}
+.collapse-body{
+  max-height:0;overflow:hidden;padding:8px;background:#F8F8F8;
+  transition:max-height 0.3s ease;
+}
+.cc-toggle:checked + .collapse-title + .collapse-body{max-height:820px;}
+
+/* 命身信息 2列网格 */
+.info-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0;background:#fff;border-radius:8px;overflow:hidden;}
+.info-item{
+  display:flex;align-items:center;gap:6px;padding:9px 10px;
+  border-right:1px solid #F0F0F0;border-bottom:1px solid #F0F0F0;font-size:14px;
+}
+.info-item:nth-child(2n){border-right:none;}
+.info-item:nth-last-child(-n+2){border-bottom:none;}
+.info-lab{
+  background:var(--teal);color:#fff;font-size:12px;font-weight:bold;
+  padding:2px 6px;border-radius:4px;flex-shrink:0;
+}
+.info-val{display:flex;align-items:center;gap:2px;font-size:20px;font-weight:bold;}
+
+/* 神煞速查 3列网格 */
+.ss-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;background:#fff;border-radius:8px;overflow:hidden;}
+.ss-cell{
+  display:flex;align-items:center;justify-content:center;gap:4px;
+  padding:9px 4px;border-right:1px solid #F0F0F0;border-bottom:1px solid #F0F0F0;
+}
+.ss-cell:nth-child(3n){border-right:none;}
+.ss-cell:nth-last-child(-n+3){border-bottom:none;}
+.ss-name{color:var(--gray);font-size:12px;flex-shrink:0;}
+.ss-val{font-size:20px;font-weight:bold;display:flex;align-items:center;gap:1px;}
+
+/* 课体格局卡片 */
+.ke-card{margin:10px 10px;background:#F8F8F8;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
+.ke-title{background:var(--teal);color:#fff;font-size:16px;font-weight:bold;padding:12px 14px;}
+.ke-body{padding:10px 12px;background:#fff;}
+.ke-row{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid #F0F0F0;font-size:14px;line-height:1.6;}
+.ke-row:last-child{border-bottom:none;}
+.ke-lab{background:var(--teal);color:#fff;font-size:12px;font-weight:bold;padding:2px 8px;border-radius:4px;flex-shrink:0;margin-top:2px;}
+.ke-val{font-weight:bold;color:var(--teal-dark);font-size:15px;}
+.ke-text{flex:1;color:#333;}
+
+/* 知识库区块卡片（daliuren_standard_kb_v2.md 预留容器） */
+.kb-card{margin:10px 10px;background:#F8F8F8;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
+.kb-card .kb-card-title{background:var(--teal);color:#fff;font-size:16px;font-weight:bold;padding:12px 14px;}
+.kb-card .kb-card-body{padding:10px 14px;background:#fff;font-size:14px;line-height:1.8;color:#333;}
+.kb-card .kb-rule{margin-bottom:8px;padding-left:8px;border-left:3px solid var(--gold);}
+.kb-card .kb-source{font-size:12px;color:var(--gray);margin-top:4px;}
 </style>
 </head>
 <body>
@@ -417,85 +426,47 @@ body{max-width:390px;margin:0 auto;min-height:100vh;position:relative;padding-bo
     </div>
   </div>
 
-  <div class="panel">
-    <div class="pmain">
-      <!-- 左栏（满宽 单栏） -->
-      <div class="pl">
-        <div class="lht">求测人</div>
-        <div class="lsub">猴(1980) 男</div>
-
-        <div class="bmrow"><div class="bmlab">本命</div><div class="bmchars"><span class="c-metal">庚</span><span class="c-metal">申</span></div></div>
-        <div class="bmrow"><div class="bmlab">行年</div><div class="bmchars"><span class="c-water">壬</span><span class="c-water">子</span></div></div>
-
-        <div class="yj"><span class="yjl">月将</span><span class="yjc">未</span></div>
-
-        <div class="lrow"><div class="llab">日空</div><div class="lval"><span class="lc kbox c-earth">戌</span><span class="lc kbox c-water">亥</span></div></div>
-        <div class="lrow"><div class="llab">时空</div><div class="lval"><span class="lc c-water ul-b">子</span><span class="lc c-earth">丑</span></div></div>
-        <div class="lrow"><div class="llab">旬首</div><div class="lval"><span class="lc c-wood">甲</span><span class="lc c-water">子</span></div></div>
-        <div class="lrow"><div class="llab">旬尾</div><div class="lval"><span class="lc c-water">癸</span><span class="lc c-metal">酉</span></div></div>
-
-        <div class="lrow"><div class="llab">太岁</div><div class="lval"><span class="lc c-fire ul-r">午</span></div></div>
-        <div class="lrow"><div class="llab">月建</div><div class="lval"><span class="lc c-fire ul-r">午</span></div></div>
-        <div class="lrow"><div class="llab">日建</div><div class="lval"><span class="lc c-metal ul-g">酉</span></div></div>
-        <div class="lrow"><div class="llab">月破</div><div class="lval"><span class="lc c-water ul-b">子</span></div></div>
-        <div class="lrow"><div class="llab">日德</div><div class="lval"><span class="lc c-fire">巳</span></div></div>
-        <div class="lrow"><div class="llab">日禄</div><div class="lval"><span class="lc c-water">子</span></div></div>
-        <div class="lrow"><div class="llab">日马</div><div class="lval"><span class="lc c-water">亥</span></div></div>
-        <div class="lrow"><div class="llab">旬丁</div><div class="lval"><span class="lc c-fire">丁</span><span class="lr c-wood">卯</span></div></div>
-        <div class="lrow"><div class="llab">生气</div><div class="lval"><span class="lc c-earth">辰</span></div></div>
-        <div class="lrow"><div class="llab">桃花</div><div class="lval"><span class="lc c-fire">午</span></div></div>
-        <div class="lrow"><div class="llab">天喜</div><div class="lval"><span class="lc c-earth">丑</span></div></div>
-
-        <div class="zxt">自选神煞</div>
-        <div class="zxlist">
-          <div class="zxrow"><div class="zxname">天德</div><div class="zxc c-black">乾</div></div>
-          <div class="zxrow"><div class="zxname">月德</div><div class="zxc c-fire">丙</div></div>
-          <div class="zxrow"><div class="zxname">病符</div><div class="zxc c-fire">巳</div></div>
-          <div class="zxrow"><div class="zxname">死气</div><div class="zxc c-earth">戌</div></div>
-          <div class="zxrow"><div class="zxname">成神</div><div class="zxc c-fire">巳</div></div>
-        </div>
-      </div>
-
-      <!-- 右栏（满宽 单栏） -->
-      <div class="pr">
-        <!-- 三传 -->
+  <div class="panel-main">
+        <!-- 三传 4列×3行：传名/六亲/地支(含旬遁干)/天将 -->
         <div class="sc">
-          <div class="sclq">官</div>
-          <div class="scg c-metal">辛</div>
-          <div class="scdz c-earth">未</div>
-          <div class="sctj">常</div>
+          <!-- 初传 -->
           <div class="scl">初</div>
-
-          <div class="sclq gray">财</div>
-          <div class="scg c-earth gray">己</div>
-          <div class="scdz c-fire gray">巳</div>
-          <div class="sctj gray">阴</div>
+          <div class="sclq">官</div>
+          <div class="scdz"><span class="scg c-metal">辛</span><span class="dz-main c-earth">未</span></div>
+          <div class="sctj">常</div>
+          <!-- 中传 -->
           <div class="scl gray">中</div>
-
-          <div class="sclq">子</div>
-          <div class="scg c-fire">丁</div>
-          <div class="scdz c-wood">卯</div>
-          <div class="sctj">贵</div>
+          <div class="sclq gray">财</div>
+          <div class="scdz gray"><span class="scg c-earth">己</span><span class="dz-main c-fire">巳</span></div>
+          <div class="sctj gray">阴</div>
+          <!-- 末传 -->
           <div class="scl">末</div>
+          <div class="sclq">子</div>
+          <div class="scdz"><span class="scg c-fire">丁</span><span class="dz-main c-wood">卯</span></div>
+          <div class="sctj">贵</div>
         </div>
 
-        <!-- 四课 -->
+        <!-- 四课 5列×4行：标签 + 四课/三课/二课/一课（一课在最右） -->
         <div class="sk">
+          <div class="skh">&nbsp;</div>
           <div class="skh">四</div>
           <div class="skh">三</div>
           <div class="skh">二</div>
           <div class="skh">一</div>
 
+          <div class="skh">天将</div>
           <div class="sktj tj-orange">阴</div>
           <div class="sktj tj-orange">常</div>
           <div class="sktj tj-orange">空</div>
           <div class="sktj tj-blue">勾</div>
 
+          <div class="skh">上神</div>
           <div class="skss c-fire">巳</div>
           <div class="skss c-earth">未</div>
           <div class="skss c-metal">酉</div>
           <div class="skss c-water">亥</div>
 
+          <div class="skh">下神</div>
           <div class="skxs c-earth">未</div>
           <div class="skxs c-metal">酉</div>
           <div class="skxs c-water">亥</div>
@@ -582,14 +553,79 @@ body{max-width:390px;margin:0 auto;min-height:100vh;position:relative;padding-bo
           <div class="hg">贵人[甲戊庚牛羊(壬癸蛇兔)--自动]</div>
           <div class="hg">涉害[根据深度]</div>
         </div>
-        <div class="kb-block" style="margin:8px 0 0 0;border-radius:0;">
-          <div class="kb-body" style="font-size:14px;line-height:1.8;padding:10px 12px;">
-            <div class="kb-rule" style="border-left:3px solid var(--gold);padding-left:8px;margin-bottom:6px;">四课由日干寄宫与地盘日支上下相生克而成；阳神主现实外在，阴神主潜在未来。三传为课中动气，初传为事之始，中传为事之中，末传为事之终。</div>
-            <div class="kb-rule" style="border-left:3px solid var(--gold);padding-left:8px;margin-bottom:6px;">天盘为动盘主思想心理外在表现，地盘为静盘主身体实际状态内在根基。天地盘→四课→三传，能量层层递进，越往后越具体、越应验。</div>
-            <div class="kb-source" style="font-size:12px;color:var(--gray);">【典籍来源：刘文元《大六壬录象完整记录》】</div>
-          </div>
-        </div>
+  </div><!-- /panel-main -->
+
+  <!-- 折叠卡片A 命身信息（默认折叠，点击标题展开） -->
+  <div class="collapse-card">
+    <input type="checkbox" id="ca-toggle" class="cc-toggle">
+    <label class="collapse-title" for="ca-toggle"><span>命身信息</span><span class="arrow">&#9654;</span></label>
+    <div class="collapse-body">
+      <div class="info-grid">
+        <div class="info-item"><span class="info-lab">求测人</span><span class="info-val" style="font-size:15px;">猴(1980) 男</span></div>
+        <div class="info-item"><span class="info-lab">月将</span><span class="info-val"><span class="yj-val c-fire ul-r">未</span></span></div>
+        <div class="info-item"><span class="info-lab">本命</span><span class="info-val"><span class="c-metal">庚</span><span class="c-metal">申</span></span></div>
+        <div class="info-item"><span class="info-lab">行年</span><span class="info-val"><span class="c-water">壬</span><span class="c-water">子</span></span></div>
+        <div class="info-item"><span class="info-lab">日空</span><span class="info-val"><span class="kbox c-earth kw-day">戌</span><span class="kbox c-water kw-day">亥</span></span></div>
+        <div class="info-item"><span class="info-lab">时空</span><span class="info-val"><span class="c-water ul-b kw-hour">子</span><span class="c-earth kw-hour">丑</span></span></div>
       </div>
+    </div>
+  </div>
+
+  <!-- 折叠卡片B 神煞速查（3列网格紧凑排列） -->
+  <div class="collapse-card">
+    <input type="checkbox" id="cb-toggle" class="cc-toggle">
+    <label class="collapse-title" for="cb-toggle"><span>神煞速查</span><span class="arrow">&#9654;</span></label>
+    <div class="collapse-body">
+      <div class="ss-grid">
+        <div class="ss-cell"><span class="ss-name">太岁</span><span class="ss-val c-fire ul-r">午</span></div>
+        <div class="ss-cell"><span class="ss-name">月建</span><span class="ss-val c-fire ul-r">午</span></div>
+        <div class="ss-cell"><span class="ss-name">日建</span><span class="ss-val c-metal ul-g">酉</span></div>
+        <div class="ss-cell"><span class="ss-name">月破</span><span class="ss-val c-water ul-b">子</span></div>
+        <div class="ss-cell"><span class="ss-name">日德</span><span class="ss-val c-fire">巳</span></div>
+        <div class="ss-cell"><span class="ss-name">日禄</span><span class="ss-val c-water">子</span></div>
+        <div class="ss-cell"><span class="ss-name">日马</span><span class="ss-val c-water">亥</span></div>
+        <div class="ss-cell"><span class="ss-name">旬首</span><span class="ss-val"><span class="c-wood">甲</span><span class="c-water">子</span></span></div>
+        <div class="ss-cell"><span class="ss-name">旬尾</span><span class="ss-val"><span class="c-water">癸</span><span class="c-metal">酉</span></span></div>
+        <div class="ss-cell"><span class="ss-name">旬丁</span><span class="ss-val"><span class="c-fire">丁</span><span class="c-wood">卯</span></span></div>
+        <div class="ss-cell"><span class="ss-name">生气</span><span class="ss-val c-earth">辰</span></div>
+        <div class="ss-cell"><span class="ss-name">桃花</span><span class="ss-val c-fire">午</span></div>
+        <div class="ss-cell"><span class="ss-name">天喜</span><span class="ss-val c-earth">丑</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 折叠卡片C 自选神煞（3列网格） -->
+  <div class="collapse-card">
+    <input type="checkbox" id="cc-toggle" class="cc-toggle">
+    <label class="collapse-title" for="cc-toggle"><span>自选神煞</span><span class="arrow">&#9654;</span></label>
+    <div class="collapse-body">
+      <div class="ss-grid">
+        <div class="ss-cell"><span class="ss-name">天德</span><span class="ss-val c-black">乾</span></div>
+        <div class="ss-cell"><span class="ss-name">月德</span><span class="ss-val c-fire">丙</span></div>
+        <div class="ss-cell"><span class="ss-name">病符</span><span class="ss-val c-fire">巳</span></div>
+        <div class="ss-cell"><span class="ss-name">死气</span><span class="ss-val c-earth">戌</span></div>
+        <div class="ss-cell"><span class="ss-name">成神</span><span class="ss-val c-fire">巳</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 课体格局卡片：课体名 + 格局判断 + 断语 -->
+  <div class="ke-card">
+    <div class="ke-title">课体格局</div>
+    <div class="ke-body">
+      <div class="ke-row"><span class="ke-lab">课体</span><span class="ke-val">遥克课 · 蒿矢</span></div>
+      <div class="ke-row"><span class="ke-lab">判断</span><span class="ke-text">四课无上下克贼，天盘克日干者发用，主事情虽微而有来克，如箭之有镞，虽小可伤。遥克力弱，所问之事多需借助外力、贵人、媒介方能成就。</span></div>
+      <div class="ke-row"><span class="ke-lab">断语</span><span class="ke-text">三传未(官鬼)→巳(妻财)→卯(子孙)。初传官鬼发用主事起于压力或官方；中传财爻为过程；末传子孙为归计，有解忧制鬼之象。</span></div>
+    </div>
+  </div>
+
+  <!-- 知识库区块（daliuren_standard_kb_v2.md 预留容器） -->
+  <div class="kb-card" id="kbContainer">
+    <div class="kb-card-title">大六壬知识库</div>
+    <div class="kb-card-body">
+      <div class="kb-rule">四课由日干寄宫与地盘日支上下相生克而成；阳神主现实外在，阴神主潜在未来。三传为课中动气，初传为事之始，中传为事之中，末传为事之终。</div>
+      <div class="kb-rule">天盘为动盘主思想心理外在表现，地盘为静盘主身体实际状态内在根基。天地盘→四课→三传，能量层层递进，越往后越具体、越应验。</div>
+      <div class="kb-source">【典籍来源：刘文元《大六壬录象完整记录》】</div>
     </div>
   </div>
 </div>
@@ -770,9 +806,9 @@ body{max-width:390px;margin:0 auto;min-height:100vh;position:relative;padding-bo
 </div>
 <!-- 底部导航 -->
 <div class="bottom-nav">
-  <div class="ni on"><span class="nic">&#8962;</span><span>首页</span></div>
+  <div class="ni on"><span class="nic">&#8962;</span><span>主页</span></div>
   <div class="ni"><span class="nic">&#9733;</span><span>AI</span></div>
-  <div class="ni"><span class="nic">&#9993;</span><span>信息</span></div>
+  <div class="ni"><span class="nic">&#128214;</span><span>学习</span></div>
   <div class="ni"><span class="nic">&#9786;</span><span>个人中心</span></div>
 </div>
 <!-- 弹窗 -->

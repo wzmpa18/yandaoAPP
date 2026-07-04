@@ -20,7 +20,7 @@ function initInputs(){
   if(timeRow){
     var now = new Date();
     var html = '<select id="lyYear" style="font-size:18px;border:none;background:none;">';
-    for(var y = 1940; y <= 2030; y++){
+    for(var y = 1900; y <= 2100; y++){
       html += '<option value="' + y + '"' + (y === now.getFullYear() ? ' selected' : '') + '>' + y + '年</option>';
     }
     html += '</select> <select id="lyMonth" style="font-size:18px;border:none;background:none;">';

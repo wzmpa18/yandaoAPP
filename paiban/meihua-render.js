@@ -26,7 +26,7 @@ function initInputs(){
   if(!ys) return;
 
   var now = new Date();
-  for(var y = 1940; y <= 2030; y++) ys.add(new Option(y + '年', y));
+  for(var y = 1900; y <= 2100; y++) ys.add(new Option(y + '年', y));
   for(var m = 1; m <= 12; m++) ms.add(new Option(pad(m) + '月', m));
   for(var d = 1; d <= 31; d++) ds.add(new Option(pad(d) + '日', d));
   for(var h = 0; h <= 23; h++){
@@ -256,7 +256,7 @@ function renderGuaText(r){
       h += '<p>' + y + '</p>';
     }
   }
-  h += '<div class="gold-hint">断语仅供参考，吉凶论断请根据具体所测之人事而定。</div>';
+  // gold-hint 已在 HTML 中静态保留，此处不再重复注入
   box.innerHTML = h;
 }
 
@@ -269,40 +269,42 @@ function formatGuaCi(gc){
   return '<strong>' + head + '</strong>' + body;
 }
 
-// ============ 渲染：综合断语 ============
+// ============ 渲染：综合断语（填充折叠卡片体，保留卡片结构） ============
 function renderDuanyu(r){
-  var box = document.getElementById('duanyuCard');
-  if(!box) return;
   var ty = r.tiYong;
   var g = r.benGua;
   var tiGua = ty.tiGua, yongGua = ty.yongGua;
   var relDesc = ty.desc;
 
-  var h = '';
-  // 总断
-  h += '<div class="duanyu-section">';
-  h += '<div class="dy-body">' + g.short + '：' + guaMeaning(g.short) + '。' +
-       '本卦体用关系为「体' + tiGua.name + '(' + tiGua.wx + ')，用' + yongGua.name + '(' + yongGua.wx + ')」，' +
-       relDesc + '。</div>';
-  h += '</div>';
+  // 总断（断语卡片，首屏可见）
+  var mainEl = document.getElementById('mhDuanyuMain');
+  if(mainEl){
+    mainEl.innerHTML = g.short + '：' + guaMeaning(g.short) + '。' +
+      '本卦体用关系为「体' + tiGua.name + '(' + tiGua.wx + ')，用' + yongGua.name + '(' + yongGua.wx + ')」，' +
+      relDesc + '。';
+  }
 
-  // 分类断语
-  h += duanyuSection('事业',事业Text(ty, r));
-  h += duanyuSection('财运', 财运Text(ty, r));
-  h += duanyuSection('感情', 感情Text(ty, r));
-  h += duanyuSection('出行', 出行Text(ty, r));
+  // 综合象断·分类断语（折叠卡片内）
+  var fenleiEl = document.getElementById('mhDuanyuFenlei');
+  if(fenleiEl){
+    fenleiEl.innerHTML =
+      duanyuSection('事业', 事业Text(ty, r)) +
+      duanyuSection('财运', 财运Text(ty, r)) +
+      duanyuSection('感情', 感情Text(ty, r)) +
+      duanyuSection('出行', 出行Text(ty, r));
+  }
 
-  // 知识库提示
-  h += '<div class="kb-placeholder" style="color:var(--dark);text-align:left;border:1px solid #E8E8E8;background:#FDFDF8;">';
-  h += '<div style="font-size:20px;font-weight:bold;color:var(--wood);margin-bottom:12px;">[知识库] 体用生克总诀</div>';
-  h += '<div style="font-size:18px;line-height:2;color:var(--dark);">';
-  h += '<p><strong>体用生克口诀：</strong>体克用，事吉；用克体，事凶。体生用，有耗失之患；用生体，有进益之喜。体用比和，百事顺遂。</p>';
-  h += '<p><strong>体用旺衰救应：</strong>体卦临时令以旺论，即使用卦旺相来克体，只要互卦和变卦有相生相比助之卦，皆克不死，谓之还有生气。</p>';
-  h += '</div>';
-  h += '<div style="font-size:16px;color:var(--gray);margin-top:12px;text-align:right;">-- 来源：meihualiuyao_standard_kb_v2.md 卷三/卷五</div>';
-  h += '</div>';
-
-  box.innerHTML = h;
+  // 体用生克知识库（折叠卡片内，短版，无来源行避免与静态重复）
+  var kbEl = document.getElementById('mhDuanyuKb');
+  if(kbEl){
+    var kh = '';
+    kh += '<div style="font-size:20px;font-weight:bold;color:var(--wood);margin-bottom:12px;">[知识库] 体用生克总诀</div>';
+    kh += '<div style="font-size:18px;line-height:2;color:var(--dark);">';
+    kh += '<p><strong>体用生克口诀：</strong>体克用，事吉；用克体，事凶。体生用，有耗失之患；用生体，有进益之喜。体用比和，百事顺遂。</p>';
+    kh += '<p><strong>体用旺衰救应：</strong>体卦临时令以旺论，即使用卦旺相来克体，只要互卦和变卦有相生相比助之卦，皆克不死，谓之还有生气。</p>';
+    kh += '</div>';
+    kbEl.innerHTML = kh;
+  }
 }
 
 function duanyuSection(title, body){

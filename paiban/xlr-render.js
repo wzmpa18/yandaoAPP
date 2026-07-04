@@ -55,7 +55,7 @@ function initInputs(){
     
     timeRow.innerHTML = '<div class="form-label">排盘时间</div>' +
       '<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">' +
-      '<select id="xlr-year" style="font-size:16px;padding:6px 8px;border:1px solid var(--lightgray);border-radius:6px;background:#fff;">' + yearOptions(1940, 2030, y) + '</select>年' +
+      '<select id="xlr-year" style="font-size:16px;padding:6px 8px;border:1px solid var(--lightgray);border-radius:6px;background:#fff;">' + yearOptions(1900, 2100, y) + '</select>年' +
       '<select id="xlr-month" style="font-size:16px;padding:6px 8px;border:1px solid var(--lightgray);border-radius:6px;background:#fff;">' + numOptions(1, 12, m) + '</select>月' +
       '<select id="xlr-day" style="font-size:16px;padding:6px 8px;border:1px solid var(--lightgray);border-radius:6px;background:#fff;">' + numOptions(1, 31, d) + '</select>日' +
       '<select id="xlr-hour" style="font-size:16px;padding:6px 8px;border:1px solid var(--lightgray);border-radius:6px;background:#fff;">' + hourOptions(hourZhi) + '</select>时' +

@@ -38,7 +38,7 @@ function initInputs(){
   if(timeText){
     var now = new Date();
     var html = '<select id="dlrYear" style="font-size:18px;border:none;background:none;">';
-    for(var y = 1940; y <= 2030; y++){
+    for(var y = 1900; y <= 2100; y++){
       html += '<option value="' + y + '"' + (y === now.getFullYear() ? ' selected' : '') + '>' + y + '年</option>';
     }
     html += '</select> <select id="dlrMonth" style="font-size:18px;border:none;background:none;">';
@@ -94,91 +94,131 @@ function doPaipan(){
   renderSanChuan(result);
 }
 
+// 天地盘宫位HTML顺序对应的DZ索引（地盘地支顺序）
+// HTML布局：卯辰巳午(顶行) / 寅·未(左右中上) / 丑·申(左右中下) / 子亥戌酉(底行)
+var TPC_DZ_ORDER = [3, 4, 5, 6, 2, 7, 1, 8, 0, 11, 10, 9];
+
+// 天将单字简称（螣蛇取"蛇"）
+function tjShort(tj){
+  if(!tj) return '';
+  if(tj === '螣蛇') return '蛇';
+  return tj.substring(0, 1);
+}
+
 function renderInfo(result, year, month, day, hour){
   var sz = result.sizhu;
-  // 更新基础信息
-  var infoRows = document.querySelectorAll('.info-card .info-val, .info-card .drow .ddv');
-  
-  // 更新日期
-  var dateVal = document.querySelector('.info-card .info-val');
-  if(dateVal){
-    dateVal.textContent = year + '年' + String(month).padStart(2,'0') + '月' + String(day).padStart(2,'0') + '日 ' + String(hour).padStart(2,'0') + '时';
+
+  // 更新日期栏四柱
+  var dbcCells = document.querySelectorAll('.dbar .dbc');
+  var pillars = [
+    {g: sz.yearGan, z: sz.yearZhi},
+    {g: sz.monthGan, z: sz.monthZhi},
+    {g: sz.dayGan, z: sz.dayZhi},
+    {g: sz.hourGan, z: sz.hourZhi}
+  ];
+  for(var i = 0; i < dbcCells.length && i < 4; i++){
+    var tgEl = dbcCells[i].querySelector('.tg');
+    var dzEl = dbcCells[i].querySelector('.dz');
+    if(tgEl) tgEl.textContent = pillars[i].g;
+    if(dzEl) dzEl.textContent = pillars[i].z;
   }
 
-  // 更新四柱
-  var info4col = document.querySelector('.info-card .info-4col');
-  if(info4col){
-    info4col.innerHTML =
-      '<div class="col">' + sz.yearGan + sz.yearZhi + '年</div>' +
-      '<div class="col">' + sz.monthGan + sz.monthZhi + '月</div>' +
-      '<div class="col">' + sz.dayGan + sz.dayZhi + '日</div>' +
-      '<div class="col">' + sz.hourGan + sz.hourZhi + '时</div>';
+  // 更新日期时间文本
+  var d1El = document.querySelector('.dbar .dbi .d1');
+  var hh = String(hour).padStart(2,'0');
+  if(d1El){
+    d1El.textContent = year + '-' + String(month).padStart(2,'0') + '-' + String(day).padStart(2,'0') + ' ' + hh + ':00';
   }
 
-  // 更新空亡
-  var kwRow = document.querySelectorAll('.info-card .info-4col')[1];
-  if(kwRow){
-    kwRow.innerHTML =
-      '<div class="col">' + sz.kongwang[0] + '</div>' +
-      '<div class="col">' + sz.kongwang[0] + '</div>' +
-      '<div class="col">' + sz.kongwang[1] + '</div>' +
-      '<div class="col">' + sz.kongwang[1] + '</div>';
+  // 更新月将（命身信息折叠卡片内）
+  var yjcEl = document.querySelector('.yj-val');
+  if(yjcEl) yjcEl.textContent = result.yueJiang;
+
+  // 更新空亡（日空、时空，命身信息折叠卡片内）
+  var kw = result.kongwang;
+  var dayKwSpans = document.querySelectorAll('.kw-day');
+  var hourKwSpans = document.querySelectorAll('.kw-hour');
+  if(dayKwSpans.length >= 2){
+    if(dayKwSpans[0]) dayKwSpans[0].textContent = kw[0];
+    if(dayKwSpans[1]) dayKwSpans[1].textContent = kw[1];
+  }
+  if(hourKwSpans.length >= 2){
+    if(hourKwSpans[0]) hourKwSpans[0].textContent = kw[0];
+    if(hourKwSpans[1]) hourKwSpans[1].textContent = kw[1];
   }
 
-  // 更新月将
-  var yjRow = document.querySelector('.info-card .info-row .info-val');
-  var infoVals = document.querySelectorAll('.info-card .info-val');
-  for(var i = 0; i < infoVals.length; i++){
-    if(infoVals[i].textContent.indexOf('月将') >= 0 || infoVals[i].textContent.indexOf('将') >= 0){
-      infoVals[i].textContent = '月将：' + result.yueJiang;
+  // 更新档案页日期时间
+  var ddvCells = document.querySelectorAll('.dinfo .drow .ddv');
+  for(var j = 0; j < ddvCells.length; j++){
+    if(ddvCells[j].textContent.indexOf('20') >= 0){
+      ddvCells[j].textContent = year + '-' + String(month).padStart(2,'0') + '-' + String(day).padStart(2,'0') + ' ' + hh + ':00';
+      break;
     }
   }
 }
 
 function renderTianPan(result){
-  // 更新天盘12宫位
   var tianPan = result.tianPan;
   var tianJiang = result.tianJiang;
   var tpcCells = document.querySelectorAll('.tpc');
-  
+
   for(var i = 0; i < tpcCells.length && i < 12; i++){
-    var dz = E.DZ[i]; // 地盘第i宫地支
-    var tp = tianPan[i]; // 天盘第i宫地支
-    var tj = tianJiang[dz] || ''; // 天将
-    
+    var dzIdx = TPC_DZ_ORDER[i];
+    var dz = E.DZ[dzIdx];         // 地盘地支
+    var tp = tianPan[dzIdx];       // 天盘地支
+    var tj = tianJiang[dz] || '';  // 天将
+
     // 更新天盘地支
     var tdzEl = tpcCells[i].querySelector('.tdz');
     if(tdzEl) tdzEl.textContent = tp;
-    
+
     // 更新天将
     var ttjEl = tpcCells[i].querySelector('.ttj');
     if(ttjEl && tj){
-      ttjEl.textContent = tj.substring(0, 1);
+      ttjEl.textContent = tjShort(tj);
     }
+
+    // 更新地盘地支
+    var tdpEl = tpcCells[i].querySelector('.tdp');
+    if(tdpEl) tdpEl.textContent = dz;
   }
 }
 
 function renderSiKe(result){
   var siKe = result.siKe;
-  // 更新四课显示
-  var keCells = document.querySelectorAll('.ke-cell, .sk-row');
-  for(var i = 0; i < siKe.length; i++){
-    if(keCells[i]){
-      var top = keCells[i].querySelector('.ke-top') || keCells[i].children[0];
-      var bot = keCells[i].querySelector('.ke-bottom') || keCells[i].children[1];
-      if(top) top.textContent = siKe[i].top;
-      if(bot) bot.textContent = siKe[i].bottom;
+  var tianJiang = result.tianJiang;
+
+  // 四课HTML从左到右排列：四课/三课/二课/一课（一课在最右）
+  // 引擎数据：siKe[0]=第一课, siKe[1]=第二课, siKe[2]=第三课, siKe[3]=第四课
+  // HTML第i列(0-based)对应 siKe[3-i]
+  var ssCells = document.querySelectorAll('.sk .skss');  // 上神
+  var xsCells = document.querySelectorAll('.sk .skxs');  // 下神
+  var tjCells = document.querySelectorAll('.sk .sktj');   // 天将
+
+  for(var i = 0; i < 4; i++){
+    var ke = siKe[3 - i];
+    if(ssCells[i]) ssCells[i].textContent = ke.top;
+    if(xsCells[i]) xsCells[i].textContent = ke.bottom;
+    if(tjCells[i] && tianJiang[ke.top]){
+      tjCells[i].textContent = tjShort(tianJiang[ke.top]);
     }
   }
 }
 
 function renderSanChuan(result){
   var sc = result.sanChuan;
-  var scCells = document.querySelectorAll('.sc-cell, .chuanchuan');
-  if(scCells.length >= 3){
-    if(scCells[0]) scCells[0].textContent = sc.chuanchuan;
-    if(scCells[1]) scCells[1].textContent = sc.zhongchuan;
-    if(scCells[2]) scCells[2].textContent = sc.mochuan;
+  var tianJiang = result.tianJiang;
+
+  // 三传HTML：3行，每行 .scdz(地支含旬遁干) + .sctj(天将)
+  var dzCells = document.querySelectorAll('.sc .scdz .dz-main');
+  var tjCells = document.querySelectorAll('.sc .sctj');
+
+  var chuans = [sc.chuanchuan, sc.zhongchuan, sc.mochuan];
+  for(var i = 0; i < 3; i++){
+    if(dzCells[i]) dzCells[i].textContent = chuans[i];
+    if(tjCells[i] && tianJiang[chuans[i]]){
+      tjCells[i].textContent = tjShort(tianJiang[chuans[i]]);
+    }
   }
 }
 

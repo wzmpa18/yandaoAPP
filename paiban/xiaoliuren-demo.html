@@ -3,7 +3,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=960,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <title>热卜小六壬</title>
 <style>
 :root{
@@ -16,8 +16,8 @@
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{width:100%;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;color:var(--dark);background:var(--bg);overflow-x:hidden;}
-body{max-width:390px;margin:0 auto;min-height:100vh;position:relative;}
-body.has-result{padding-bottom:60px;}
+body{max-width:390px;margin:0 auto;min-height:100vh;position:relative;padding-bottom:60px;}
+body.has-result{padding-bottom:120px;}
 a{text-decoration:none;color:inherit;}
 input,select,button,textarea{font-family:inherit;outline:none;border:none;background:none;}
 
@@ -130,7 +130,7 @@ input,select,button,textarea{font-family:inherit;outline:none;border:none;backgr
 .duanyu-content{color:var(--dark);font-size:22px;display:inline;line-height:1.6;}
 
 /* ===== 结果页底部操作栏（5个按钮）===== */
-.res-bar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:390px;height:60px;background:#fff;display:flex;align-items:center;border-top:1px solid var(--lightgray);z-index:100;}
+.res-bar{position:fixed;bottom:60px;left:50%;transform:translateX(-50%);width:100%;max-width:390px;height:60px;background:#fff;display:flex;align-items:center;border-top:1px solid var(--lightgray);z-index:99;}
 .rb-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;height:100%;position:relative;}
 .rb-icon{font-size:26px;line-height:1;color:#333;}
 .rb-text{font-size:13px;color:#333;}
@@ -203,6 +203,12 @@ input,select,button,textarea{font-family:inherit;outline:none;border:none;backgr
 /* 区段标题 */
 .section-title{font-size:22px;font-weight:600;color:var(--dark);padding:16px 20px 4px;background:#fff;display:flex;align-items:center;gap:8px;}
 .section-title .st-icon{font-size:24px;}
+
+/* ===== 底部全局导航 + 回到顶部 ===== */
+.bottom-nav .bn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px;color:#666;text-decoration:none;}
+.bottom-nav .bn-item span:first-child{font-size:20px;}
+#backTop{position:fixed;bottom:130px;left:50%;transform:translateX(-150px);width:44px;height:44px;border-radius:50%;background:#fff;border:1px solid var(--teal);display:none;align-items:center;justify-content:center;z-index:98;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.15);font-size:22px;color:var(--teal);}
+#backTop.show{display:flex;}
 </style>
 </head>
 <body>
@@ -774,6 +780,17 @@ input,select,button,textarea{font-family:inherit;outline:none;border:none;backgr
   </div>
 </div>
 
+<!-- 底部全局导航 -->
+<div class="bottom-nav" style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:390px;height:60px;background:#fff;display:flex;border-top:1px solid var(--lightgray);z-index:100;">
+  <a class="bn-item" href="../index.html"><span>🏠</span><span>主页</span></a>
+  <a class="bn-item" href="../ai.html"><span>🤖</span><span>AI</span></a>
+  <a class="bn-item" href="../study.html"><span>📖</span><span>学习</span></a>
+  <a class="bn-item" href="../profile.html"><span>👤</span><span>个人中心</span></a>
+</div>
+
+<!-- 回到顶部 -->
+<div id="backTop" title="回到顶部">↑</div>
+
 <script src="xlr-engine.js"></script>
 <script src="xlr-render.js"></script>
 <script>
@@ -932,6 +949,16 @@ function closeGongPopup(e){
       cells[i].addEventListener('click',function(){openGongPopup(key);});
     })(gongKeys[i]);
   }
+})();
+
+/* 回到顶部 */
+(function(){
+  var bt=document.getElementById('backTop');
+  if(!bt)return;
+  window.addEventListener('scroll',function(){
+    if(window.scrollY>300){bt.classList.add('show');}else{bt.classList.remove('show');}
+  });
+  bt.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
 })();
 </script>
 

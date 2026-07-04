@@ -414,6 +414,25 @@ ul,ol{list-style:none;}
   display:flex;align-items:center;justify-content:center;gap:8px;
 }
 .scroll-hint::before,.scroll-hint::after{content:'';flex:1;height:1px;background:#E8D5C4;max-width:120px;}
+
+/* ===== 折叠卡片（纯CSS，点击标题展开/收起，默认收起） ===== */
+.collapse-card{
+  position:relative;margin:0 14px 14px;background:#fff;border-radius:12px;overflow:hidden;
+  box-shadow:0 1px 4px rgba(0,0,0,.08);
+}
+.cc-toggle{position:absolute;top:0;left:0;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;opacity:0;}
+.collapse-title{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 16px;font-size:20px;font-weight:bold;color:#fff;line-height:1.3;
+  background:var(--teal);cursor:pointer;-webkit-tap-highlight-color:transparent;
+}
+.collapse-title .ct-text{flex:1;}
+.collapse-title .arrow{font-size:18px;transition:transform .3s;display:inline-block;margin-left:8px;}
+.collapse-body{max-height:0;overflow:hidden;transition:max-height .35s ease;padding:0 16px;}
+.cc-toggle:checked + .collapse-title + .collapse-body{max-height:4000px;padding:14px 16px;}
+.cc-toggle:checked + .collapse-title .arrow{transform:rotate(90deg);}
+.collapse-body-inner{font-size:18px;line-height:2;color:var(--dark);}
+.kb-box{border:1px solid #E8E8E8;background:#FDFDF8;border-radius:8px;padding:14px;}
 </style>
 </head>
 <body>
@@ -842,22 +861,33 @@ ul,ol{list-style:none;}
       <p><strong>六五：</strong>悔亡，厥宗噬肤，往何咎。</p>
       <p><strong>上九：</strong>睽孤，见豕负涂，载鬼一车，先张之弧，后说之弧，匪寇婚媾，往遇雨则吉。</p>
     </div>
-    <div class="kb-placeholder" style="color:var(--dark);text-align:left;border:1px solid #E8E8E8;background:#FDFDF8;">
-      <div style="font-size:20px;font-weight:bold;color:var(--wood);margin-bottom:12px;">[知识库] 火泽睽卦象意</div>
-      <div style="font-size:18px;line-height:2;color:var(--dark);">
-        <p><strong>卦象：</strong>上离下兑。离为火、为目、为中女；兑为泽、为口、为少女。火在上而泽在下，火炎上而泽润下，二体相违，乖离之象。</p>
-        <p><strong>主要象意：</strong>哑巴吃黄连有苦说不出、大眼瞪小眼、无房户、没文化、没文凭、戴眼镜、心肌缺血、牙痛、牙周炎、盲人、缺心眼、辛辣嘴苦、白眼狼、没礼貌、不讲理、文化部、宣传部、广播电台、心理医生、小心眼。</p>
-        <p><strong>体用关系：</strong>离为体事易成，兑为体难成。离火克兑金，若离为体则克用为吉，若兑为体则用克体为凶。</p>
-        <p style="margin-top:6px;color:var(--fire);"><strong>病象：</strong>腰疾、头痛、烧伤、惊吓症、外伤、口腔症、呼吸道炎症、血压病、暗破相。</p>
+  </div>
+
+  <!-- 卦象意知识库详解（折叠，默认收起） -->
+  <div class="collapse-card">
+    <input type="checkbox" id="ly-guayi-toggle" class="cc-toggle">
+    <label class="collapse-title" for="ly-guayi-toggle">
+      <span class="ct-text">卦象意详解（火泽睽 / 山泽损）</span>
+      <span class="arrow">▶</span>
+    </label>
+    <div class="collapse-body">
+      <div class="kb-box">
+        <div style="font-size:20px;font-weight:bold;color:var(--wood);margin-bottom:12px;">[知识库] 火泽睽卦象意</div>
+        <div style="font-size:18px;line-height:2;color:var(--dark);">
+          <p><strong>卦象：</strong>上离下兑。离为火、为目、为中女；兑为泽、为口、为少女。火在上而泽在下，火炎上而泽润下，二体相违，乖离之象。</p>
+          <p><strong>主要象意：</strong>哑巴吃黄连有苦说不出、大眼瞪小眼、无房户、没文化、没文凭、戴眼镜、心肌缺血、牙痛、牙周炎、盲人、缺心眼、辛辣嘴苦、白眼狼、没礼貌、不讲理、文化部、宣传部、广播电台、心理医生、小心眼。</p>
+          <p><strong>体用关系：</strong>离为体事易成，兑为体难成。离火克兑金，若离为体则克用为吉，若兑为体则用克体为凶。</p>
+          <p style="margin-top:6px;color:var(--fire);"><strong>病象：</strong>腰疾、头痛、烧伤、惊吓症、外伤、口腔症、呼吸道炎症、血压病、暗破相。</p>
+        </div>
+        <div style="font-size:20px;font-weight:bold;color:var(--wood);margin:16px 0 12px;">[知识库] 山泽损卦象意</div>
+        <div style="font-size:18px;line-height:2;color:var(--dark);">
+          <p><strong>卦象：</strong>上艮下兑。艮为山、为手、为少男；兑为泽、为口、为少女。山下有泽，损下益上之象。</p>
+          <p><strong>主要象意：</strong>损失、投资、破产、剧院、歌厅、色情场所、少年合唱队、幼儿园、儿童游乐场、庙中许愿、矿山、房屋介绍所、中小学校、广播电台、鸡舍、拍卖行、山葱野蒜。</p>
+          <p><strong>体用关系：</strong>兑为体事易成，艮为体难成或花钱可成。艮土生兑金，若兑为体则用生体为吉，若艮为体则体生用为耗。</p>
+          <p style="margin-top:6px;color:var(--fire);"><strong>病象：</strong>内破相、腿脚伤残、脾胃之疾、关节痛、神经痛、津液不足。</p>
+        </div>
+        <div style="font-size:16px;color:var(--gray);margin-top:12px;text-align:right;">-- 来源：meihualiuyao_standard_kb_v2.md 卷四 4.2 六十四卦象意</div>
       </div>
-      <div style="font-size:20px;font-weight:bold;color:var(--wood);margin:16px 0 12px;">[知识库] 山泽损卦象意</div>
-      <div style="font-size:18px;line-height:2;color:var(--dark);">
-        <p><strong>卦象：</strong>上艮下兑。艮为山、为手、为少男；兑为泽、为口、为少女。山下有泽，损下益上之象。</p>
-        <p><strong>主要象意：</strong>损失、投资、破产、剧院、歌厅、色情场所、少年合唱队、幼儿园、儿童游乐场、庙中许愿、矿山、房屋介绍所、中小学校、广播电台、鸡舍、拍卖行、山葱野蒜。</p>
-        <p><strong>体用关系：</strong>兑为体事易成，艮为体难成或花钱可成。艮土生兑金，若兑为体则用生体为吉，若艮为体则体生用为耗。</p>
-        <p style="margin-top:6px;color:var(--fire);"><strong>病象：</strong>内破相、腿脚伤残、脾胃之疾、关节痛、神经痛、津液不足。</p>
-      </div>
-      <div style="font-size:16px;color:var(--gray);margin-top:12px;text-align:right;">-- 来源：meihualiuyao_standard_kb_v2.md 卷四 4.2 六十四卦象意</div>
     </div>
   </div>
 
@@ -876,52 +906,102 @@ ul,ol{list-style:none;}
         <p><strong>解卦：</strong>这个卦是异卦（下兑上离）相叠。离为火；兑为泽。上火下泽，相违不相济。克则生，往复无空。万物有所不同，必有所异，相互矛盾。睽即矛盾。</p>
       </div>
     </div>
-    <div class="jiegua-section">
-      <div class="sec-title">事业：</div>
-      <div class="sec-body">事业开创困难，处境艰辛。如能志同道合，相互信任，目的可以达到。但起初成功的多是小事。小事积累可成大事。事成于协力合作，败于众志相异。应加强团结，委曲以求相通。最忌内部相互猜疑。</div>
-    </div>
-    <div class="jiegua-section">
-      <div class="sec-title">经商：</div>
-      <div class="sec-body">应以心平气和的态度投入市场竞争，求大同而存小异。对竞争对手不应敌视，可和而不流，群而不党。尤其不能惹起纠纷，极力避免灾祸。第38卦火泽睽（睽卦）异中求同</div>
-    </div>
-    <div class="jiegua-section">
-      <div class="sec-title">求名：</div>
-      <div class="sec-body">以真诚的心努力上进。对于恶人必要时亦不可完全不交往，应采取宽大包容的态度，适度往来。对志同道合者也不必完全一致，可异中求同。</div>
-    </div>
-    <div class="jiegua-section">
-      <div class="sec-title">外出：</div>
-      <div class="sec-body">顺利。途中可以得到善人相助。</div>
-    </div>
-    <div class="jiegua-section">
-      <div class="sec-title">婚恋：</div>
-      <div class="sec-body">双方必真诚相待。否则，第三者极易介入，夫妻相疑则家破。</div>
-    </div>
-    <div class="jiegua-section">
-      <div class="sec-title">决策：</div>
-      <div class="sec-body">处于矛盾、对立状态。必须注意以宽宏大度、平和、柔顺的态度对待人生。这样才能心平气和，柔而上进。认清合必有离，离必有合；同中有异，异中有同的道理。</div>
-    </div>
-    <div class="kb-placeholder" style="color:var(--dark);text-align:left;border:1px solid #E8E8E8;background:#FDFDF8;">
-      <div style="font-size:20px;font-weight:bold;color:var(--wood);margin-bottom:12px;">[知识库] 体用生克解卦法</div>
-      <div style="font-size:18px;line-height:2;color:var(--dark);">
-        <p><strong>体用总诀：</strong>体克用，事吉；用克体，事凶。体生用，有耗失之患；用生体，有进益之喜。体用比和，百事顺遂。</p>
-        <p><strong>世应关系：</strong>世爻为己，应爻为对方或所测之事。世应相生则吉，世应相克则凶。世应比和则双方同心；世爻逢空，主心中不实、缺乏信心。</p>
-        <p><strong>六亲断事：</strong>子孙持世主消灾无忧，但问官职不利；官鬼持世主忧患临身，但问功名有利；妻财持世主财利可求；兄弟持世主破财口舌；父母持世主劳碌辛苦。</p>
+  </div>
+
+  <!-- 分类详断（折叠，默认收起） -->
+  <div class="collapse-card">
+    <input type="checkbox" id="ly-fenlei-toggle" class="cc-toggle">
+    <label class="collapse-title" for="ly-fenlei-toggle">
+      <span class="ct-text">分类详断（事业 / 经商 / 求名 / 外出 / 婚恋 / 决策）</span>
+      <span class="arrow">▶</span>
+    </label>
+    <div class="collapse-body">
+      <div class="collapse-body-inner">
+        <div class="jiegua-section">
+          <div class="sec-title">事业：</div>
+          <div class="sec-body">事业开创困难，处境艰辛。如能志同道合，相互信任，目的可以达到。但起初成功的多是小事。小事积累可成大事。事成于协力合作，败于众志相异。应加强团结，委曲以求相通。最忌内部相互猜疑。</div>
+        </div>
+        <div class="jiegua-section">
+          <div class="sec-title">经商：</div>
+          <div class="sec-body">应以心平气和的态度投入市场竞争，求大同而存小异。对竞争对手不应敌视，可和而不流，群而不党。尤其不能惹起纠纷，极力避免灾祸。第38卦火泽睽（睽卦）异中求同</div>
+        </div>
+        <div class="jiegua-section">
+          <div class="sec-title">求名：</div>
+          <div class="sec-body">以真诚的心努力上进。对于恶人必要时亦不可完全不交往，应采取宽大包容的态度，适度往来。对志同道合者也不必完全一致，可异中求同。</div>
+        </div>
+        <div class="jiegua-section">
+          <div class="sec-title">外出：</div>
+          <div class="sec-body">顺利。途中可以得到善人相助。</div>
+        </div>
+        <div class="jiegua-section">
+          <div class="sec-title">婚恋：</div>
+          <div class="sec-body">双方必真诚相待。否则，第三者极易介入，夫妻相疑则家破。</div>
+        </div>
+        <div class="jiegua-section">
+          <div class="sec-title">决策：</div>
+          <div class="sec-body">处于矛盾、对立状态。必须注意以宽宏大度、平和、柔顺的态度对待人生。这样才能心平气和，柔而上进。认清合必有离，离必有合；同中有异，异中有同的道理。</div>
+        </div>
       </div>
-      <div style="font-size:20px;font-weight:bold;color:var(--wood);margin:16px 0 12px;">[知识库] 分类占断通则</div>
-      <div style="font-size:18px;line-height:2;color:var(--dark);">
-        <p><strong>人事：</strong>占人事，先看《周易》爻辞以断吉凶；次看卦之体用，以论五行生克。体为主，用为事应。用生体及比和则吉，体生用及克体则不吉。</p>
-        <p><strong>婚姻：</strong>占婚姻，体卦为己方，用卦为对方。用生体、比和则婚成且吉；体生用则我方主动追求，恐有耗费；用克体则对方不利于我，婚难成或成而不美。乾为老男、坤为老母、震为长男、巽为长女、坎为中男、离为中女、艮为少男、兑为少女。</p>
-        <p><strong>求财：</strong>占求财，以体卦为主，以用卦为财。用卦生体则财来找我，易得；体克用则我去求财，可得但费力；体生用则财去我耗；用克体则求财难得且有损。</p>
-        <p><strong>疾病：</strong>占疾病，以体卦为病人，用卦为病症。用克体则病情加重；体克用则病可治；用生体则病有转机、得医药之助；体生用则病耗气血。变卦为疾病最终结果，变卦生体或比和则病可愈。</p>
-        <p><strong>出行：</strong>占出行，体卦为己，用卦为所往之地。用生体、比和则出行吉利；用克体则出行有阻或有灾；体生用则出行耗费。变卦为出行最终结果。</p>
-        <p><strong>失物：</strong>占失物，以体卦为己，用卦为失物。体克用则物可寻回；用克体则物难寻；用生体则物将自回或有人送还。失物方位以用卦所属方位断之。</p>
+    </div>
+  </div>
+
+  <!-- 体用生克知识库（折叠，默认收起） -->
+  <div class="collapse-card">
+    <input type="checkbox" id="ly-tiyong-toggle" class="cc-toggle">
+    <label class="collapse-title" for="ly-tiyong-toggle">
+      <span class="ct-text">体用生克知识库</span>
+      <span class="arrow">▶</span>
+    </label>
+    <div class="collapse-body">
+      <div class="kb-box">
+        <div style="font-size:20px;font-weight:bold;color:var(--wood);margin-bottom:12px;">[知识库] 体用生克解卦法</div>
+        <div style="font-size:18px;line-height:2;color:var(--dark);">
+          <p><strong>体用总诀：</strong>体克用，事吉；用克体，事凶。体生用，有耗失之患；用生体，有进益之喜。体用比和，百事顺遂。</p>
+          <p><strong>世应关系：</strong>世爻为己，应爻为对方或所测之事。世应相生则吉，世应相克则凶。世应比和则双方同心；世爻逢空，主心中不实、缺乏信心。</p>
+          <p><strong>六亲断事：</strong>子孙持世主消灾无忧，但问官职不利；官鬼持世主忧患临身，但问功名有利；妻财持世主财利可求；兄弟持世主破财口舌；父母持世主劳碌辛苦。</p>
+        </div>
       </div>
-      <div style="font-size:20px;font-weight:bold;color:var(--wood);margin:16px 0 12px;">[知识库] 旺衰救应与应期</div>
-      <div style="font-size:18px;line-height:2;color:var(--dark);">
-        <p><strong>卦气旺衰：</strong>春天震巽旺、离火旺于夏、乾兑旺于秋、坎水旺于冬、坤艮旺于辰戌丑未月。体卦临时令以旺论，即使用卦旺相来克体，只要互卦和变卦有相生相比助之卦，皆克不死，谓之还有生气。</p>
-        <p><strong>应期推断：</strong>乾兑属金，应期在庚辛日或申酉日；震巽属木，应期在甲乙日或寅卯日；坎属水，应期在壬癸日或亥子日；离属火，应期在丙丁日或巳午日；坤艮属土，应期在戊己日或辰戌丑未日。事速则应期也速，事缓则应期也慢。</p>
+    </div>
+  </div>
+
+  <!-- 分类占断知识库（折叠，默认收起） -->
+  <div class="collapse-card">
+    <input type="checkbox" id="ly-fenleizhan-toggle" class="cc-toggle">
+    <label class="collapse-title" for="ly-fenleizhan-toggle">
+      <span class="ct-text">分类占断知识库</span>
+      <span class="arrow">▶</span>
+    </label>
+    <div class="collapse-body">
+      <div class="kb-box">
+        <div style="font-size:20px;font-weight:bold;color:var(--wood);margin-bottom:12px;">[知识库] 分类占断通则</div>
+        <div style="font-size:18px;line-height:2;color:var(--dark);">
+          <p><strong>人事：</strong>占人事，先看《周易》爻辞以断吉凶；次看卦之体用，以论五行生克。体为主，用为事应。用生体及比和则吉，体生用及克体则不吉。</p>
+          <p><strong>婚姻：</strong>占婚姻，体卦为己方，用卦为对方。用生体、比和则婚成且吉；体生用则我方主动追求，恐有耗费；用克体则对方不利于我，婚难成或成而不美。乾为老男、坤为老母、震为长男、巽为长女、坎为中男、离为中女、艮为少男、兑为少女。</p>
+          <p><strong>求财：</strong>占求财，以体卦为主，以用卦为财。用卦生体则财来找我，易得；体克用则我去求财，可得但费力；体生用则财去我耗；用克体则求财难得且有损。</p>
+          <p><strong>疾病：</strong>占疾病，以体卦为病人，用卦为病症。用克体则病情加重；体克用则病可治；用生体则病有转机、得医药之助；体生用则病耗气血。变卦为疾病最终结果，变卦生体或比和则病可愈。</p>
+          <p><strong>出行：</strong>占出行，体卦为己，用卦为所往之地。用生体、比和则出行吉利；用克体则出行有阻或有灾；体生用则出行耗费。变卦为出行最终结果。</p>
+          <p><strong>失物：</strong>占失物，以体卦为己，用卦为失物。体克用则物可寻回；用克体则物难寻；用生体则物将自回或有人送还。失物方位以用卦所属方位断之。</p>
+        </div>
       </div>
-      <div style="font-size:16px;color:var(--gray);margin-top:12px;text-align:right;">-- 来源：meihualiuyao_standard_kb_v2.md 卷三/卷五</div>
+    </div>
+  </div>
+
+  <!-- 旺衰救应与应期知识库（折叠，默认收起） -->
+  <div class="collapse-card">
+    <input type="checkbox" id="ly-wangshuai-toggle" class="cc-toggle">
+    <label class="collapse-title" for="ly-wangshuai-toggle">
+      <span class="ct-text">旺衰救应与应期</span>
+      <span class="arrow">▶</span>
+    </label>
+    <div class="collapse-body">
+      <div class="kb-box">
+        <div style="font-size:20px;font-weight:bold;color:var(--wood);margin-bottom:12px;">[知识库] 旺衰救应与应期</div>
+        <div style="font-size:18px;line-height:2;color:var(--dark);">
+          <p><strong>卦气旺衰：</strong>春天震巽旺、离火旺于夏、乾兑旺于秋、坎水旺于冬、坤艮旺于辰戌丑未月。体卦临时令以旺论，即使用卦旺相来克体，只要互卦和变卦有相生相比助之卦，皆克不死，谓之还有生气。</p>
+          <p><strong>应期推断：</strong>乾兑属金，应期在庚辛日或申酉日；震巽属木，应期在甲乙日或寅卯日；坎属水，应期在壬癸日或亥子日；离属火，应期在丙丁日或巳午日；坤艮属土，应期在戊己日或辰戌丑未日。事速则应期也速，事缓则应期也慢。</p>
+        </div>
+        <div style="font-size:16px;color:var(--gray);margin-top:12px;text-align:right;">-- 来源：meihualiuyao_standard_kb_v2.md 卷三/卷五</div>
+      </div>
     </div>
   </div>
 </div>
@@ -948,10 +1028,10 @@ ul,ol{list-style:none;}
 
 <!-- 底部全局导航（所有页面共用） -->
 <div class="bottom-nav">
-  <div class="bn-item on"><span class="bn-icon">&#8962;</span><span>首页</span></div>
-  <div class="bn-item"><span class="bn-icon">&#9733;</span><span>AI</span></div>
-  <div class="bn-item"><span class="bn-icon">&#9993;</span><span>信息</span></div>
-  <div class="bn-item"><span class="bn-icon">&#9786;</span><span>个人中心</span></div>
+  <a class="bn-item on" href="../index.html"><span class="bn-icon">&#8962;</span><span>主页</span></a>
+  <a class="bn-item" href="../ai.html"><span class="bn-icon">&#9733;</span><span>AI</span></a>
+  <a class="bn-item" href="../study.html"><span class="bn-icon">&#9993;</span><span>学习</span></a>
+  <a class="bn-item" href="../profile.html"><span class="bn-icon">&#9786;</span><span>个人中心</span></a>
 </div>
 
 <!-- 回到顶部 -->

@@ -308,6 +308,25 @@ ul,ol{list-style:none;}
   width:100%;height:52px;border-radius:10px;background:var(--teal);
   color:#fff;font-size:22px;font-weight:bold;margin-top:16px;cursor:pointer;
 }
+
+/* ===== 折叠卡片（纯CSS，点击标题展开/收起，默认收起） ===== */
+.collapse-card{
+  position:relative;margin:0 14px 14px;background:#fff;border-radius:12px;overflow:hidden;
+  box-shadow:0 1px 4px rgba(0,0,0,.08);
+}
+.cc-toggle{position:absolute;top:0;left:0;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;opacity:0;}
+.collapse-title{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 16px;font-size:20px;font-weight:bold;color:#fff;line-height:1.3;
+  background:var(--teal);cursor:pointer;-webkit-tap-highlight-color:transparent;
+}
+.collapse-title .ct-text{flex:1;}
+.collapse-title .arrow{font-size:18px;transition:transform .3s;display:inline-block;margin-left:8px;}
+.collapse-body{max-height:0;overflow:hidden;transition:max-height .35s ease;padding:0 16px;}
+.cc-toggle:checked + .collapse-title + .collapse-body{max-height:4000px;padding:14px 16px;}
+.cc-toggle:checked + .collapse-title .arrow{transform:rotate(90deg);}
+.collapse-body-inner{font-size:18px;line-height:2;color:var(--dark);}
+.kb-box{border:1px solid #E8E8E8;background:#FDFDF8;border-radius:8px;padding:14px;}
 </style>
 </head>
 <body>
@@ -504,11 +523,24 @@ ul,ol{list-style:none;}
           <span class="shensha-item"><span class="shensha-name">官符--</span><span class="shensha-dizhi">戌</span></span>
           <span class="shensha-item"><span class="shensha-name">死神--</span><span class="shensha-dizhi">酉</span></span>
         </span>
-        <div class="kb-placeholder" style="margin:8px 0 0;color:var(--dark);text-align:left;border:1px solid #E8E8E8;background:#FDFDF8;padding:12px;font-size:16px;line-height:2;">
-        <span style="font-weight:bold;color:var(--wood);">[知识库] 神煞说明：</span>
-        神煞为辅助参考，以卦象体用生克为主。驿马主动、主出行变动；桃花主人缘、感情；贵人主得助；羊刃主血光、刚烈；灾煞主意外；劫煞主破耗。以上神煞数据由排盘算法自动计算生成，知识库提供神煞含义说明。具体应事需结合卦象体用关系综合判断。
-        <span style="display:block;text-align:right;color:var(--gray);font-size:14px;">-- 来源：meihualiuyao_standard_kb_v2.md</span>
       </div>
+    </div>
+  </div>
+
+  <!-- 神煞说明知识库（折叠） -->
+  <div class="collapse-card">
+    <input type="checkbox" id="mh-shensha-toggle" class="cc-toggle">
+    <label class="collapse-title" for="mh-shensha-toggle">
+      <span class="ct-text">神煞说明知识库</span>
+      <span class="arrow">▶</span>
+    </label>
+    <div class="collapse-body">
+      <div class="kb-box">
+        <div style="font-size:20px;font-weight:bold;color:var(--wood);margin-bottom:12px;">[知识库] 神煞说明</div>
+        <div style="font-size:18px;line-height:2;color:var(--dark);">
+          <p>神煞为辅助参考，以卦象体用生克为主。驿马主动、主出行变动；桃花主人缘、感情；贵人主得助；羊刃主血光、刚烈；灾煞主意外；劫煞主破耗。以上神煞数据由排盘算法自动计算生成，知识库提供神煞含义说明。具体应事需结合卦象体用关系综合判断。</p>
+        </div>
+        <div style="font-size:16px;color:var(--gray);margin-top:12px;text-align:right;">-- 来源：meihualiuyao_standard_kb_v2.md</div>
       </div>
     </div>
   </div>
@@ -584,72 +616,133 @@ ul,ol{list-style:none;}
       <p><strong>上六：</strong>迷复，凶，有灾眚。用行师，终有大败，以其国君，凶；至于十年，不克征。</p>
     </div>
     <div class="gold-hint">断语仅供参考，吉凶论断请根据具体所测之人事而定。</div>
-    <div class="kb-placeholder" style="color:var(--dark);text-align:left;border:1px solid #E8E8E8;background:#FDFDF8;">
-      <div style="font-size:20px;font-weight:bold;color:var(--wood);margin-bottom:12px;">[知识库] 地雷复卦象意</div>
-      <div style="font-size:18px;line-height:2;color:var(--dark);">
-        <p><strong>卦象：</strong>上坤下震。坤为地、为顺、为母；震为雷、为动、为长男。雷在地中，一阳初生，万物复苏之象。</p>
-        <p><strong>主要象意：</strong>生闷气、反复、夫妻反目、地震、天翻地覆、刚开始、有威信的领导、欺压百姓、大发雷霆、房屋拆迁、地皮改造、舞场戏院、运动场、黄鱼、甜甘蔗、绿色车、火车、停车场。</p>
-        <p><strong>体用关系：</strong>震为体事易成，坤为体难成。震木克坤土，若震为体则体克用为吉；若坤为体则用克体为凶。</p>
-        <p style="margin-top:6px;color:var(--fire);"><strong>病象：</strong>肝脾不调、中气不足、心悸气短、津液不足、腰疾、畏寒、肝肾之疾、痔疮、便溏泻。</p>
+  </div>
+
+  <!-- 卦象意详解知识库（折叠） -->
+  <div class="collapse-card">
+    <input type="checkbox" id="mh-guayi-toggle" class="cc-toggle">
+    <label class="collapse-title" for="mh-guayi-toggle">
+      <span class="ct-text">卦象意详解（地雷复 / 卦气旺衰）</span>
+      <span class="arrow">▶</span>
+    </label>
+    <div class="collapse-body">
+      <div class="kb-box">
+        <div style="font-size:20px;font-weight:bold;color:var(--wood);margin-bottom:12px;">[知识库] 地雷复卦象意</div>
+        <div style="font-size:18px;line-height:2;color:var(--dark);">
+          <p><strong>卦象：</strong>上坤下震。坤为地、为顺、为母；震为雷、为动、为长男。雷在地中，一阳初生，万物复苏之象。</p>
+          <p><strong>主要象意：</strong>生闷气、反复、夫妻反目、地震、天翻地覆、刚开始、有威信的领导、欺压百姓、大发雷霆、房屋拆迁、地皮改造、舞场戏院、运动场、黄鱼、甜甘蔗、绿色车、火车、停车场。</p>
+          <p><strong>体用关系：</strong>震为体事易成，坤为体难成。震木克坤土，若震为体则体克用为吉；若坤为体则用克体为凶。</p>
+          <p style="margin-top:6px;color:var(--fire);"><strong>病象：</strong>肝脾不调、中气不足、心悸气短、津液不足、腰疾、畏寒、肝肾之疾、痔疮、便溏泻。</p>
+        </div>
+        <div style="font-size:20px;font-weight:bold;color:var(--wood);margin:16px 0 12px;">[知识库] 卦气旺衰与动爻分析</div>
+        <div style="font-size:18px;line-height:2;color:var(--dark);">
+          <p><strong>卦气旺衰：</strong>本卦为地雷复，上坤土下震木。当前为午月（夏），火旺土相木休。震木休囚，坤土得月令之相气。体卦若为震木，则卦气偏弱，需看互卦变卦有无生扶。</p>
+          <p><strong>互卦坤为地：</strong>互卦为坤土，上坤下坤。土旺于四季，互卦坤土当令，若体卦为震木，互卦耗体（木克土），需注意中间过程有消耗。若体卦为坤土，互卦比和相助，中间过程顺利。</p>
+          <p><strong>变卦山雷颐：</strong>上艮下震。艮为山、为土，震为雷、为木。变卦为事物最终结果，艮土在上为阻隔，震木在下为动，凡事有阻而后通之象。</p>
+        </div>
+        <div style="font-size:16px;color:var(--gray);margin-top:12px;text-align:right;">-- 来源：meihualiuyao_standard_kb_v2.md 卷四 4.2</div>
       </div>
-      <div style="font-size:20px;font-weight:bold;color:var(--wood);margin:16px 0 12px;">[知识库] 卦气旺衰与动爻分析</div>
-      <div style="font-size:18px;line-height:2;color:var(--dark);">
-        <p><strong>卦气旺衰：</strong>本卦为地雷复，上坤土下震木。当前为午月（夏），火旺土相木休。震木休囚，坤土得月令之相气。体卦若为震木，则卦气偏弱，需看互卦变卦有无生扶。</p>
-        <p><strong>互卦坤为地：</strong>互卦为坤土，上坤下坤。土旺于四季，互卦坤土当令，若体卦为震木，互卦耗体（木克土），需注意中间过程有消耗。若体卦为坤土，互卦比和相助，中间过程顺利。</p>
-        <p><strong>变卦山雷颐：</strong>上艮下震。艮为山、为土，震为雷、为木。变卦为事物最终结果，艮土在上为阻隔，震木在下为动，凡事有阻而后通之象。</p>
-      </div>
-      <div style="font-size:16px;color:var(--gray);margin-top:12px;text-align:right;">-- 来源：meihualiuyao_standard_kb_v2.md 卷四 4.2</div>
     </div>
   </div>
 
   <!-- 综合象断 -->
   <div class="duanyu-card" id="duanyuCard">
     <div class="duanyu-section">
-      <div class="dy-body">复：表示重复再来、周而复始之意。是个状况卦，吉凶未定。好事会重复，坏事也会重复再来的。此卦显现一种循环的状态，可能是好、也可能是坏。</div>
+      <div class="dy-body" id="mhDuanyuMain">复：表示重复再来、周而复始之意。是个状况卦，吉凶未定。好事会重复，坏事也会重复再来的。此卦显现一种循环的状态，可能是好、也可能是坏。</div>
     </div>
-    <div class="duanyu-section">
-      <div class="dy-title">事业：</div>
-      <div class="dy-body">占事业以体卦为主，用卦为所谋之事。用生体、比和则事业顺遂，谋事可成；体克用则需努力方可成功；体生用则耗费精力，事倍功半；用克体则事业受阻，宜守不宜进。互卦为事业过程，变卦为最终结果。变卦生体或比和则终得圆满，变卦克体则中途生变。【典籍来源：《梅花易数》卷五】</div>
-    </div>
-    <div class="duanyu-section">
-      <div class="dy-title">财运：</div>
-      <div class="dy-body">占求财以体卦为主，用卦为财。用生体则财来找我，易得；体克用则我去求财，可得但费力；体生用则财去我耗，有损耗；用克体则求财难得且有损。财之数可由卦数、爻数及五行生成数推断。坎为六数，离为三数，震为四数，巽为五数，乾为一四九，兑为四二九，艮为五七十，坤为八五十。【典籍来源：《梅花易数》卷五】</div>
-    </div>
-    <div class="duanyu-section">
-      <div class="dy-title">感情：</div>
-      <div class="dy-body">占婚姻体卦为己方，用卦为对方。用生体、比和则婚成且吉；体生用则我方主动追求，恐有耗费；用克体则对方不利于我，婚难成或成而不美。乾为老男、坤为老母、震为长男、巽为长女、坎为中男、离为中女、艮为少男、兑为少女，以体用所临之卦断对方年龄、性情、相貌。变卦生体则婚后渐佳，变卦克体则中途生变。【典籍来源：《梅花易数》卷五】</div>
-    </div>
-    <div class="duanyu-section">
-      <div class="dy-title">出行：</div>
-      <div class="dy-body">占出行体卦为己，用卦为所往之地或所行之事。用生体、比和则出行吉利；用克体则出行有阻或有灾；体生用则出行耗费。出行方向以用卦方位结合后天八卦方位推断，乾西北、坤西南、震东、巽东南、坎北、离南、艮东北、兑西。变卦为出行最终结果，变卦生体则到达后顺利，变卦克体则途中有变。【典籍来源：《梅花易数》卷五】</div>
-    </div>
-    <div class="kb-placeholder" style="color:var(--dark);text-align:left;border:1px solid #E8E8E8;background:#FDFDF8;">
-      <div style="font-size:20px;font-weight:bold;color:var(--wood);margin-bottom:12px;">[知识库] 体用生克总诀</div>
-      <div style="font-size:18px;line-height:2;color:var(--dark);">
-        <p><strong>体用生克口诀：</strong>体克用，事吉；用克体，事凶。体生用，有耗失之患；用生体，有进益之喜。体用比和，百事顺遂。</p>
-        <p><strong>体用旺衰救应：</strong>体卦临时令以旺论，即使用卦旺相来克体，只要互卦和变卦有相生相比助之卦，皆克不死，谓之还有生气。体卦衰而被用卦旺相来克，若互卦和变卦有相生相比助之卦，也不论死，谓之有相助之气。旺相用卦克休囚体卦，互卦和变卦均没有生、比之卦，当有凶灾之事，无救。</p>
+  </div>
+
+  <!-- 综合象断·分类断语（折叠） -->
+  <div class="collapse-card">
+    <input type="checkbox" id="mh-fenlei-toggle" class="cc-toggle">
+    <label class="collapse-title" for="mh-fenlei-toggle">
+      <span class="ct-text">综合象断（事业 / 财运 / 感情 / 出行）</span>
+      <span class="arrow">▶</span>
+    </label>
+    <div class="collapse-body">
+      <div class="kb-box" id="mhDuanyuFenlei">
+        <div class="duanyu-section">
+          <div class="dy-title">事业：</div>
+          <div class="dy-body">占事业以体卦为主，用卦为所谋之事。用生体、比和则事业顺遂，谋事可成；体克用则需努力方可成功；体生用则耗费精力，事倍功半；用克体则事业受阻，宜守不宜进。互卦为事业过程，变卦为最终结果。变卦生体或比和则终得圆满，变卦克体则中途生变。【典籍来源：《梅花易数》卷五】</div>
+        </div>
+        <div class="duanyu-section">
+          <div class="dy-title">财运：</div>
+          <div class="dy-body">占求财以体卦为主，用卦为财。用生体则财来找我，易得；体克用则我去求财，可得但费力；体生用则财去我耗，有损耗；用克体则求财难得且有损。财之数可由卦数、爻数及五行生成数推断。坎为六数，离为三数，震为四数，巽为五数，乾为一四九，兑为四二九，艮为五七十，坤为八五十。【典籍来源：《梅花易数》卷五】</div>
+        </div>
+        <div class="duanyu-section">
+          <div class="dy-title">感情：</div>
+          <div class="dy-body">占婚姻体卦为己方，用卦为对方。用生体、比和则婚成且吉；体生用则我方主动追求，恐有耗费；用克体则对方不利于我，婚难成或成而不美。乾为老男、坤为老母、震为长男、巽为长女、坎为中男、离为中女、艮为少男、兑为少女，以体用所临之卦断对方年龄、性情、相貌。变卦生体则婚后渐佳，变卦克体则中途生变。【典籍来源：《梅花易数》卷五】</div>
+        </div>
+        <div class="duanyu-section">
+          <div class="dy-title">出行：</div>
+          <div class="dy-body">占出行体卦为己，用卦为所往之地或所行之事。用生体、比和则出行吉利；用克体则出行有阻或有灾；体生用则出行耗费。出行方向以用卦方位结合后天八卦方位推断，乾西北、坤西南、震东、巽东南、坎北、离南、艮东北、兑西。变卦为出行最终结果，变卦生体则到达后顺利，变卦克体则途中有变。【典籍来源：《梅花易数》卷五】</div>
+        </div>
       </div>
-      <div style="font-size:20px;font-weight:bold;color:var(--wood);margin:16px 0 12px;">[知识库] 用卦生体详断（八卦）</div>
-      <div style="font-size:18px;line-height:2;color:var(--dark);">
-        <p><strong>乾卦生体：</strong>主公门中有喜益，或功名上有喜，或因官有财，或问讼得理，或有金宝之利，或有老人进财，或尊长惠送，或有官贵之喜。</p>
-        <p><strong>坤卦生体：</strong>主有田土之喜，或有田土进财，或得乡人之益，或得阴人之利，或有果谷之利，或有布帛之喜。</p>
-        <p><strong>震卦生体：</strong>主山林之益，或因山林得财，或进东方之财，或因动中有喜，或有木货交易之利，或因草木姓氏人称心。</p>
-        <p><strong>巽卦生体：</strong>亦主山林之益，或因山林得财，或于东南得财，或因草木姓人而进利，或以茶果得利，或有茶果菜蔬之喜。</p>
-        <p><strong>坎卦生体：</strong>有北方之喜，或受北方之财，或水边人进利，或因点水人称心，或有因鱼盐酒货文书交易之利，或有馈送鱼盐酒之喜。</p>
-        <p><strong>离卦生体：</strong>主有南方之财，或有文书之喜，或有炉冶场之利，或因火姓人而得财。</p>
-        <p><strong>艮卦生体：</strong>有东北方之财，或山田之喜，或因山林田土获财，或得宫音带土人之财。物当安稳，事有终始。</p>
-        <p><strong>兑卦生体：</strong>有西方之财，或喜悦事，或有食物金玉货利之源，或商音之人，或带口之人欣逢，或主宾之乐，或朋友讲习之事。</p>
+    </div>
+  </div>
+
+  <!-- 体用生克知识库（折叠） -->
+  <div class="collapse-card">
+    <input type="checkbox" id="mh-tiyong-toggle" class="cc-toggle">
+    <label class="collapse-title" for="mh-tiyong-toggle">
+      <span class="ct-text">体用生克知识库</span>
+      <span class="arrow">▶</span>
+    </label>
+    <div class="collapse-body">
+      <div class="kb-box" id="mhDuanyuKb">
+        <div style="font-size:20px;font-weight:bold;color:var(--wood);margin-bottom:12px;">[知识库] 体用生克总诀</div>
+        <div style="font-size:18px;line-height:2;color:var(--dark);">
+          <p><strong>体用生克口诀：</strong>体克用，事吉；用克体，事凶。体生用，有耗失之患；用生体，有进益之喜。体用比和，百事顺遂。</p>
+          <p><strong>体用旺衰救应：</strong>体卦临时令以旺论，即使用卦旺相来克体，只要互卦和变卦有相生相比助之卦，皆克不死，谓之还有生气。体卦衰而被用卦旺相来克，若互卦和变卦有相生相比助之卦，也不论死，谓之有相助之气。旺相用卦克休囚体卦，互卦和变卦均没有生、比之卦，当有凶灾之事，无救。</p>
+        </div>
       </div>
-      <div style="font-size:20px;font-weight:bold;color:var(--wood);margin:16px 0 12px;">[知识库] 分类占断</div>
-      <div style="font-size:18px;line-height:2;color:var(--dark);">
-        <p><strong>人事：</strong>先看《周易》爻辞以断吉凶；次看卦之体用，以论五行生克。体为主，用为事应。断卦前必须先排出互卦与变卦，才能判断事情的整个来龙去脉。互卦表示中间过程，变卦表示最终结果。</p>
-        <p><strong>婚姻：</strong>体卦为己方，用卦为对方。用生体、比和则婚成且吉；体生用则我方主动追求，恐有耗费；用克体则对方不利于我，婚难成或成而不美。乾为老男、坤为老母、震为长男、巽为长女、坎为中男、离为中女、艮为少男、兑为少女。</p>
-        <p><strong>求财：</strong>以体卦为主，以用卦为财。用卦生体则财来找我，易得；体克用则我去求财，可得但费力；体生用则财去我耗；用克体则求财难得且有损。财之数可由卦数、爻数及五行生成数推断。</p>
-        <p><strong>疾病：</strong>以体卦为病人，用卦为病症。用克体则病情加重；体克用则病可治；用生体则病有转机、得医药之助；体生用则病耗气血。变卦为疾病最终结果，变卦生体或比和则病可愈。</p>
-        <p><strong>出行：</strong>体卦为己，用卦为所往之地。用生体、比和则出行吉利；用克体则出行有阻或有灾；体生用则出行耗费。出行方向以用卦方位结合后天八卦方位推断，变卦为出行最终结果。</p>
-        <p><strong>失物：</strong>以体卦为己，用卦为失物。体克用则物可寻回；用克体则物难寻；用生体则物将自回或有人送还；体生用则物去难返。失物方位以用卦所属方位断之。</p>
+    </div>
+  </div>
+
+  <!-- 用卦生体详断知识库（折叠） -->
+  <div class="collapse-card">
+    <input type="checkbox" id="mh-yonggua-toggle" class="cc-toggle">
+    <label class="collapse-title" for="mh-yonggua-toggle">
+      <span class="ct-text">用卦生体详断（八卦）</span>
+      <span class="arrow">▶</span>
+    </label>
+    <div class="collapse-body">
+      <div class="kb-box">
+        <div style="font-size:20px;font-weight:bold;color:var(--wood);margin-bottom:12px;">[知识库] 用卦生体详断（八卦）</div>
+        <div style="font-size:18px;line-height:2;color:var(--dark);">
+          <p><strong>乾卦生体：</strong>主公门中有喜益，或功名上有喜，或因官有财，或问讼得理，或有金宝之利，或有老人进财，或尊长惠送，或有官贵之喜。</p>
+          <p><strong>坤卦生体：</strong>主有田土之喜，或有田土进财，或得乡人之益，或得阴人之利，或有果谷之利，或有布帛之喜。</p>
+          <p><strong>震卦生体：</strong>主山林之益，或因山林得财，或进东方之财，或因动中有喜，或有木货交易之利，或因草木姓氏人称心。</p>
+          <p><strong>巽卦生体：</strong>亦主山林之益，或因山林得财，或于东南得财，或因草木姓人而进利，或以茶果得利，或有茶果菜蔬之喜。</p>
+          <p><strong>坎卦生体：</strong>有北方之喜，或受北方之财，或水边人进利，或因点水人称心，或有因鱼盐酒货文书交易之利，或有馈送鱼盐酒之喜。</p>
+          <p><strong>离卦生体：</strong>主有南方之财，或有文书之喜，或有炉冶场之利，或因火姓人而得财。</p>
+          <p><strong>艮卦生体：</strong>有东北方之财，或山田之喜，或因山林田土获财，或得宫音带土人之财。物当安稳，事有终始。</p>
+          <p><strong>兑卦生体：</strong>有西方之财，或喜悦事，或有食物金玉货利之源，或商音之人，或带口之人欣逢，或主宾之乐，或朋友讲习之事。</p>
+        </div>
       </div>
-      <div style="font-size:16px;color:var(--gray);margin-top:12px;text-align:right;">-- 来源：meihualiuyao_standard_kb_v2.md 卷三/卷五</div>
+    </div>
+  </div>
+
+  <!-- 分类占断知识库（折叠） -->
+  <div class="collapse-card">
+    <input type="checkbox" id="mh-fenleizhan-toggle" class="cc-toggle">
+    <label class="collapse-title" for="mh-fenleizhan-toggle">
+      <span class="ct-text">分类占断知识库</span>
+      <span class="arrow">▶</span>
+    </label>
+    <div class="collapse-body">
+      <div class="kb-box">
+        <div style="font-size:20px;font-weight:bold;color:var(--wood);margin-bottom:12px;">[知识库] 分类占断</div>
+        <div style="font-size:18px;line-height:2;color:var(--dark);">
+          <p><strong>人事：</strong>先看《周易》爻辞以断吉凶；次看卦之体用，以论五行生克。体为主，用为事应。断卦前必须先排出互卦与变卦，才能判断事情的整个来龙去脉。互卦表示中间过程，变卦表示最终结果。</p>
+          <p><strong>婚姻：</strong>体卦为己方，用卦为对方。用生体、比和则婚成且吉；体生用则我方主动追求，恐有耗费；用克体则对方不利于我，婚难成或成而不美。乾为老男、坤为老母、震为长男、巽为长女、坎为中男、离为中女、艮为少男、兑为少女。</p>
+          <p><strong>求财：</strong>以体卦为主，以用卦为财。用卦生体则财来找我，易得；体克用则我去求财，可得但费力；体生用则财去我耗；用克体则求财难得且有损。财之数可由卦数、爻数及五行生成数推断。</p>
+          <p><strong>疾病：</strong>以体卦为病人，用卦为病症。用克体则病情加重；体克用则病可治；用生体则病有转机、得医药之助；体生用则病耗气血。变卦为疾病最终结果，变卦生体或比和则病可愈。</p>
+          <p><strong>出行：</strong>体卦为己，用卦为所往之地。用生体、比和则出行吉利；用克体则出行有阻或有灾；体生用则出行耗费。出行方向以用卦方位结合后天八卦方位推断，变卦为出行最终结果。</p>
+          <p><strong>失物：</strong>以体卦为己，用卦为失物。体克用则物可寻回；用克体则物难寻；用生体则物将自回或有人送还；体生用则物去难返。失物方位以用卦所属方位断之。</p>
+        </div>
+        <div style="font-size:16px;color:var(--gray);margin-top:12px;text-align:right;">-- 来源：meihualiuyao_standard_kb_v2.md 卷三/卷五</div>
+      </div>
     </div>
   </div>
 </div>
@@ -676,10 +769,10 @@ ul,ol{list-style:none;}
 
 <!-- 底部全局导航 -->
 <div class="bottom-nav">
-  <div class="bn-item on"><span class="bn-icon">&#8962;</span><span>首页</span></div>
-  <div class="bn-item"><span class="bn-icon">&#9733;</span><span>AI</span></div>
-  <div class="bn-item"><span class="bn-icon">&#9993;</span><span>信息</span></div>
-  <div class="bn-item"><span class="bn-icon">&#9786;</span><span>个人中心</span></div>
+  <a class="bn-item on" href="../index.html"><span class="bn-icon">&#8962;</span><span>主页</span></a>
+  <a class="bn-item" href="../ai.html"><span class="bn-icon">&#9733;</span><span>AI</span></a>
+  <a class="bn-item" href="../study.html"><span class="bn-icon">&#9993;</span><span>学习</span></a>
+  <a class="bn-item" href="../profile.html"><span class="bn-icon">&#9786;</span><span>个人中心</span></a>
 </div>
 
 <div class="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" style="display:none;" id="backTop">&#8679;</div>

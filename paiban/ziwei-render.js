@@ -21,11 +21,11 @@ var DZ = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥
 var HOUR_NAME = ['子时','丑时','寅时','卯时','辰时','巳时','午时','未时','申时','酉时','戌时','亥时'];
 var HOUR_RANGE = ['23:00-1:00','1:00-3:00','3:00-5:00','5:00-7:00','7:00-9:00','9:00-11:00','11:00-13:00','13:00-15:00','15:00-17:00','17:00-19:00','19:00-21:00','21:00-23:00'];
 
-// 星曜颜色表（与现有 HTML 一致）
+// 星曜颜色表（专业标准：紫微/七杀/廉贞/太阳/破军/巨门/贪狼=红，天机/天相=绿，武曲=蓝，天同/天府/天梁/太阴=黄）
 var STAR_COLOR = {
-  '紫微': 'y', '天机': 'g', '太阳': 'r', '武曲': 'b', '天同': 'y', '廉贞': 'r',
-  '天府': 'y', '太阴': 'p', '贪狼': 'r', '巨门': 'p', '天相': 'g', '天梁': 'y',
-  '七杀': 'r', '破军': 'p',
+  '紫微': 'r', '天机': 'g', '太阳': 'r', '武曲': 'b', '天同': 'y', '廉贞': 'r',
+  '天府': 'y', '太阴': 'y', '贪狼': 'r', '巨门': 'r', '天相': 'g', '天梁': 'y',
+  '七杀': 'r', '破军': 'r',
   '左辅': 'p', '右弼': 'p', '文昌': 'b', '文曲': 'b',
   '禄存': 'y', '天魁': 'p', '天钺': 'p',
   '擎羊': 'r', '陀罗': 'r', '地劫': 'r', '天空': 'r'
@@ -628,9 +628,9 @@ function render() {
  * ============================================================ */
 
 // 连线样式常量
-var SF_LINE_COLOR = '#F1B232';     // 金色
-var SF_LINE_WIDTH = '1';            // 1px线宽
-var SF_DASHARRAY = '5,3';           // 虚线间距
+var SF_LINE_COLOR = '#999999';        // 灰色虚线（三方四正）
+var SF_LINE_WIDTH = '1';              // 1px线宽
+var SF_DASHARRAY = '4,3';             // 虚线间距
 var SVG_NS = 'http://www.w3.org/2000/svg';
 
 // SVG覆盖层及辅助状态（每次 drawOverlay 时刷新）
@@ -775,7 +775,7 @@ window.drawOverlay = function() {
   _sfOuterRect = outer.getBoundingClientRect();
 
   // ===== 飞星箭头 marker 定义（飞星/四化模式用）=====
-  var COLORS = window.COLORS || { lu: '#34C759', quan: '#FF3B30', ke: '#007AFF', ji: '#1C1C1E' };
+  var COLORS = window.COLORS || { lu: '#34A853', quan: '#9C27B0', ke: '#2368B2', ji: '#EA4335' };
   var defs = document.createElementNS(SVG_NS, 'defs');
   ['lu', 'quan', 'ke', 'ji'].forEach(function(t) {
     var mk = document.createElementNS(SVG_NS, 'marker');
@@ -814,16 +814,40 @@ window.drawOverlay = function() {
       var off = cellW * 0.35; // 箭头终点向内收缩，不触达宫位中心
       var sx = _sfCenter.x + ux * 4, sy = _sfCenter.y + uy * 4;
       var ex = p2.x - ux * off, ey = p2.y - uy * off;
+      var col = COLORS[fx.t];
       var ln = document.createElementNS(SVG_NS, 'line');
       ln.setAttribute('x1', sx);
       ln.setAttribute('y1', sy);
       ln.setAttribute('x2', ex);
       ln.setAttribute('y2', ey);
-      ln.setAttribute('stroke', COLORS[fx.t]);
+      ln.setAttribute('stroke', col);
       ln.setAttribute('stroke-width', '2');
       ln.setAttribute('stroke-linecap', 'round');
       ln.setAttribute('marker-end', 'url(#fx-' + fx.t + ')');
       svg.appendChild(ln);
+      // 文字标签（禄/权/科/忌）位于箭头中点
+      var mx = (sx + ex) / 2, my = (sy + ey) / 2;
+      // 白色背景圆角矩形提高可读性
+      var bg = document.createElementNS(SVG_NS, 'rect');
+      bg.setAttribute('x', mx - 7);
+      bg.setAttribute('y', my - 6);
+      bg.setAttribute('width', 14);
+      bg.setAttribute('height', 12);
+      bg.setAttribute('rx', 3);
+      bg.setAttribute('fill', '#fff');
+      bg.setAttribute('stroke', col);
+      bg.setAttribute('stroke-width', '0.8');
+      bg.setAttribute('opacity', '0.92');
+      svg.appendChild(bg);
+      var txt = document.createElementNS(SVG_NS, 'text');
+      txt.setAttribute('x', mx);
+      txt.setAttribute('y', my + 3.5);
+      txt.setAttribute('text-anchor', 'middle');
+      txt.setAttribute('font-size', '9');
+      txt.setAttribute('font-weight', 'bold');
+      txt.setAttribute('fill', col);
+      txt.textContent = SIHUA_LABEL[fx.t] || '';
+      svg.appendChild(txt);
     });
   }
 };
@@ -967,9 +991,9 @@ function initSelects() {
   var daySel = document.getElementById('zwDay');
   var hourSel = document.getElementById('zwHour');
 
-  // 年份：1940-2030
+  // 年份：1900-2100
   if (yearSel && yearSel.children.length === 0) {
-    for (var y = 1940; y <= 2030; y++) {
+    for (var y = 1900; y <= 2100; y++) {
       var opt = document.createElement('option');
       opt.value = y;
       opt.textContent = y + '年';

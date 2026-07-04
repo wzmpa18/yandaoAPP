@@ -49,7 +49,7 @@ function initSelectors(){
   var ms = document.getElementById('inputMonth');
   var ds = document.getElementById('inputDay');
   if(!ys) return;
-  for(var y = 1940; y <= 2030; y++) ys.add(new Option(y + '\u5e74', y));
+  for(var y = 1900; y <= 2100; y++) ys.add(new Option(y + '\u5e74', y));
   for(var m = 1; m <= 12; m++) ms.add(new Option(m + '\u6708', m));
   for(var d = 1; d <= 31; d++) ds.add(new Option(d + '\u65e5', d));
   ys.value = 1990; ms.value = 1; ds.value = 1;
@@ -222,10 +222,9 @@ function renderFromGanzhi(gz, gender, name){
 
   // 近似birthDate(从年柱60甲子推算，取接近当前的年份)
   var gzIdx = E.ganzhiIndex(yg, yz);
-  var approxYear = 1984 + gzIdx;
   var nowYear = new Date().getFullYear();
-  while(approxYear < nowYear - 60) approxYear += 60;
-  while(approxYear > nowYear) approxYear -= 60;
+  var approxYear = nowYear - ((nowYear - 1984) % 60 + 60 - gzIdx) % 60;
+  if(approxYear > nowYear) approxYear -= 60;
   var birthDate = new Date(approxYear, 0, 1, 0, 0, 0);
 
   var xingzuo = {name: '\u2014', en: '\u2014'};

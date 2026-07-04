@@ -231,7 +231,7 @@ function hourSelToHour(idx){
 
 function getYearOptions(defaultYear){
   var html = '';
-  for(var y = 1940; y <= 2030; y++){
+  for(var y = 1900; y <= 2100; y++){
     html += '<option value="' + y + '"' + (y === defaultYear ? ' selected' : '') + '>' + y + '年</option>';
   }
   return html;
@@ -264,12 +264,10 @@ function getHourOptions(defaultIdx){
 function getLunarYearOptions(){
   var html = '';
   var now = new Date();
-  var curYearIdx = ((now.getFullYear() - 4) % 60 + 60) % 60;
-  for(var i = 0; i < 60; i++){
-    var year = 1984 + i; // 甲子年从1984开始
-    if(year >= 1940 && year <= 2040){
-      html += '<option value="' + year + '"' + (i === curYearIdx ? ' selected' : '') + '>' + year + '年(' + LUNAR_YEARS[i] + ')</option>';
-    }
+  var curYear = now.getFullYear();
+  for(var year = 1900; year <= 2100; year++){
+    var idx = ((year - 4) % 60 + 60) % 60;
+    html += '<option value="' + year + '"' + (year === curYear ? ' selected' : '') + '>' + year + '年(' + LUNAR_YEARS[idx] + ')</option>';
   }
   return html;
 }
@@ -382,37 +380,48 @@ function ganzhiToSolarDate(input){
   var mIdx = _ganzhiIndex(mGan, mZhi);
   var dIdx = _ganzhiIndex(dGan, dZhi);
 
-  // 年柱序号 → 候选公历年(立春后 year = 1984 + yIdx)
-  var baseYear = 1984 + yIdx;
+  // 年柱序号 → 候选公历年(多个甲子周期: 1924/1984/2044)
+  var cycleStarts = [1924, 1984, 2044]; // 1900-2100范围内的三个甲子年
+  var candidateYears = [];
+  for(var ci = 0; ci < cycleStarts.length; ci++){
+    var by = cycleStarts[ci] + yIdx;
+    if(by >= 1900 && by <= 2100) candidateYears.push(by);
+  }
 
   // 第一轮：精确匹配年/月/日三柱
-  for(var dy = -1; dy <= 1; dy++){
-    var Y = baseYear + dy;
-    if(Y < 1940 || Y > 2040) continue;
-    for(var M = 1; M <= 12; M++){
-      for(var D = 1; D <= 31; D++){
-        var td = new Date(Y, M - 1, D);
-        if(td.getMonth() !== M - 1 || td.getDate() !== D) continue;
-        if(_calcYearPillar(Y, M, D) === yIdx &&
-           _calcMonthPillar(Y, M, D) === mIdx &&
-           _calcDayPillar(Y, M, D) === dIdx){
-          return { year: Y, month: M, day: D, hour: hour };
+  for(var cy = 0; cy < candidateYears.length; cy++){
+    var Y = candidateYears[cy];
+    for(var dy = -1; dy <= 1; dy++){
+      var YY = Y + dy;
+      if(YY < 1900 || YY > 2100) continue;
+      for(var M = 1; M <= 12; M++){
+        for(var D = 1; D <= 31; D++){
+          var td = new Date(YY, M - 1, D);
+          if(td.getMonth() !== M - 1 || td.getDate() !== D) continue;
+          if(_calcYearPillar(YY, M, D) === yIdx &&
+             _calcMonthPillar(YY, M, D) === mIdx &&
+             _calcDayPillar(YY, M, D) === dIdx){
+            return { year: YY, month: M, day: D, hour: hour };
+          }
         }
       }
     }
   }
 
   // 第二轮：仅匹配年柱+日柱(月柱可能因节气边界差异)
-  for(var dy2 = -1; dy2 <= 1; dy2++){
-    var Y2 = baseYear + dy2;
-    if(Y2 < 1940 || Y2 > 2040) continue;
-    for(var M2 = 1; M2 <= 12; M2++){
-      for(var D2 = 1; D2 <= 31; D2++){
-        var td2 = new Date(Y2, M2 - 1, D2);
-        if(td2.getMonth() !== M2 - 1 || td2.getDate() !== D2) continue;
-        if(_calcYearPillar(Y2, M2, D2) === yIdx &&
-           _calcDayPillar(Y2, M2, D2) === dIdx){
-          return { year: Y2, month: M2, day: D2, hour: hour };
+  for(var cy2 = 0; cy2 < candidateYears.length; cy2++){
+    var Y2 = candidateYears[cy2];
+    for(var dy2 = -1; dy2 <= 1; dy2++){
+      var YY2 = Y2 + dy2;
+      if(YY2 < 1900 || YY2 > 2100) continue;
+      for(var M2 = 1; M2 <= 12; M2++){
+        for(var D2 = 1; D2 <= 31; D2++){
+          var td2 = new Date(YY2, M2 - 1, D2);
+          if(td2.getMonth() !== M2 - 1 || td2.getDate() !== D2) continue;
+          if(_calcYearPillar(YY2, M2, D2) === yIdx &&
+             _calcDayPillar(YY2, M2, D2) === dIdx){
+            return { year: YY2, month: M2, day: D2, hour: hour };
+          }
         }
       }
     }
