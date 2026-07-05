@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -6,9 +6,9 @@
 <title>大六壬</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{width:100%;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;color:#1A1A1A;background:#F5EDE6;overflow-x:hidden;}
+html,body{width:100%;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;color:#1A1A1A;background:#F8F8F8;overflow-x:hidden;}
 /* 页面基准宽度390px（手机标准宽度），居中显示 */
-body{max-width:390px;margin:0 auto;min-height:100vh;position:relative;padding-bottom:104px;background:#F5EDE6;}
+body{max-width:390px;margin:0 auto;min-height:100vh;position:relative;padding-bottom:96px;background:#F8F8F8;}
 :root{
   --white:#FFFFFF;--dark:#00BCB4;--blue:#00BCB4;--teal:#00BCB4;--teal-dark:#009B94;--teal-light:#E0F5F3;
   --main:#1A1A1A;--gray:#777777;--datebg:#EDE4D8;
@@ -30,8 +30,8 @@ body{max-width:390px;margin:0 auto;min-height:100vh;position:relative;padding-bo
 
 /* ===== 头部 高50px（内页）/ 80px（首页）青绿色通栏 ===== */
 .app-header{
-  position:sticky;top:0;z-index:100;height:50px;background:var(--teal);
-  display:flex;align-items:center;justify-content:space-between;padding:0 12px;
+  position:sticky;top:0;z-index:100;height:64px;background:var(--teal);
+  display:flex;align-items:center;justify-content:space-between;padding:0 16px;
   width:100%;
 }
 .app-header.home{height:80px;}
@@ -41,7 +41,7 @@ body{max-width:390px;margin:0 auto;min-height:100vh;position:relative;padding-bo
 }
 .app-header.home .ht{font-size:32px;}
 .hb{
-  width:44px;height:44px;display:flex;align-items:center;justify-content:center;
+  width:44px;height:56px;display:flex;align-items:center;justify-content:center;
   font-size:28px;color:#fff;background:none;border:none;cursor:pointer;line-height:1;padding:0;
 }
 .hb-dark{color:#fff;}
@@ -50,14 +50,14 @@ body{max-width:390px;margin:0 auto;min-height:100vh;position:relative;padding-bo
 /* ===== 底部Tab栏 高44px ===== */
 .tab-bar{
   position:fixed;bottom:60px;left:50%;transform:translateX(-50%);
-  width:100%;max-width:390px;height:44px;
+  width:100%;max-width:390px;height:56px;
   background:var(--white);display:flex;z-index:99;border-top:1px solid var(--bdr);
 }
 .tab-bar label{
   flex:1;display:flex;align-items:center;justify-content:center;
   font-size:20px;color:#888;cursor:pointer;position:relative;
 }
-.tab-bar label.on{color:var(--blue);font-weight:bold;}
+.tab-bar label.on{color:var(--teal);font-weight:bold;}
 .tab-bar label.on::after{
   content:'';position:absolute;bottom:0;left:25%;right:25%;height:3px;background:var(--blue);
 }
@@ -74,7 +74,7 @@ body{max-width:390px;margin:0 auto;min-height:100vh;position:relative;padding-bo
   font-size:13px;color:#999;gap:2px;
 }
 .bottom-nav .ni .nic{font-size:26px;line-height:1;}
-.bottom-nav .ni.on{color:var(--blue);}
+.bottom-nav .ni.on{color:var(--teal);}
 
 /* ===== Tab页面 ===== */
 .tpage{display:none;}
@@ -96,14 +96,14 @@ body{max-width:390px;margin:0 auto;min-height:100vh;position:relative;padding-bo
 }
 .dbl{display:flex;flex-direction:column;flex-shrink:0;}
 .dbl span{
-  background:var(--gblock);color:#fff;font-size:14px;font-weight:bold;
+  background:var(--gblock);color:#fff;font-size:16px;font-weight:bold;
   width:32px;flex:1;display:flex;align-items:center;justify-content:center;
   line-height:1;border-right:2px solid #fff;
 }
 .dbg{display:flex;flex:1;min-width:0;}
 .dbc{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2px 0;min-width:0;}
-.dbc .tg{font-size:22px;font-weight:bold;line-height:1.1;}
-.dbc .dz{font-size:22px;font-weight:bold;line-height:1.1;}
+.dbc .tg{font-size:20px;font-weight:bold;line-height:1.1;}
+.dbc .dz{font-size:20px;font-weight:bold;line-height:1.1;}
 .dbc .dl{font-size:10px;color:var(--gray);line-height:1;margin-top:2px;}
 .dbi{text-align:right;font-size:11px;color:var(--gray);line-height:1.5;
   flex-shrink:0;padding:4px 8px 4px 4px;display:flex;flex-direction:column;justify-content:center;max-width:150px;}
@@ -129,7 +129,7 @@ body{max-width:390px;margin:0 auto;min-height:100vh;position:relative;padding-bo
 .sc .scdz{display:flex;align-items:baseline;justify-content:center;gap:2px;padding:2px 4px;}
 .sc .scdz .scg{font-size:12px;font-weight:bold;line-height:1;}
 .sc .scdz .dz-main{font-size:20px;font-weight:bold;line-height:1;}
-.sc .sctj{font-size:14px;font-weight:bold;color:#C87820;}
+.sc .sctj{font-size:16px;font-weight:bold;color:#C87820;}
 .sc .gray{background:var(--gbar)!important;}
 
 /* ===== 四课 5列×4行 紧凑(行高32px)：标签列 + 四课/三课/二课/一课（从右到左，一课在最右） ===== */
@@ -141,7 +141,7 @@ body{max-width:390px;margin:0 auto;min-height:100vh;position:relative;padding-bo
 .sk > div:nth-child(5n){border-right:none;}
 .sk > div:nth-child(n+16){border-bottom:none;}
 .sk .skh{background:var(--gblock)!important;color:#fff;font-size:12px;font-weight:bold;}
-.sk .sktj{font-size:14px;font-weight:bold;}
+.sk .sktj{font-size:16px;font-weight:bold;}
 .sk .skss{font-size:20px;font-weight:bold;line-height:1;}
 .sk .skxs{font-size:16px;font-weight:bold;line-height:1;}
 
@@ -163,46 +163,46 @@ body{max-width:390px;margin:0 auto;min-height:100vh;position:relative;padding-bo
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   padding:6px 4px;cursor:pointer;
 }
-.tcen .cday{font-size:18px;font-weight:bold;color:var(--teal-dark);}
+.tcen .cday{font-size:16px;font-weight:bold;color:var(--teal-dark);}
 .tcen .cke{font-size:16px;margin:4px 0;font-weight:500;color:var(--teal-dark);}
-.tcen .cfa{font-size:14px;color:#888;}
-.tphint{padding:10px 6px;text-align:center;background:#fff;width:100%;}
-.tphint .hr{color:var(--fire);font-size:14px;font-weight:500;margin-bottom:4px;}
+.tcen .cfa{font-size:16px;color:#888;}
+.tphint{padding:8px 6px;text-align:center;background:#fff;width:100%;}
+.tphint .hr{color:var(--fire);font-size:16px;font-weight:500;margin-bottom:4px;}
 .tphint .hg{color:#999;font-size:12px;line-height:1.8;}
 
-/* ===== 输入页 卡片圆角12px，padding10px，margin-bottom:12px ===== */
-.dbar2{background:var(--dark);height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-radius:12px 12px 0 0;}
+/* ===== 输入页 卡片圆角12px，padding10px，margin-bottom:16px ===== */
+.dbar2{background:var(--dark);height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-radius:12px 12px 0 0;}
 .dbar2 .bt{color:#fff;font-size:20px;font-weight:bold;}
 .dbar2 .bi{color:#fff;font-size:24px;cursor:pointer;}
-.irow{height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-bottom:1px solid #F0F0F0;background:#fff;}
+.irow{height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid #F0F0F0;background:#fff;}
 .irow:last-child{border-bottom:none;border-radius:0 0 12px 12px;}
-.irow .rl{font-size:18px;}
-.irow .rv{display:flex;align-items:center;gap:6px;font-size:18px;}
-.irow .rv .ar{color:var(--blue);font-size:12px;}
-.irow .rv .ic{color:var(--blue);font-size:22px;}
-.brow{display:flex;gap:14px;padding:12px 10px;background:#fff;border-radius:0 0 12px 12px;}
-.bbtn{flex:1;height:56px;border:2px solid var(--blue);border-radius:12px;background:#fff;color:var(--blue);font-size:20px;font-weight:bold;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;}
+.irow .rl{font-size:16px;}
+.irow .rv{display:flex;align-items:center;gap:6px;font-size:16px;}
+.irow .rv .ar{color:var(--teal);font-size:12px;}
+.irow .rv .ic{color:var(--teal);font-size:20px;}
+.brow{display:flex;gap:14px;padding:16px 10px;background:#fff;border-radius:0 0 12px 12px;}
+.bbtn{flex:1;height:56px;border:2px solid var(--blue);border-radius:12px;background:#fff;color:var(--teal);font-size:20px;font-weight:bold;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;}
 .icard{margin:0 10px 12px;background:#fff;border-radius:12px;overflow:hidden;padding:0;}
-.icard:first-of-type{margin-top:12px;}
+.icard:first-of-type{margin-top:16px;}
 .icard+.icard{margin-top:0;}
 
 /* ===== 辅助页 ===== */
-.agrid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--blue);margin:12px 10px;border-radius:8px;overflow:hidden;}
-.abtn{height:60px;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--blue);font-weight:500;border-right:1px solid var(--blue);border-bottom:1px solid var(--blue);}
+.agrid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--blue);margin:16px 10px;border-radius:8px;overflow:hidden;}
+.abtn{height:60px;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--teal);font-weight:500;border-right:1px solid var(--blue);border-bottom:1px solid var(--blue);}
 .abtn:nth-child(3n){border-right:none;}
 .abtn:nth-child(n+7){border-bottom:none;}
 .sblock{margin:0 10px 12px;background:#fff;border-radius:12px;overflow:hidden;}
-.sdark{background:var(--dark);color:#fff;height:44px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:bold;}
-.swhite{background:#fff;padding:10px;font-size:16px;line-height:1.8;}
+.sdark{background:var(--dark);color:#fff;height:56px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:bold;}
+.swhite{background:#fff;padding:8px;font-size:16px;line-height:1.8;}
 .ssell{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #F0F0F0;margin-bottom:8px;}
 .ssell .sv{font-size:17px;display:flex;align-items:center;gap:6px;}
-.pht{color:var(--blue);font-size:18px;line-height:1.7;}
+.pht{color:var(--teal);font-size:16px;line-height:1.7;}
 
 /* ===== 神煞页 ===== */
-.sssel{margin:12px 10px;background:#fff;border:1px solid #E8E8E8;border-radius:12px;overflow:hidden;}
-.sssrow{height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;}
+.sssel{margin:16px 10px;background:#fff;border:1px solid #E8E8E8;border-radius:12px;overflow:hidden;}
+.sssrow{height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;}
 .sslist{margin:0 10px 12px;background:#fff;border-radius:12px;overflow:hidden;}
-.si{display:flex;align-items:center;padding:0 12px;min-height:44px;border-bottom:1px solid #F0F0F0;}
+.si{display:flex;align-items:center;padding:0 16px;min-height:56px;border-bottom:1px solid #F0F0F0;}
 .si:nth-child(odd){background:#F5F5F5;}
 .si:last-child{border-bottom:none;}
 .si .sn{font-size:17px;font-weight:bold;width:70px;flex-shrink:0;}
@@ -210,23 +210,23 @@ body{max-width:390px;margin:0 auto;min-height:100vh;position:relative;padding-bo
 .si .sds{font-size:15px;color:var(--gray);flex:1;}
 
 /* ===== 评注页 ===== */
-.pcard{margin:12px 10px;background:#fff;border-radius:12px;overflow:hidden;}
-.pbar{background:var(--dark);color:#fff;height:44px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:bold;position:relative;}
+.pcard{margin:16px 10px;background:#fff;border-radius:12px;overflow:hidden;}
+.pbar{background:var(--dark);color:#fff;height:56px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:bold;position:relative;}
 .pbar .ph{position:absolute;right:14px;font-size:24px;}
-.pbody{padding:10px;}
+.pbody{padding:8px;}
 .psec{background:var(--teal-dark);color:#fff;font-size:17px;font-weight:bold;padding:6px 12px;margin:0 -10px 8px;}
 
 /* ===== 档案页 ===== */
-.dcard{margin:12px 10px;background:#fff;border-radius:12px;overflow:hidden;}
-.dbar3{background:var(--dark);color:#fff;height:44px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:bold;}
-.darea{padding:8px 12px;border-bottom:1px solid #F0F0F0;}
+.dcard{margin:16px 10px;background:#fff;border-radius:12px;overflow:hidden;}
+.dbar3{background:var(--dark);color:#fff;height:56px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:bold;}
+.darea{padding:8px 16px;border-bottom:1px solid #F0F0F0;}
 .darea .dlab{font-size:16px;color:var(--gray);padding:4px 0;}
-.darea .db{min-height:38px;background:#EEEEEE;border-radius:6px;padding:8px;font-size:14px;color:#999;}
+.darea .db{min-height:38px;background:#EEEEEE;border-radius:6px;padding:8px;font-size:16px;color:#999;}
 .darea.tall .db{min-height:80px;}
-.dbtnarea{padding:14px;display:flex;justify-content:center;}
-.dbtn{height:52px;padding:0 40px;border:2px solid var(--blue);border-radius:10px;background:#fff;color:var(--blue);font-size:20px;font-weight:bold;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;}
+.dbtnarea{padding:16px;display:flex;justify-content:center;}
+.dbtn{height:52px;padding:0 40px;border:2px solid var(--blue);border-radius:10px;background:#fff;color:var(--teal);font-size:20px;font-weight:bold;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;}
 .dinfo{margin:0 10px 12px;background:#fff;border-radius:12px;overflow:hidden;}
-.drow{display:flex;padding:10px 12px;border-bottom:1px solid #F0F0F0;font-size:16px;}
+.drow{display:flex;padding:8px 12px;border-bottom:1px solid #F0F0F0;font-size:16px;}
 .drow:last-child{border-bottom:none;}
 .drow .ddl{width:120px;flex-shrink:0;}
 .drow .ddv{flex:1;}
@@ -235,7 +235,7 @@ body{max-width:390px;margin:0 auto;min-height:100vh;position:relative;padding-bo
 .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;padding:20px;}
 .modal.show{display:flex;}
 .mbox{background:#fff;border-radius:12px;width:100%;max-width:350px;max-height:70vh;overflow-y:auto;padding:16px;position:relative;}
-.mtitle{font-size:20px;font-weight:bold;margin-bottom:12px;text-align:center;}
+.mtitle{font-size:20px;font-weight:bold;margin-bottom:16px;text-align:center;}
 .mclose{position:absolute;top:10px;right:14px;font-size:24px;color:#999;background:none;border:none;cursor:pointer;}
 
 /* 移动端适配：屏幕小于390px时满宽显示 */
@@ -250,14 +250,14 @@ body{max-width:390px;margin:0 auto;min-height:100vh;position:relative;padding-bo
 
 /* ===== 神煞卡片样式 ===== */
 .ss-card{
-  margin:12px 10px;background:#fff;border-radius:12px;
+  margin:16px 10px;background:#fff;border-radius:12px;
   overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.06);
 }
 .ss-card .ss-card-title{
   font-size:20px;color:var(--gold);font-weight:600;
-  padding:14px 16px 8px;border-bottom:1px solid #F0F0F0;
+  padding:16px 16px 8px;border-bottom:1px solid #F0F0F0;
 }
-.ss-card .ss-card-body{padding:12px 16px;}
+.ss-card .ss-card-body{padding:16px 16px;}
 .ss-card .ss-card-row{
   margin-bottom:8px;font-size:16px;line-height:1.9;
   display:flex;align-items:flex-start;
@@ -276,11 +276,11 @@ body{max-width:390px;margin:0 auto;min-height:100vh;position:relative;padding-bo
   overflow:hidden;border:1px solid #F0F0F0;
 }
 .kb-block .kb-title{
-  background:var(--teal);color:#fff;font-size:18px;font-weight:bold;
-  padding:10px 14px;text-align:center;
+  background:var(--teal);color:#fff;font-size:16px;font-weight:bold;
+  padding:8px 16px;text-align:center;
 }
 .kb-block .kb-body{
-  padding:12px 14px;font-size:15px;line-height:1.9;
+  padding:16px;font-size:15px;line-height:1.9;
   color:#333;
 }
 .kb-block .kb-body .kb-rule{
@@ -295,13 +295,13 @@ body{max-width:390px;margin:0 auto;min-height:100vh;position:relative;padding-bo
 
 /* ===== 折叠卡片（纯CSS：input checkbox + label，默认折叠） ===== */
 .collapse-card{
-  margin:10px 10px;background:#F8F8F8;border-radius:12px;
+  margin:8px 10px;background:#F8F8F8;border-radius:12px;
   overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.06);
 }
 .cc-toggle{display:none;}
 .collapse-title{
   display:flex;align-items:center;justify-content:space-between;
-  padding:12px 14px;background:var(--teal);color:#fff;
+  padding:16px;background:var(--teal);color:#fff;
   font-size:16px;font-weight:bold;cursor:pointer;
 }
 .collapse-title .arrow{
@@ -319,7 +319,7 @@ body{max-width:390px;margin:0 auto;min-height:100vh;position:relative;padding-bo
 .info-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0;background:#fff;border-radius:8px;overflow:hidden;}
 .info-item{
   display:flex;align-items:center;gap:6px;padding:9px 10px;
-  border-right:1px solid #F0F0F0;border-bottom:1px solid #F0F0F0;font-size:14px;
+  border-right:1px solid #F0F0F0;border-bottom:1px solid #F0F0F0;font-size:16px;
 }
 .info-item:nth-child(2n){border-right:none;}
 .info-item:nth-last-child(-n+2){border-bottom:none;}
@@ -341,19 +341,19 @@ body{max-width:390px;margin:0 auto;min-height:100vh;position:relative;padding-bo
 .ss-val{font-size:20px;font-weight:bold;display:flex;align-items:center;gap:1px;}
 
 /* 课体格局卡片 */
-.ke-card{margin:10px 10px;background:#F8F8F8;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
-.ke-title{background:var(--teal);color:#fff;font-size:16px;font-weight:bold;padding:12px 14px;}
-.ke-body{padding:10px 12px;background:#fff;}
-.ke-row{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid #F0F0F0;font-size:14px;line-height:1.6;}
+.ke-card{margin:8px 10px;background:#F8F8F8;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
+.ke-title{background:var(--teal);color:#fff;font-size:16px;font-weight:bold;padding:16px;}
+.ke-body{padding:8px 12px;background:#fff;}
+.ke-row{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid #F0F0F0;font-size:16px;line-height:1.6;}
 .ke-row:last-child{border-bottom:none;}
 .ke-lab{background:var(--teal);color:#fff;font-size:12px;font-weight:bold;padding:2px 8px;border-radius:4px;flex-shrink:0;margin-top:2px;}
 .ke-val{font-weight:bold;color:var(--teal-dark);font-size:15px;}
 .ke-text{flex:1;color:#333;}
 
 /* 知识库区块卡片（daliuren_standard_kb_v2.md 预留容器） */
-.kb-card{margin:10px 10px;background:#F8F8F8;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
-.kb-card .kb-card-title{background:var(--teal);color:#fff;font-size:16px;font-weight:bold;padding:12px 14px;}
-.kb-card .kb-card-body{padding:10px 14px;background:#fff;font-size:14px;line-height:1.8;color:#333;}
+.kb-card{margin:8px 10px;background:#F8F8F8;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
+.kb-card .kb-card-title{background:var(--teal);color:#fff;font-size:16px;font-weight:bold;padding:16px;}
+.kb-card .kb-card-body{padding:8px 16px;background:#fff;font-size:16px;line-height:1.8;color:#333;}
 .kb-card .kb-rule{margin-bottom:8px;padding-left:8px;border-left:3px solid var(--gold);}
 .kb-card .kb-source{font-size:12px;color:var(--gray);margin-top:4px;}
 </style>
@@ -647,7 +647,7 @@ body{max-width:390px;margin:0 auto;min-height:100vh;position:relative;padding-bo
   <div class="sblock">
     <div class="sdark">用神提示</div>
     <div class="swhite">
-      <div class="ssell"><span>用神类别</span><span class="sv">人体疾病 <span style="color:var(--blue);font-size:12px;">&#9660;</span></span></div>
+      <div class="ssell"><span>用神类别</span><span class="sv">人体疾病 <span style="color:var(--teal);font-size:12px;">&#9660;</span></span></div>
       <div class="pht" style="font-size:15px;line-height:1.9;">
         <div class="kb-rule" style="border-left:3px solid var(--gold);padding-left:8px;margin-bottom:8px;">年命为占断之太极点，可代表求测者本人，也可代表所测之人的出生年支；年命上神对日干、日支、三传的作用，决定事情最终结局。</div>
         <div class="kb-rule" style="border-left:3px solid var(--gold);padding-left:8px;margin-bottom:8px;">日干为求测人，亦是事体之主动方；日干所克者为财，生我者为印，克我者为官鬼，同我者为兄弟，我生者为子孙。</div>
@@ -674,7 +674,7 @@ body{max-width:390px;margin:0 auto;min-height:100vh;position:relative;padding-bo
   <div class="sblock">
     <div class="sdark">主要判别方法</div>
     <div class="swhite">
-      <div style="font-size:18px;font-weight:bold;margin-bottom:4px;">占病</div>
+      <div style="font-size:16px;font-weight:bold;margin-bottom:4px;">占病</div>
       <div style="font-size:15px;line-height:1.9;">虎鬼居日上两课，多主病在表；若居辰上两课多主病在里。虎鬼居初传，并在头部及上身；虎鬼居中传，病在胸腰部；虎鬼居末传，病在腿足及下半身。四墓覆生，必是旧病再起；回环周遍亦同此断。四下生其四上名「源消根断」，占病必因不摄食而致，全身气力耗尽。卯加申、戌加卯，占病必是手足不举或有伤。血支血忌乘白虎或并病符克干，必主血病。两蛇夹墓病积块。白虎乘日墓加临干支年命者亦同此断。</div>
     </div>
   </div>
@@ -688,7 +688,7 @@ body{max-width:390px;margin:0 auto;min-height:100vh;position:relative;padding-bo
     <div style="width:44px;"></div>
   </div>
   <div class="sssel">
-    <div class="sssrow"><span style="font-size:17px;">神煞类别</span><span style="font-size:17px;display:flex;align-items:center;gap:6px;">岁煞 <span style="color:var(--blue);font-size:12px;">&#9660;</span></span></div>
+    <div class="sssrow"><span style="font-size:17px;">神煞类别</span><span style="font-size:17px;display:flex;align-items:center;gap:6px;">岁煞 <span style="color:var(--teal);font-size:12px;">&#9660;</span></span></div>
   </div>
   <div class="ss-card">
     <div class="ss-card-title">岁煞神煞</div>
@@ -721,7 +721,7 @@ body{max-width:390px;margin:0 auto;min-height:100vh;position:relative;padding-bo
     <div class="ht">评注信息</div>
     <div style="width:44px;"></div>
   </div>
-  <div class="pcard" style="margin-top:12px;">
+  <div class="pcard" style="margin-top:16px;">
     <div class="pbar">《六壬全钤》癸酉日第三课 <span class="ph">?</span></div>
     <div class="pbody"><div class="pht" style="font-size:15px;line-height:1.9;">
       <div class="kb-rule" style="border-left:3px solid var(--gold);padding-left:8px;margin-bottom:8px;">遥克课：四课中无上下克贼，而有遥相克者。本课为蒿矢课，天盘克日干者发用，主事情虽微而有来克，如箭之有镞，虽小可伤。</div>
@@ -806,17 +806,17 @@ body{max-width:390px;margin:0 auto;min-height:100vh;position:relative;padding-bo
 </div>
 <!-- 底部导航 -->
 <div class="bottom-nav">
-  <div class="ni on"><span class="nic">&#8962;</span><span>主页</span></div>
-  <div class="ni"><span class="nic">&#9733;</span><span>AI</span></div>
-  <div class="ni"><span class="nic">&#128214;</span><span>学习</span></div>
-  <div class="ni"><span class="nic">&#9786;</span><span>个人中心</span></div>
+  <a class="ni on" href="../index.html"><span class="nic">&#8962;</span><span>主页</span></a>
+  <a class="ni" href="../ai.html"><span class="nic">&#9733;</span><span>AI</span></a>
+  <a class="ni" href="../study.html"><span class="nic">&#128214;</span><span>学习</span></a>
+  <a class="ni" href="../profile.html"><span class="nic">&#9786;</span><span>个人中心</span></a>
 </div>
 <!-- 弹窗 -->
 <div class="modal" id="cMod" onclick="if(event.target===this)clsM();">
   <div class="mbox">
     <button class="mclose" onclick="clsM()">&times;</button>
     <div class="mtitle" id="mT">宫位详情</div>
-    <div style="color:#333;text-align:left;padding:10px 0;font-size:15px;line-height:1.9;">
+    <div style="color:#333;text-align:left;padding:8px 0;font-size:15px;line-height:1.9;">
     <div class="kb-rule" style="border-left:3px solid var(--gold);padding-left:8px;margin-bottom:8px;">天盘为动盘，主外来之人、外来之事、思想活动、心理变化；它描述的是动态信息、表象与当下趋势。</div>
     <div class="kb-rule" style="border-left:3px solid var(--gold);padding-left:8px;margin-bottom:8px;">地盘为静盘，主自身、身体、内在状态、家宅、根基、实际环境；它描述静态信息和潜在资源。</div>
     <div class="kb-rule" style="border-left:3px solid var(--gold);padding-left:8px;margin-bottom:8px;">天盘反映当前主要矛盾与显化信息；占断时先看天盘所乘天将，再合地支象义综合取象。</div>
@@ -847,5 +847,7 @@ function goResult(){
 <script src="../utils/feedback.js"></script>
 <!-- AI 解析系统 -->
 <script src="../utils/ai-config.js"></script>
+<script src="../utils/kb-loader.js"></script>
+<script src="../utils/global-error.js"></script>
 </body>
 </html>

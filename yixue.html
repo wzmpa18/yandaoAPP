@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -8,22 +8,22 @@
 :root{--teal:#00BCB4;--bg:#F8F8F8;--white:#FFFFFF;--dark:#222222;--gray:#707070;--lightgray:#E5E5E5;}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{width:100%;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;color:var(--dark);background:var(--bg);}
-body{max-width:390px;margin:0 auto;min-height:100vh;padding-bottom:70px;}
+body{max-width:390px;margin:0 auto;min-height:100vh;padding-bottom:64px;}
 
 /* 顶部返回栏 */
-.top-bar{height:70px;background:var(--teal);display:flex;align-items:center;padding:0 16px;position:sticky;top:0;z-index:10;}
-.top-bar .back-btn{width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:28px;color:#fff;margin-right:12px;border:none;background:none;}
-.top-bar .page-title{font-size:26px;font-weight:bold;color:#fff;}
+.top-bar{height:64px;background:var(--teal);display:flex;align-items:center;padding:0 16px;position:sticky;top:0;z-index:10;}
+.top-bar .back-btn{width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:24px;color:#fff;margin-right:16px;border:none;background:none;}
+.top-bar .page-title{font-size:20px;font-weight:bold;color:#fff;}
 
 /* 卡片网格 */
-.card-grid{display:grid;grid-template-columns:repeat(1,1fr);gap:14px;padding:14px 16px;}
-.card{background:var(--white);border-radius:12px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.06);cursor:pointer;text-decoration:none;color:inherit;display:flex;align-items:center;gap:14px;transition:transform .15s;}
+.card-grid{display:grid;grid-template-columns:repeat(1,1fr);gap:16px;padding:16px;}
+.card{background:var(--white);border-radius:12px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.06);cursor:pointer;text-decoration:none;color:inherit;display:flex;align-items:center;gap:16px;transition:transform .15s;}
 .card:active{transform:scale(.97);}
 .card .card-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
 .card .card-info{flex:1;}
 .card .card-name{font-size:17px;font-weight:bold;color:var(--dark);margin-bottom:4px;}
 .card .card-desc{font-size:13px;color:var(--gray);line-height:1.4;}
-.card .card-arrow{color:var(--gray);font-size:18px;}
+.card .card-arrow{color:var(--gray);font-size:16px;}
 
 .card.liuyao .card-icon{background:#EEF2FF;color:#667eea;}
 .card.meihua .card-icon{background:#FFF0F3;color:#f5576c;}
